@@ -1,0 +1,142 @@
+@page "/compose"
+
+<PageTitle>Compose - Omail</PageTitle>
+
+<div class="space-y-4">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-omail-800 dark:text-white flex items-center">
+            <lord-icon
+                src="https://cdn.lordicon.com/wloilxuq.json"
+                trigger="loop"
+                delay="1000"
+                colors="primary:#121331,secondary:#818cf8"
+                class="w-8 h-8 mr-2">
+            </lord-icon>
+            Compose Email
+        </h1>
+        <div class="flex space-x-2">
+            <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 px-3 py-1 rounded-lg border border-omail-200 dark:border-omail-700 transition-all duration-300">
+                Save Draft
+            </button>
+            <button class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iltqorsz.json"
+                    trigger="hover"
+                    colors="primary:#ffffff"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Send</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">To:</label>
+                <div class="flex flex-wrap items-center gap-2 border-b border-omail-200 dark:border-omail-700 pb-2">
+                    <div class="bg-omail-100 dark:bg-omail-700 rounded-full px-3 py-1 flex items-center">
+                        <span class="text-omail-800 dark:text-omail-200 text-sm">john.doe@example.com</span>
+                        <button class="ml-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-omail-800 dark:text-omail-200 placeholder-omail-400 text-sm" placeholder="Type email address..."/>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <div class="flex space-x-3">
+                    <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 text-sm flex items-center">
+                        <span>Cc</span>
+                    </button>
+                    <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 text-sm flex items-center">
+                        <span>Bcc</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div>
+                <input type="text" class="w-full border-0 border-b border-omail-200 dark:border-omail-700 focus:ring-0 pb-2 text-omail-800 dark:text-omail-200 bg-transparent" placeholder="Subject"/>
+            </div>
+            
+            <div class="border rounded-lg dark:border-omail-700 p-4 min-h-[200px]">
+                <!-- This would be a rich text editor in a real implementation -->
+                <textarea class="w-full min-h-[200px] border-0 focus:ring-0 bg-transparent text-omail-800 dark:text-omail-200" placeholder="Write your message here..."></textarea>
+            </div>
+            
+            <div>
+                <div class="flex items-center space-x-4">
+                    <button class="flex items-center text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/xhbsnkyp.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5 mr-1">
+                        </lord-icon>
+                        <span class="text-sm">Attach Files</span>
+                    </button>
+                    
+                    <button class="flex items-center text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/wfydcujn.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5 mr-1">
+                        </lord-icon>
+                        <span class="text-sm">Add Images</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Attachments Preview -->
+            <div class="border-t border-omail-200 dark:border-omail-700 pt-4 mt-4">
+                <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200 mb-2">Attachments (2)</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex items-center p-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-omail-50 dark:bg-omail-800">
+                        <div class="bg-omail-200 dark:bg-omail-700 p-2 rounded mr-3">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/nocvdjmh.json"
+                                trigger="hover"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-6 h-6">
+                            </lord-icon>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium text-omail-800 dark:text-omail-200 truncate">Presentation.pptx</p>
+                            <p class="text-xs text-omail-500 dark:text-omail-400">2.4 MB</p>
+                        </div>
+                        <button class="text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-200 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center p-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-omail-50 dark:bg-omail-800">
+                        <div class="bg-omail-200 dark:bg-omail-700 p-2 rounded mr-3">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/puvaffet.json"
+                                trigger="hover"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-6 h-6">
+                            </lord-icon>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium text-omail-800 dark:text-omail-200 truncate">Report-Q2-2023.pdf</p>
+                            <p class="text-xs text-omail-500 dark:text-omail-400">1.8 MB</p>
+                        </div>
+                        <button class="text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-200 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

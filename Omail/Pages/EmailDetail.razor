@@ -1,0 +1,172 @@
+@page "/email-detail/{Id:int}"
+
+<PageTitle>Email - Omail</PageTitle>
+
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="inbox" class="text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iifryyua.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5 mr-1">
+                </lord-icon>
+                <span>Back to Inbox</span>
+            </a>
+        </div>
+        <div class="flex space-x-2">
+            <button class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
+                <lord-icon
+                    src="https://cdn.lordicon.com/gsqxdxog.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+            </button>
+            <button class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
+                <lord-icon
+                    src="https://cdn.lordicon.com/kbtmbyzy.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+            </button>
+            <button class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
+                <lord-icon
+                    src="https://cdn.lordicon.com/jmkrnisz.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-xl font-bold text-omail-900 dark:text-omail-100">Meeting reminder for tomorrow's project review</h1>
+            
+            <div class="flex items-start my-4">
+                <div class="mr-4">
+                    <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                        JD
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-omail-900 dark:text-omail-100 font-medium">John Doe</span>
+                            <span class="text-omail-500 dark:text-omail-400 text-sm ml-1">&lt;john.doe@example.com&gt;</span>
+                        </div>
+                        <div class="text-sm text-omail-500 dark:text-omail-400">
+                            June 12, 2023, 10:24 AM
+                        </div>
+                    </div>
+                    <div class="text-sm text-omail-500 dark:text-omail-400 flex items-center mt-1">
+                        <span>To: Me</span>
+                        <button class="ml-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-omail-200">
+                            <span class="text-xs">Show Details</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-omail-200 dark:border-omail-700 pt-4">
+                <div class="prose dark:prose-invert max-w-none">
+                    <p>Hi Team,</p>
+                    <p>Just a friendly reminder about our scheduled meeting tomorrow at 2 PM to review the current status of Project Aurora.</p>
+                    <p>Here's the agenda for our meeting:</p>
+                    <ol>
+                        <li>Review of completed milestones</li>
+                        <li>Discussion of current challenges</li>
+                        <li>Planning for the next sprint</li>
+                        <li>Resource allocation for upcoming tasks</li>
+                    </ol>
+                    <p>Please come prepared with your latest updates and any questions you might have. I've attached the latest project report for your reference.</p>
+                    <p>The meeting link is included in your calendar invitation. If you're unable to attend, please let me know as soon as possible.</p>
+                    <p>Best regards,<br>John Doe<br>Project Manager</p>
+                </div>
+                
+                <!-- Attachments -->
+                <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4">
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200 mb-3">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/xhbsnkyp.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5 inline mr-1">
+                        </lord-icon>
+                        Attachments (1)
+                    </h3>
+                    
+                    <div class="inline-block border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden">
+                        <div class="flex items-center p-3 bg-omail-50 dark:bg-omail-800">
+                            <div class="mr-3">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/puvaffet.json"
+                                    trigger="hover"
+                                    colors="primary:#121331,secondary:#818cf8"
+                                    class="w-8 h-8">
+                                </lord-icon>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-omail-800 dark:text-omail-200">Project-Aurora-Status-Report.pdf</p>
+                                <p class="text-xs text-omail-500 dark:text-omail-400">2.1 MB</p>
+                            </div>
+                            <div class="ml-4">
+                                <button class="p-1 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/xsdtfyne.json"
+                                        trigger="hover"
+                                        colors="primary:#121331,secondary:#818cf8"
+                                        class="w-5 h-5">
+                                    </lord-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4 space-y-3">
+                <div class="flex space-x-3">
+                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/hpivxauj.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5">
+                        </lord-icon>
+                        <span>Reply</span>
+                    </button>
+                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/akuwjdzh.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5">
+                        </lord-icon>
+                        <span>Reply All</span>
+                    </button>
+                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/rxufjlal.json"
+                            trigger="hover"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-5 h-5">
+                        </lord-icon>
+                        <span>Forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    // In a real application, you would fetch the email details using this ID
+}

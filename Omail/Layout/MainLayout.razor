@@ -52,6 +52,45 @@
         <!-- Mobile menu -->
         <div class="sm:hidden @(isMobileMenuOpen ? "block" : "hidden") bg-white dark:bg-omail-800 shadow-lg dark:shadow-omail-600/20 transition-colors duration-500">
             <div class="px-2 pt-2 pb-3 space-y-1">
+                <!-- Email mobile links -->
+                <NavLink href="inbox" Match="NavLinkMatch.All" 
+                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
+                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    <span class="flex items-center">
+                        <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Inbox
+                    </span>
+                </NavLink>
+                <NavLink href="compose" 
+                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
+                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    <span class="flex items-center">
+                        <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Compose
+                    </span>
+                </NavLink>
+                <NavLink href="sent" 
+                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
+                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    <span class="flex items-center">
+                        <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Sent
+                    </span>
+                </NavLink>
+                
+                <!-- Existing mobile links -->
                 <NavLink href="" Match="NavLinkMatch.All" 
                     class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
                     ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">

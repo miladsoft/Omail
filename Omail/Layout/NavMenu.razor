@@ -3,6 +3,89 @@
 
     <div class="flex-1">
         <ul class="space-y-1">
+            <!-- Email Navigation Items -->
+            <li>
+                <NavLink href="inbox" Match="NavLinkMatch.All" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+                    <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
+                    <div class="min-w-[32px] flex justify-center">
+                        <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
+                                   trigger="hover"
+                                   colors="primary:#ffffff"
+                                   class="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8">
+                        </lord-icon>
+                    </div>
+                    <span class="transition-all duration-200 group-[.active]:font-medium group-[.active]:text-omail-50 ml-3 lg:inline md:hidden">Inbox</span>
+                    <div class="hidden md:block lg:hidden absolute left-full ml-2 px-2 py-1 bg-omail-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Inbox
+                    </div>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink href="compose" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+                    <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
+                    <div class="min-w-[32px] flex justify-center">
+                        <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
+                                   trigger="hover"
+                                   colors="primary:#ffffff"
+                                   class="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8">
+                        </lord-icon>
+                    </div>
+                    <span class="transition-all duration-200 group-[.active]:font-medium group-[.active]:text-omail-50 ml-3 lg:inline md:hidden">Compose</span>
+                    <div class="hidden md:block lg:hidden absolute left-full ml-2 px-2 py-1 bg-omail-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Compose
+                    </div>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink href="sent" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+                    <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
+                    <div class="min-w-[32px] flex justify-center">
+                        <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
+                                   trigger="hover"
+                                   colors="primary:#ffffff"
+                                   class="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8">
+                        </lord-icon>
+                    </div>
+                    <span class="transition-all duration-200 group-[.active]:font-medium group-[.active]:text-omail-50 ml-3 lg:inline md:hidden">Sent</span>
+                    <div class="hidden md:block lg:hidden absolute left-full ml-2 px-2 py-1 bg-omail-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Sent
+                    </div>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink href="drafts" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+                    <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
+                    <div class="min-w-[32px] flex justify-center">
+                        <lord-icon src="https://cdn.lordicon.com/puvaffet.json"
+                                   trigger="hover"
+                                   colors="primary:#ffffff"
+                                   class="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8">
+                        </lord-icon>
+                    </div>
+                    <span class="transition-all duration-200 group-[.active]:font-medium group-[.active]:text-omail-50 ml-3 lg:inline md:hidden">Drafts</span>
+                    <div class="hidden md:block lg:hidden absolute left-full ml-2 px-2 py-1 bg-omail-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Drafts
+                    </div>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink href="trash" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+                    <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
+                    <div class="min-w-[32px] flex justify-center">
+                        <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                                   trigger="hover"
+                                   colors="primary:#ffffff"
+                                   class="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8">
+                        </lord-icon>
+                    </div>
+                    <span class="transition-all duration-200 group-[.active]:font-medium group-[.active]:text-omail-50 ml-3 lg:inline md:hidden">Trash</span>
+                    <div class="hidden md:block lg:hidden absolute left-full ml-2 px-2 py-1 bg-omail-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Trash
+                    </div>
+                </NavLink>
+            </li>
+            <li class="my-2 border-t border-omail-500/30"></li>
+            <!-- Existing Navigation Items -->
             <li>
                 <NavLink href="wallet" Match="NavLinkMatch.All" class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
                     <span class="absolute left-0 w-1 h-8 bg-omail-100 rounded-r-md opacity-0 transform scale-y-0 group-[.active]:opacity-100 group-[.active]:scale-y-100 transition-all duration-300 origin-left"></span>
@@ -87,6 +170,73 @@
 
     <!-- Mobile menu items -->
     <div class="sm:hidden px-2 pt-2 pb-3 space-y-1">
+        <!-- Email mobile menu items -->
+        <NavLink href="inbox" 
+            class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
+            ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+            <div class="min-w-[32px] flex justify-center">
+                <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
+                          trigger="hover"
+                          colors="primary:#ffffff"
+                          class="w-8 h-8">
+                </lord-icon>
+            </div>
+            <span class="ml-3">Inbox</span>
+        </NavLink>
+        
+        <NavLink href="compose" 
+            class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
+            ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+            <div class="min-w-[32px] flex justify-center">
+                <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
+                          trigger="hover"
+                          colors="primary:#ffffff"
+                          class="w-8 h-8">
+                </lord-icon>
+            </div>
+            <span class="ml-3">Compose</span>
+        </NavLink>
+        
+        <NavLink href="sent" 
+            class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
+            ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+            <div class="min-w-[32px] flex justify-center">
+                <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
+                          trigger="hover"
+                          colors="primary:#ffffff"
+                          class="w-8 h-8">
+                </lord-icon>
+            </div>
+            <span class="ml-3">Sent</span>
+        </NavLink>
+        
+        <NavLink href="drafts" 
+            class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
+            ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+            <div class="min-w-[32px] flex justify-center">
+                <lord-icon src="https://cdn.lordicon.com/puvaffet.json"
+                          trigger="hover"
+                          colors="primary:#ffffff"
+                          class="w-8 h-8">
+                </lord-icon>
+            </div>
+            <span class="ml-3">Drafts</span>
+        </NavLink>
+        
+        <NavLink href="trash" 
+            class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
+            ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
+            <div class="min-w-[32px] flex justify-center">
+                <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                          trigger="hover"
+                          colors="primary:#ffffff"
+                          class="w-8 h-8">
+                </lord-icon>
+            </div>
+            <span class="ml-3">Trash</span>
+        </NavLink>
+        
+        <!-- Existing mobile menu items -->
         <NavLink href="wallet" 
             class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
             ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
@@ -99,8 +249,6 @@
             </div>
             <span class="ml-3">Wallet</span>
         </NavLink>
-        
-        <!-- Add similar NavLinks for Browse, Portfolio, Founder, Settings -->
         <NavLink href="browse" 
             class="flex items-center px-4 py-3 rounded-lg text-white hover:bg-omail-600/80 transition-all duration-200 group relative" 
             ActiveClass="bg-gradient-to-r from-omail-400/70 to-omail-600/90 shadow-omail">
