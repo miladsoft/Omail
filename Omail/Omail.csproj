@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+  </ItemGroup>
+
+  <!-- Run npm install and build -->
+  <Target Name="NpmInstallAndBuild" BeforeTargets="BeforeBuild">
+    <Exec Command="node -v" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="NodeJSInstalled" />
+    </Exec>
+    <Message Condition="'$(NodeJSInstalled)'=='0'" Importance="high" Text="Installing npm dependencies..." />
+    <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(NodeJSInstalled)'=='0'" Importance="high" Text="Running npm build..." />
+    <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Warning Condition="'$(NodeJSInstalled)'!='0'" Text="Node.js is not installed, skipping npm commands." />
+  </Target>
+
+  <!-- Simplified Direct Tailwind CSS Build -->
+  <Target Name="BuildTailwindCSSOnPublish" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Release'">
+    <Exec Command="node -v" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="NodeJSInstalled" />
+    </Exec>
+    <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npx -y tailwindcss@latest -i style.css -o ./wwwroot/css/style.min.css --minify" ContinueOnError="true" />
+    <Warning Condition="'$(NodeJSInstalled)'!='0'" Text="Node.js is not installed, skipping Tailwind CSS build." />
+  </Target>
+
+</Project>

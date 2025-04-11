@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Omail</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/style.min.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="Omail.styles.css" rel="stylesheet" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+</head>
+
+<body class="bg-omail-100">
+    <div id="app">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="w-16 h-16 border-4 border-omail-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" class="fixed bottom-0 w-full bg-omail-100 text-omail-700 p-4 hidden shadow-lg z-50">
+        An unhandled error has occurred.
+        <a href="." class="font-medium underline">Reload</a>
+        <span class="dismiss cursor-pointer float-right">🗙</span>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+</body>
+
+</html>

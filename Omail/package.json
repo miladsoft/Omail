@@ -1,0 +1,14 @@
+{
+  "name": "omail-client",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tailwindcss -i style.css -o wwwroot/css/style.min.css --minify",
+    "dev": "tailwindcss -i style.css -o wwwroot/css/style.min.css --watch"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
+  },
+  "dependencies": {}
+}

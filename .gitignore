@@ -1,0 +1,68 @@
+# .NET Core
+bin/
+obj/
+*.swp
+*.user
+*.userosscache
+*.suo
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Visual Studio files
+.vs/
+*.nupkg
+*.vsix
+*.vsixmanifest
+*.psmdcp
+
+# Rider files
+.idea/
+*.sln.iml
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# NPM and Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Blazor WebAssembly
+**/wwwroot/dist/
+**/wwwroot/css/style.min.css
+**/blazor.*.js
+**/service-worker-assets.js
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Temporary and log files
+*.tmp
+*.log
+logs/
+bin/
+ 

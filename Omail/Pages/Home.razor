@@ -1,0 +1,67 @@
+﻿@page "/"
+
+<PageTitle>Home - Omail UI</PageTitle>
+
+<div class="card dark:bg-omail-dark/30 bg-white shadow-md rounded-lg overflow-hidden transition-colors duration-300">
+    <div class="p-6">
+        <div class="flex items-center mb-4">
+            <div class="bg-gradient-to-r from-omail-primary to-omail-primary/70 rounded-full p-3 mr-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-omail-primary dark:text-omail-light transition-colors duration-300">Welcome to OmailUI</h1>
+        </div>
+        
+        <p class="text-lg text-omail-600 dark:text-omail-light/80 mb-8 transition-colors duration-300">
+            A modern, responsive UI framework for Blazor applications with dark mode support.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="text-omail-primary dark:text-omail-light mb-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Smart Design</h3>
+                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
+                    Thoughtfully designed components that work together seamlessly.
+                </p>
+            </div>
+            
+            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="text-omail-primary dark:text-omail-light mb-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Fully Responsive</h3>
+                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
+                    Looks great on any device, from phones to desktops.
+                </p>
+            </div>
+            
+            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="text-omail-primary dark:text-omail-light mb-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Customizable</h3>
+                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
+                    Easily adapt the framework to match your brand identity.
+                </p>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="tailwind-demo" class="btn-primary w-full sm:w-auto text-center">
+                View Components
+            </a>
+            <a href="counter" class="px-4 py-2 border border-omail-primary text-omail-primary hover:bg-omail-primary hover:text-white rounded shadow transition-colors w-full sm:w-auto text-center">
+                Try Demos
+            </a>
+        </div>
+    </div>
+</div>
