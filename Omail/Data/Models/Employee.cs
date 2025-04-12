@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Omail.Data.Models
 {
@@ -7,40 +7,54 @@ namespace Omail.Data.Models
     {
         public int Id { get; set; }
         
-        [Required, MaxLength(50)]
+        [Required]
+        [MaxLength(100)]
         public string FirstName { get; set; }
         
-        [Required, MaxLength(50)]
+        [Required]
+        [MaxLength(100)]
         public string LastName { get; set; }
         
-        [Required, MaxLength(100), EmailAddress]
+        // Change to computed property, not stored in database
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
+        
+        [Required]
+        [EmailAddress]
+        [MaxLength(100)]
         public string Email { get; set; }
         
         [Required]
         public string PasswordHash { get; set; }
         
-        [MaxLength(20)]
-        public string PhoneNumber { get; set; }
+        [MaxLength(15)]
+        public string PhoneNumber { get; set; } = string.Empty; // Default value to avoid null
         
-        public string ProfilePicture { get; set; }
+        [MaxLength(100)]
+        public string Position { get; set; } = string.Empty; // Default value
         
-        public string Position { get; set; }
+        public string ProfilePicture { get; set; } = string.Empty; // Default value
         
         public bool IsManager { get; set; }
         
-        // Foreign keys
+        public bool IsActive { get; set; }
+        
+        [Required]
         public int SectionId { get; set; }
         
-        // Navigation properties
-        public virtual Section Section { get; set; }
-        public virtual ICollection<EmailRecipient> ReceivedEmails { get; set; } = new List<EmailRecipient>();
-        public virtual ICollection<EmailMessage> SentEmails { get; set; } = new List<EmailMessage>();
-        public virtual ICollection<EmailApproval> PendingApprovals { get; set; } = new List<EmailApproval>();
+        public DateTime HireDate { get; set; }
         
-        // Helper property to get full name
-        public string FullName => $"{FirstName} {LastName}";
+        // Navigation property
+        public Section Section { get; set; }
         
-        // Helper property to get initials (for avatar)
-        public string Initials => $"{FirstName[0]}{LastName[0]}".ToUpper();
+        public ICollection<EmailMessage> SentEmails { get; set; } = new List<EmailMessage>();
+        public ICollection<EmailRecipient> ReceivedEmails { get; set; } = new List<EmailRecipient>();
+        public ICollection<EmailApproval> EmailApprovals { get; set; } = new List<EmailApproval>();
+        
+        [NotMapped]
+        public ICollection<EmailApproval> PendingApprovals { get; set; } = new List<EmailApproval>();
+        
+        // Helper property for avatar display
+        public string Initials => $"{FirstName?.FirstOrDefault() ?? '?'}{LastName?.FirstOrDefault() ?? '?'}";
     }
 }

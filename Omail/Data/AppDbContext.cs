@@ -81,22 +81,61 @@ namespace Omail.Data
         {
             // Seed organizations
             modelBuilder.Entity<Organization>().HasData(
-                new Organization { Id = 1, Name = "Omail Corporation", Description = "Main organization" }
+                new Organization { 
+                    Id = 1, 
+                    Name = "Omail Corporation", 
+                    Description = "Main organization" 
+                }
             );
 
             // Seed departments
             modelBuilder.Entity<Department>().HasData(
-                new Department { Id = 1, Name = "Information Technology", OrganizationId = 1 },
-                new Department { Id = 2, Name = "Human Resources", OrganizationId = 1 },
-                new Department { Id = 3, Name = "Finance", OrganizationId = 1 }
+                new Department { 
+                    Id = 1, 
+                    Name = "Information Technology", 
+                    Description = "IT department responsible for software and hardware management",
+                    OrganizationId = 1 
+                },
+                new Department { 
+                    Id = 2, 
+                    Name = "Human Resources", 
+                    Description = "HR department responsible for employee management",
+                    OrganizationId = 1 
+                },
+                new Department { 
+                    Id = 3, 
+                    Name = "Finance", 
+                    Description = "Finance department responsible for financial management",
+                    OrganizationId = 1 
+                }
             );
 
             // Seed sections
             modelBuilder.Entity<Section>().HasData(
-                new Section { Id = 1, Name = "Software Development", DepartmentId = 1 },
-                new Section { Id = 2, Name = "Network Operations", DepartmentId = 1 },
-                new Section { Id = 3, Name = "Recruitment", DepartmentId = 2 },
-                new Section { Id = 4, Name = "Accounting", DepartmentId = 3 }
+                new Section { 
+                    Id = 1, 
+                    Name = "Software Development", 
+                    Description = "Develops and maintains software applications",
+                    DepartmentId = 1 
+                },
+                new Section { 
+                    Id = 2, 
+                    Name = "Network Operations", 
+                    Description = "Manages network infrastructure",
+                    DepartmentId = 1 
+                },
+                new Section { 
+                    Id = 3, 
+                    Name = "Recruitment", 
+                    Description = "Handles recruitment process",
+                    DepartmentId = 2 
+                },
+                new Section { 
+                    Id = 4, 
+                    Name = "Accounting", 
+                    Description = "Manages accounts and financial reporting",
+                    DepartmentId = 3 
+                }
             );
 
             // Add more seed data here if needed

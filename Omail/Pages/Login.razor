@@ -3,7 +3,8 @@
 
 @inject AuthService AuthService
 @inject NavigationManager NavigationManager
-@inject OmailAuthenticationStateProvider AuthStateProvider
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILogger<Login> Logger
 
 <PageTitle>Login - Omail</PageTitle>
 
@@ -19,6 +20,11 @@
             <h2 class="mt-6 text-center text-2xl font-extrabold text-omail-900 dark:text-white">
                 Sign in to your account
             </h2>
+            <p class="mt-2 text-center text-sm text-omail-500 dark:text-omail-300">
+                Default admin credentials: <br/>
+                <span class="font-medium text-omail-600 dark:text-omail-300">Email: admin@omail.com</span> <br/>
+                <span class="font-medium text-omail-600 dark:text-omail-300">Password: Admin@123</span>
+            </p>
         </div>
         <EditForm Model="loginModel" OnValidSubmit="HandleLogin" class="mt-8 space-y-6">
             <DataAnnotationsValidator />
@@ -59,13 +65,20 @@
             </div>
 
             <div>
-                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500">
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500" disabled="@isLoggingIn">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <svg class="h-5 w-5 text-omail-500 group-hover:text-omail-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                        </svg>
+                        @if (isLoggingIn)
+                        {
+                            <div class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                        }
+                        else
+                        {
+                            <svg class="h-5 w-5 text-omail-500 group-hover:text-omail-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                        }
                     </span>
-                    Sign in
+                    @(isLoggingIn ? "Signing in..." : "Sign in")
                 </button>
             </div>
         </EditForm>
@@ -75,6 +88,7 @@
 @code {
     private LoginModel loginModel = new LoginModel();
     private string errorMessage;
+    private bool isLoggingIn = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,23 +104,33 @@
 
     private async Task HandleLogin()
     {
+        errorMessage = string.Empty;
+        isLoggingIn = true;
+        
         try
         {
+            Logger.LogInformation("Login attempt for user: {Email}", loginModel.Email);
             var result = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
 
             if (result)
             {
-                await AuthStateProvider.NotifyUserAuthenticationAsync();
+                await ((OmailAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthenticationAsync();
                 NavigationManager.NavigateTo("/inbox");
             }
             else
             {
-                errorMessage = "Invalid email or password.";
+                errorMessage = "Invalid email or password. Please try again.";
+                Logger.LogWarning("Login failed for user: {Email}", loginModel.Email);
             }
         }
         catch (Exception ex)
         {
             errorMessage = $"An error occurred: {ex.Message}";
+            Logger.LogError(ex, "Login error for user: {Email}", loginModel.Email);
+        }
+        finally
+        {
+            isLoggingIn = false;
         }
     }
 

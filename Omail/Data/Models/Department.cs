@@ -6,14 +6,17 @@ namespace Omail.Data.Models
     {
         public int Id { get; set; }
         
-        [Required, MaxLength(100)]
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
         
-        // Foreign keys
+        [MaxLength(500)]
+        public string Description { get; set; } = string.Empty; // Setting a default value
+        
         public int OrganizationId { get; set; }
         
         // Navigation properties
-        public virtual Organization Organization { get; set; }
-        public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+        public Organization Organization { get; set; }
+        public ICollection<Section> Sections { get; set; } = new List<Section>();
     }
 }
