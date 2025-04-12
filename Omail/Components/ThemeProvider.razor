@@ -1,0 +1,21 @@
+@inject ThemeService ThemeService
+@implements IDisposable
+
+<div class="@ThemeService.GetThemeClass()">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChange -= StateHasChanged;
+    }
+}

@@ -3,44 +3,46 @@
 @inject ThemeService ThemeService
 @implements IAsyncDisposable
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    @if (context.User.Identity?.IsAuthenticated != true)
-                    {
-                        <RedirectToLogin />
-                    }
-                    else
-                    {
-                        <p class="p-4 text-center">
-                            You are not authorized to access this resource.
-                        </p>
-                    }
-                </NotAuthorized>
-                <Authorizing>
-                    <div class="flex justify-center items-center h-screen">
-                        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+<ThemeProvider>
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Omail.Shared.MainLayout)">
+                    <NotAuthorized>
+                        @if (context.User.Identity?.IsAuthenticated != true)
+                        {
+                            <RedirectToLogin />
+                        }
+                        else
+                        {
+                            <p class="p-4 text-center">
+                                You are not authorized to access this resource.
+                            </p>
+                        }
+                    </NotAuthorized>
+                    <Authorizing>
+                        <div class="flex justify-center items-center h-screen">
+                            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+                        </div>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(Omail.Shared.MainLayout)">
+                    <div class="py-12 flex flex-col items-center justify-center text-center">
+                        <h1 class="text-2xl font-bold text-omail-700 dark:text-omail-200">404 - Page Not Found</h1>
+                        <p class="mt-4 text-omail-600 dark:text-omail-400">The page you're looking for doesn't exist.</p>
+                        <a href="/" class="mt-4 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg">
+                            Return Home
+                        </a>
                     </div>
-                </Authorizing>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <div class="py-12 flex flex-col items-center justify-center text-center">
-                    <h1 class="text-2xl font-bold text-omail-700 dark:text-omail-200">404 - Page Not Found</h1>
-                    <p class="mt-4 text-omail-600 dark:text-omail-400">The page you're looking for doesn't exist.</p>
-                    <a href="/" class="mt-4 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg">
-                        Return Home
-                    </a>
-                </div>
-            </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+</ThemeProvider>
 
 @code {
     protected override async Task OnInitializedAsync()
