@@ -72,6 +72,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var dbContext = services.GetRequiredService<AppDbContext>();
+        // Make sure database exists and is up to date with the current model
         dbContext.Database.EnsureCreated();
         
         // Seed admin user

@@ -20,29 +20,32 @@ namespace Omail.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure relationships
+            // Organization-Department relationship
             modelBuilder.Entity<Department>()
                 .HasOne(d => d.Organization)
                 .WithMany(o => o.Departments)
                 .HasForeignKey(d => d.OrganizationId);
 
+            // Department-Section relationship
             modelBuilder.Entity<Section>()
                 .HasOne(s => s.Department)
                 .WithMany(d => d.Sections)
                 .HasForeignKey(s => s.DepartmentId);
 
+            // Section-Employee relationship
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Section)
                 .WithMany(s => s.Employees)
                 .HasForeignKey(e => e.SectionId);
 
+            // EmailMessage-Employee (sender) relationship
             modelBuilder.Entity<EmailMessage>()
                 .HasOne(e => e.Sender)
                 .WithMany(s => s.SentEmails)
                 .HasForeignKey(e => e.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Many-to-many relationship between emails and recipients
+            // EmailRecipient relationships - explicitly define column names
             modelBuilder.Entity<EmailRecipient>()
                 .HasKey(er => new { er.EmailId, er.RecipientId });
 
@@ -54,9 +57,10 @@ namespace Omail.Data
             modelBuilder.Entity<EmailRecipient>()
                 .HasOne(er => er.Recipient)
                 .WithMany(e => e.ReceivedEmails)
-                .HasForeignKey(er => er.RecipientId);
+                .HasForeignKey(er => er.RecipientId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
-            // Email approvals
+            // EmailApproval relationships
             modelBuilder.Entity<EmailApproval>()
                 .HasOne(a => a.Email)
                 .WithMany(e => e.Approvals)
@@ -64,10 +68,11 @@ namespace Omail.Data
 
             modelBuilder.Entity<EmailApproval>()
                 .HasOne(a => a.Approver)
-                .WithMany(e => e.PendingApprovals)
-                .HasForeignKey(a => a.ApproverId);
+                .WithMany()  // Don't use the PendingApprovals navigation property here
+                .HasForeignKey(a => a.ApproverId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Email attachments
+            // EmailAttachment relationship
             modelBuilder.Entity<EmailAttachment>()
                 .HasOne(a => a.Email)
                 .WithMany(e => e.Attachments)

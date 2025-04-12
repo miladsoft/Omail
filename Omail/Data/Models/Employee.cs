@@ -51,10 +51,12 @@ namespace Omail.Data.Models
         public ICollection<EmailRecipient> ReceivedEmails { get; set; } = new List<EmailRecipient>();
         public ICollection<EmailApproval> EmailApprovals { get; set; } = new List<EmailApproval>();
         
+        // This is a computed property, not stored in the database
         [NotMapped]
-        public ICollection<EmailApproval> PendingApprovals { get; set; } = new List<EmailApproval>();
+        public ICollection<EmailApproval> PendingApprovals => EmailApprovals?.Where(a => a.Status == ApprovalStatus.Pending).ToList() ?? new List<EmailApproval>();
         
         // Helper property for avatar display
+        [NotMapped]
         public string Initials => $"{FirstName?.FirstOrDefault() ?? '?'}{LastName?.FirstOrDefault() ?? '?'}";
     }
 }
