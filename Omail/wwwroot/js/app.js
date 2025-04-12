@@ -88,6 +88,23 @@ window.iconHandler = {
     }
 };
 
+// Loading handler
+window.loadingHandler = {
+    hideLoader: function() {
+        var loadingEl = document.getElementById('app-loading');
+        if (loadingEl) {
+            loadingEl.style.display = 'none';
+        }
+    },
+    
+    showLoader: function() {
+        var loadingEl = document.getElementById('app-loading');
+        if (loadingEl) {
+            loadingEl.style.display = 'flex';
+        }
+    }
+};
+
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', function () {
     window.themeManager.initializeTheme();
@@ -95,6 +112,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Replace icons after a short delay to give them a chance to load
     setTimeout(function() {
         window.iconHandler.replaceAllIcons();
+        
+        // Ensure loader is hidden
+        window.loadingHandler.hideLoader();
     }, 1000);
     
     // Enable dismissing Blazor error UI
@@ -108,6 +128,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
+});
+
+// Ensure loader is hidden when the window is fully loaded
+window.addEventListener('load', function() {
+    window.loadingHandler.hideLoader();
 });
 
 // File drag and drop handling for email attachments

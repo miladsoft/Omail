@@ -66,32 +66,46 @@
         </div>
     </div>
 
-    <div id="app-loading" class="fixed inset-0 flex items-center justify-center z-50">
+    <div id="app-loading" class="fixed inset-0 flex items-center justify-center z-50 bg-omail-50 dark:bg-omail-900">
         <div class="flex flex-col items-center">
             <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
-            <div class="text-omail-600 font-medium mt-4">Loading Omail...</div>
+            <div class="text-omail-600 dark:text-omail-400 font-medium mt-4">Loading Omail...</div>
         </div>
     </div>
 
     <script src="_framework/blazor.server.js"></script>
     
-    <!-- Add Heroicons as a fallback for icons -->
-    <script src="https://unpkg.com/@@heroicons/store@0.1.5/dist/icon-store.js"></script>
     
-    <!-- Add error handling for lord-icon elements -->
+    <!-- Improved loading script with multiple fallback mechanisms -->
     <script>
-        // Simple script without interop
+        // Set a global timeout to hide the loader even if other events fail
+        var loaderTimeout = setTimeout(function() {
+            hideLoader();
+        }, 10000); // 10 seconds max loading time
+        
+        function hideLoader() {
+            var loadingEl = document.getElementById('app-loading');
+            if (loadingEl) {
+                loadingEl.style.display = 'none';
+            }
+            // Clear the timeout if it's already handled
+            clearTimeout(loaderTimeout);
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Hide loading spinner when Blazor is fully loaded
-            Blazor.addEventListener('afterStarted', function() {
-                const loadingEl = document.getElementById('app-loading');
-                if (loadingEl) {
-                    loadingEl.style.display = 'none';
+            // Try to detect when Blazor is loaded using multiple approaches
+            if (window.Blazor) {
+                if (typeof Blazor.addEventListener === 'function') {
+                    Blazor.addEventListener('afterStarted', hideLoader);
                 }
                 
-                // Replace lord-icon elements with SVG fallbacks if they fail to load
-                setTimeout(replaceLordIconsWithFallbacks, 2000);
-            });
+                // Additional fallback
+                setTimeout(function() {
+                    if (document.querySelector('.mud-layout')) {
+                        hideLoader();
+                    }
+                }, 1000);
+            }
             
             // Make the dismiss button work for blazor error UI
             const dismissButton = document.querySelector('#blazor-error-ui .dismiss');
@@ -100,8 +114,19 @@
                     document.getElementById('blazor-error-ui').style.display = 'none';
                 });
             }
+            
+            // If Blazor object is available, try to attach event listeners
+            if (window.Blazor && typeof Blazor._internal !== 'undefined') {
+                var originalStart = Blazor._internal.start;
+                Blazor._internal.start = function() {
+                    var result = originalStart.apply(this, arguments);
+                    hideLoader();
+                    return result;
+                };
+            }
         });
         
+        // Replace lord-icon elements with SVG fallbacks
         function replaceLordIconsWithFallbacks() {
             const lordIcons = document.querySelectorAll('lord-icon');
             
@@ -121,33 +146,7 @@
             });
         }
         
-        function getIconTypeFromSrc(src) {
-            // Extract the icon name from the src URL
-            if (!src) return 'mail';
-            
-            const parts = src.split('/');
-            const fileName = parts[parts.length - 1].replace('.json', '');
-            
-            // Map common lord-icon names to Heroicon equivalents
-            const iconMap = {
-                'tkaubbni': 'inbox',
-                'wloilxuq': 'pencil-square',
-                'iltqorsz': 'paper-airplane',
-                'puvaffet': 'document',
-                'gsqxdxog': 'trash',
-                'hwuyodym': 'cog',
-                'fihkmkwt': 'briefcase',
-                'msoeawqm': 'search',
-                'nxooksci': 'refresh',
-                'jxwksgwv': 'chevron-right',
-                'iifryyua': 'chevron-left',
-                'hjeefwhm': 'check-circle',
-                'yeallgsa': 'credit-card',
-                'eszyyflr': 'user-circle'
-            };
-            
-            return iconMap[fileName] || 'document-text';
-        }
+
         
         function createFallbackSVG(iconType, color, className) {
             // Create a span element to hold the icon
@@ -167,6 +166,11 @@
             }
             
             return span;
+        }
+        
+        // Additional check for DOM ready state
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(hideLoader, 2000);
         }
     </script>
 </body>
