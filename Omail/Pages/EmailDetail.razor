@@ -1,32 +1,29 @@
 @page "/email-detail/{Id:int}"
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@attribute [Authorize]
+@inject EmailService EmailService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Email - Omail</PageTitle>
 
 <div class="space-y-4">
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-            <a href="inbox" class="text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 flex items-center">
+            <a href="javascript:history.back()" class="text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 flex items-center">
                 <lord-icon
                     src="https://cdn.lordicon.com/iifryyua.json"
                     trigger="hover"
                     colors="primary:#121331,secondary:#818cf8"
                     class="w-5 h-5 mr-1">
                 </lord-icon>
-                <span>Back to Inbox</span>
+                <span>Back</span>
             </a>
         </div>
         <div class="flex space-x-2">
-            <button class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
+            <button @onclick="MoveToTrash" class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
                 <lord-icon
                     src="https://cdn.lordicon.com/gsqxdxog.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5">
-                </lord-icon>
-            </button>
-            <button class="p-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800">
-                <lord-icon
-                    src="https://cdn.lordicon.com/kbtmbyzy.json"
                     trigger="hover"
                     colors="primary:#121331,secondary:#818cf8"
                     class="w-5 h-5">
@@ -43,130 +40,385 @@
         </div>
     </div>
 
-    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
-        <div class="p-6">
-            <h1 class="text-xl font-bold text-omail-900 dark:text-omail-100">Meeting reminder for tomorrow's project review</h1>
-            
-            <div class="flex items-start my-4">
-                <div class="mr-4">
-                    <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
-                        JD
+    @if (isLoading)
+    {
+        <div class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+            <p class="mt-4 text-omail-600 dark:text-omail-400">Loading email...</p>
+        </div>
+    }
+    else if (email == null)
+    {
+        <div class="py-12 flex flex-col items-center justify-center text-center bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+            <lord-icon
+                src="https://cdn.lordicon.com/tdrtiskw.json"
+                trigger="loop"
+                delay="2000"
+                colors="primary:#121331,secondary:#818cf8"
+                class="w-16 h-16 mb-4">
+            </lord-icon>
+            <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">Email not found</h3>
+            <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
+                The email you're looking for doesn't exist or you don't have permission to view it.
+            </p>
+            <button @onclick="@(() => NavigationManager.NavigateTo("/inbox"))" class="mt-4 px-4 py-2 bg-omail-600 hover:bg-omail-700 text-white rounded-lg">
+                Return to Inbox
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <h1 class="text-xl font-bold text-omail-900 dark:text-omail-100">@email.Subject</h1>
+                
+                <div class="flex items-start my-4">
+                    <div class="mr-4">
+                        <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                            @(email.Sender?.Initials ?? "??")
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-omail-900 dark:text-omail-100 font-medium">@email.Sender?.FullName</span>
+                                <span class="text-omail-500 dark:text-omail-400 text-sm ml-1">&lt;@email.Sender?.Email&gt;</span>
+                            </div>
+                            <div class="text-sm text-omail-500 dark:text-omail-400">
+                                @FormatDateDetailed(email.SentAt ?? email.CreatedAt)
+                            </div>
+                        </div>
+                        <div class="text-sm text-omail-500 dark:text-omail-400 flex items-center mt-1">
+                            @{
+                                var recipients = email.Recipients.Where(r => r.Type == RecipientType.To).ToList();
+                                var ccRecipients = email.Recipients.Where(r => r.Type == RecipientType.Cc).ToList();
+                                var bccRecipients = email.Recipients.Where(r => r.Type == RecipientType.Bcc).ToList();
+                                var currentUserRecipient = recipients.FirstOrDefault(r => r.RecipientId == currentUserId);
+                                
+                                if (currentUserRecipient != null)
+                                {
+                                    <span>To: Me</span>
+                                    if (recipients.Count > 1)
+                                    {
+                                        <span> and @(recipients.Count - 1) other@(recipients.Count > 2 ? "s" : "")</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>To: @(string.Join(", ", recipients.Select(r => r.Recipient.FullName ?? r.Recipient.Email)))</span>
+                                }
+                            }
+                            <button class="ml-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-omail-200" @onclick="ToggleDetails">
+                                <span class="text-xs">@(showDetails ? "Hide Details" : "Show Details")</span>
+                            </button>
+                        </div>
+                        
+                        @if (showDetails)
+                        {
+                            <div class="mt-2 bg-omail-50 dark:bg-omail-700/30 p-3 rounded text-sm">
+                                <div class="mb-1">
+                                    <span class="text-omail-700 dark:text-omail-300 font-medium">From: </span>
+                                    <span class="text-omail-600 dark:text-omail-400">@email.Sender?.FullName &lt;@email.Sender?.Email&gt;</span>
+                                </div>
+                                
+                                <div class="mb-1">
+                                    <span class="text-omail-700 dark:text-omail-300 font-medium">To: </span>
+                                    <span class="text-omail-600 dark:text-omail-400">
+                                        @string.Join(", ", recipients.Select(r => $"{r.Recipient.FullName} <{r.Recipient.Email}>"))
+                                    </span>
+                                </div>
+                                
+                                @if (ccRecipients.Any())
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-omail-700 dark:text-omail-300 font-medium">Cc: </span>
+                                        <span class="text-omail-600 dark:text-omail-400">
+                                            @string.Join(", ", ccRecipients.Select(r => $"{r.Recipient.FullName} <{r.Recipient.Email}>"))
+                                        </span>
+                                    </div>
+                                }
+                                
+                                @if (email.SenderId == currentUserId && bccRecipients.Any())
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-omail-700 dark:text-omail-300 font-medium">Bcc: </span>
+                                        <span class="text-omail-600 dark:text-omail-400">
+                                            @string.Join(", ", bccRecipients.Select(r => $"{r.Recipient.FullName} <{r.Recipient.Email}>"))
+                                        </span>
+                                    </div>
+                                }
+                                
+                                <div>
+                                    <span class="text-omail-700 dark:text-omail-300 font-medium">Date: </span>
+                                    <span class="text-omail-600 dark:text-omail-400">@FormatDateDetailed(email.SentAt ?? email.CreatedAt)</span>
+                                </div>
+                                
+                                @if (email.Approvals.Any())
+                                {
+                                    <div class="mt-2">
+                                        <span class="text-omail-700 dark:text-omail-300 font-medium">Approval Status: </span>
+                                        <span class="@GetApprovalStatusColorClass(email.Status)">
+                                            @GetApprovalStatusText(email.Status)
+                                        </span>
+                                    </div>
+                                    
+                                    foreach (var approval in email.Approvals)
+                                    {
+                                        <div class="ml-4 mt-1">
+                                            <span class="text-omail-600 dark:text-omail-400">@approval.Approver.FullName: </span>
+                                            <span class="@GetApprovalColorClass(approval.Status)">@approval.Status.ToString()</span>
+                                            @if (!string.IsNullOrEmpty(approval.Comments))
+                                            {
+                                                <div class="ml-4 mt-1 text-omail-500 dark:text-omail-400 italic">
+                                                    "@approval.Comments"
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-omail-900 dark:text-omail-100 font-medium">John Doe</span>
-                            <span class="text-omail-500 dark:text-omail-400 text-sm ml-1">&lt;john.doe@example.com&gt;</span>
-                        </div>
-                        <div class="text-sm text-omail-500 dark:text-omail-400">
-                            June 12, 2023, 10:24 AM
-                        </div>
+                
+                <div class="border-t border-omail-200 dark:border-omail-700 pt-4">
+                    <div class="prose dark:prose-invert max-w-none">
+                        @((MarkupString)FormatEmailBody(email.Body))
                     </div>
-                    <div class="text-sm text-omail-500 dark:text-omail-400 flex items-center mt-1">
-                        <span>To: Me</span>
-                        <button class="ml-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-omail-200">
-                            <span class="text-xs">Show Details</span>
+                    
+                    <!-- Attachments -->
+                    @if (email.Attachments.Any())
+                    {
+                        <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4">
+                            <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200 mb-3">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/xhbsnkyp.json"
+                                    trigger="hover"
+                                    colors="primary:#121331,secondary:#818cf8"
+                                    class="w-5 h-5 inline mr-1">
+                                </lord-icon>
+                                Attachments (@email.Attachments.Count)
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                @foreach (var attachment in email.Attachments)
+                                {
+                                    <div class="inline-block border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden">
+                                        <div class="flex items-center p-3 bg-omail-50 dark:bg-omail-800">
+                                            <div class="mr-3">
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/puvaffet.json"
+                                                    trigger="hover"
+                                                    colors="primary:#121331,secondary:#818cf8"
+                                                    class="w-8 h-8">
+                                                </lord-icon>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-omail-800 dark:text-omail-200">@attachment.FileName</p>
+                                                <p class="text-xs text-omail-500 dark:text-omail-400">@FormatFileSize(attachment.FileSize)</p>
+                                            </div>
+                                            <div class="ml-4">
+                                                <button class="p-1 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                                    <lord-icon
+                                                        src="https://cdn.lordicon.com/xsdtfyne.json"
+                                                        trigger="hover"
+                                                        colors="primary:#121331,secondary:#818cf8"
+                                                        class="w-5 h-5">
+                                                    </lord-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4 space-y-3">
+                    <div class="flex space-x-3">
+                        <button @onclick="ReplyToEmail" class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/hpivxauj.json"
+                                trigger="hover"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-5 h-5">
+                            </lord-icon>
+                            <span>Reply</span>
+                        </button>
+                        <button @onclick="ReplyAllToEmail" class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/akuwjdzh.json"
+                                trigger="hover"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-5 h-5">
+                            </lord-icon>
+                            <span>Reply All</span>
+                        </button>
+                        <button @onclick="ForwardEmail" class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/rxufjlal.json"
+                                trigger="hover"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-5 h-5">
+                            </lord-icon>
+                            <span>Forward</span>
                         </button>
                     </div>
                 </div>
             </div>
-            
-            <div class="border-t border-omail-200 dark:border-omail-700 pt-4">
-                <div class="prose dark:prose-invert max-w-none">
-                    <p>Hi Team,</p>
-                    <p>Just a friendly reminder about our scheduled meeting tomorrow at 2 PM to review the current status of Project Aurora.</p>
-                    <p>Here's the agenda for our meeting:</p>
-                    <ol>
-                        <li>Review of completed milestones</li>
-                        <li>Discussion of current challenges</li>
-                        <li>Planning for the next sprint</li>
-                        <li>Resource allocation for upcoming tasks</li>
-                    </ol>
-                    <p>Please come prepared with your latest updates and any questions you might have. I've attached the latest project report for your reference.</p>
-                    <p>The meeting link is included in your calendar invitation. If you're unable to attend, please let me know as soon as possible.</p>
-                    <p>Best regards,<br>John Doe<br>Project Manager</p>
-                </div>
-                
-                <!-- Attachments -->
-                <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4">
-                    <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200 mb-3">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/xhbsnkyp.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 inline mr-1">
-                        </lord-icon>
-                        Attachments (1)
-                    </h3>
-                    
-                    <div class="inline-block border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden">
-                        <div class="flex items-center p-3 bg-omail-50 dark:bg-omail-800">
-                            <div class="mr-3">
-                                <lord-icon
-                                    src="https://cdn.lordicon.com/puvaffet.json"
-                                    trigger="hover"
-                                    colors="primary:#121331,secondary:#818cf8"
-                                    class="w-8 h-8">
-                                </lord-icon>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-omail-800 dark:text-omail-200">Project-Aurora-Status-Report.pdf</p>
-                                <p class="text-xs text-omail-500 dark:text-omail-400">2.1 MB</p>
-                            </div>
-                            <div class="ml-4">
-                                <button class="p-1 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/xsdtfyne.json"
-                                        trigger="hover"
-                                        colors="primary:#121331,secondary:#818cf8"
-                                        class="w-5 h-5">
-                                    </lord-icon>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-6 border-t border-omail-200 dark:border-omail-700 pt-4 space-y-3">
-                <div class="flex space-x-3">
-                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/hpivxauj.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5">
-                        </lord-icon>
-                        <span>Reply</span>
-                    </button>
-                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/akuwjdzh.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5">
-                        </lord-icon>
-                        <span>Reply All</span>
-                    </button>
-                    <button class="flex items-center space-x-1 px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 text-omail-800 dark:text-omail-200 hover:bg-omail-50 dark:hover:bg-omail-700">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/rxufjlal.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5">
-                        </lord-icon>
-                        <span>Forward</span>
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {
     [Parameter]
     public int Id { get; set; }
+    
+    private EmailMessage email;
+    private bool isLoading = true;
+    private bool showDetails = false;
+    private int currentUserId;
 
-    // In a real application, you would fetch the email details using this ID
+    protected override async Task OnInitializedAsync()
+    {
+        // Get current user ID
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            currentUserId = userId;
+        }
+
+        await LoadEmail();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadEmail();
+    }
+
+    private async Task LoadEmail()
+    {
+        isLoading = true;
+        
+        try
+        {
+            email = await EmailService.GetEmailByIdAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading email: {ex.Message}");
+            email = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task MoveToTrash()
+    {
+        if (email == null) return;
+        
+        try
+        {
+            await EmailService.MoveToTrashAsync(email.Id);
+            NavigationManager.NavigateTo("/inbox");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error moving email to trash: {ex.Message}");
+        }
+    }
+
+    private void ReplyToEmail()
+    {
+        if (email == null) return;
+        NavigationManager.NavigateTo($"/compose?reply={email.Id}");
+    }
+
+    private void ReplyAllToEmail()
+    {
+        if (email == null) return;
+        NavigationManager.NavigateTo($"/compose?replyAll={email.Id}");
+    }
+
+    private void ForwardEmail()
+    {
+        if (email == null) return;
+        NavigationManager.NavigateTo($"/compose?forward={email.Id}");
+    }
+
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+    }
+
+    private string FormatDateDetailed(DateTime date)
+    {
+        return date.ToString("dddd, MMMM d, yyyy h:mm tt");
+    }
+
+    private string FormatEmailBody(string body)
+    {
+        // This is a simple implementation - in a real app you might:
+        // 1. Use a sanitizer library to prevent XSS attacks
+        // 2. Use a Markdown or HTML renderer for better formatting
+        // 3. Transform URLs to clickable links
+        
+        if (string.IsNullOrWhiteSpace(body))
+            return "<p><em>No content</em></p>";
+            
+        // Simple transformation: replace newlines with <br> tags
+        return body.Replace("\r\n", "<br>").Replace("\n", "<br>");
+    }
+
+    private string GetApprovalStatusText(EmailStatus status)
+    {
+        return status switch
+        {
+            EmailStatus.PendingApproval => "Pending Approval",
+            EmailStatus.Approved => "Approved",
+            EmailStatus.Rejected => "Rejected",
+            _ => status.ToString()
+        };
+    }
+
+    private string GetApprovalStatusColorClass(EmailStatus status)
+    {
+        return status switch
+        {
+            EmailStatus.PendingApproval => "text-yellow-600 dark:text-yellow-400",
+            EmailStatus.Approved => "text-green-600 dark:text-green-400",
+            EmailStatus.Rejected => "text-red-600 dark:text-red-400",
+            _ => "text-omail-600 dark:text-omail-400"
+        };
+    }
+
+    private string GetApprovalColorClass(ApprovalStatus status)
+    {
+        return status switch
+        {
+            ApprovalStatus.Pending => "text-yellow-600 dark:text-yellow-400",
+            ApprovalStatus.Approved => "text-green-600 dark:text-green-400",
+            ApprovalStatus.Rejected => "text-red-600 dark:text-red-400",
+            _ => "text-omail-600 dark:text-omail-400"
+        };
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1) {
+            order++;
+            len = len / 1024;
+        }
+
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    @inject AuthenticationStateProvider AuthenticationStateProvider
 }

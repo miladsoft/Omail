@@ -1,0 +1,188 @@
+@inject EmailService EmailService
+@inject AuthService AuthService
+@inject ApprovalService ApprovalService
+@implements IDisposable
+
+<!-- Email folders sidebar -->
+<div class="col-span-12 md:col-span-3 space-y-2">
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
+        <div class="p-4">
+            <a href="inbox" class="@GetLinkClass("inbox")" @onclick="async () => await OnPageChangeAsync("inbox")">
+                <lord-icon
+                    src="https://cdn.lordicon.com/tkaubbni.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5 mr-3">
+                </lord-icon>
+                <span>Inbox</span>
+                @if (inboxCount > 0)
+                {
+                    <span class="ml-auto bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">@inboxCount</span>
+                }
+            </a>
+            <a href="sent" class="@GetLinkClass("sent")" @onclick="async () => await OnPageChangeAsync("sent")">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iltqorsz.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5 mr-3">
+                </lord-icon>
+                <span>Sent</span>
+            </a>
+            <a href="drafts" class="@GetLinkClass("drafts")" @onclick="async () => await OnPageChangeAsync("drafts")">
+                <lord-icon
+                    src="https://cdn.lordicon.com/puvaffet.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5 mr-3">
+                </lord-icon>
+                <span>Drafts</span>
+                @if (draftsCount > 0)
+                {
+                    <span class="ml-auto bg-omail-500 text-white text-xs px-2 py-0.5 rounded-full">@draftsCount</span>
+                }
+            </a>
+            @if (isManager && pendingApprovalsCount > 0)
+            {
+                <a href="approvals" class="@GetLinkClass("approvals")" @onclick="async () => await OnPageChangeAsync("approvals")">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/hjeefwhm.json"
+                        trigger="hover"
+                        colors="primary:#121331,secondary:#818cf8"
+                        class="w-5 h-5 mr-3">
+                    </lord-icon>
+                    <span>Approvals</span>
+                    <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">@pendingApprovalsCount</span>
+                </a>
+            }
+            <a href="trash" class="@GetLinkClass("trash")" @onclick="async () => await OnPageChangeAsync("trash")">
+                <lord-icon
+                    src="https://cdn.lordicon.com/gsqxdxog.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5 mr-3">
+                </lord-icon>
+                <span>Trash</span>
+            </a>
+        </div>
+        <div class="border-t border-omail-100 dark:border-omail-700 p-4">
+            <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Labels</h3>
+            <div class="space-y-1">
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    <span>Important</span>
+                </a>
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                    <span>Work</span>
+                </a>
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                    <span>Personal</span>
+                </a>
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                    <span>Projects</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-4">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300">Storage</h3>
+            <span class="text-xs text-omail-500 dark:text-omail-400">75%</span>
+        </div>
+        <div class="w-full bg-omail-200 dark:bg-omail-700 rounded-full h-2">
+            <div class="bg-omail-600 h-2 rounded-full" style="width: 75%"></div>
+        </div>
+        <p class="text-xs text-omail-500 dark:text-omail-400 mt-1">7.5 GB of 10 GB used</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ActivePage { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> OnPageChange { get; set; }
+    
+    private int inboxCount = 0;
+    private int draftsCount = 0;
+    private int pendingApprovalsCount = 0;
+    private Employee currentUser;
+    private bool isManager = false;
+    private System.Timers.Timer refreshTimer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshCounts();
+        
+        // Setup a refresh timer (every 30 seconds)
+        refreshTimer = new System.Timers.Timer(30000);
+        refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(RefreshCounts);
+        refreshTimer.Start();
+    }
+    
+    private async Task RefreshCounts()
+    {
+        try
+        {
+            currentUser = await AuthService.GetCurrentUserAsync();
+            
+            if (currentUser != null)
+            {
+                // Check if user is a manager
+                isManager = currentUser.IsManager;
+                
+                // Get unread inbox count - filter for only unread emails
+                var inbox = await EmailService.GetInboxAsync();
+                inboxCount = inbox.Count(e => 
+                    e.Recipients.FirstOrDefault(r => r.RecipientId == currentUser.Id)?.IsRead == false
+                );
+                
+                // Get drafts count
+                var drafts = await EmailService.GetDraftsAsync();
+                draftsCount = drafts.Count;
+                
+                // Get pending approvals count for managers
+                if (isManager)
+                {
+                    var approvals = await ApprovalService.GetPendingApprovalsAsync();
+                    pendingApprovalsCount = approvals.Count;
+                }
+                
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error refreshing counts: {ex.Message}");
+        }
+    }
+    
+    private string GetLinkClass(string page)
+    {
+        var baseClass = "flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-lg mb-1";
+        
+        if (page == ActivePage)
+        {
+            return baseClass + " bg-omail-100/50 dark:bg-omail-600/40 font-medium border-l-4 border-omail-600 dark:border-omail-100";
+        }
+        
+        return baseClass;
+    }
+    
+    private async Task OnPageChangeAsync(string pageName)
+    {
+        if (OnPageChange.HasDelegate)
+        {
+            await OnPageChange.InvokeAsync(pageName);
+        }
+    }
+    
+    public void Dispose()
+    {
+        refreshTimer?.Stop();
+        refreshTimer?.Dispose();
+    }
+}

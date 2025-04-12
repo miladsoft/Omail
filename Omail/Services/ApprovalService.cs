@@ -8,11 +8,13 @@ namespace Omail.Services
     {
         private readonly AppDbContext _context;
         private readonly AuthService _authService;
+        private readonly EmailService _emailService;
 
-        public ApprovalService(AppDbContext context, AuthService authService)
+        public ApprovalService(AppDbContext context, AuthService authService, ServiceFactory serviceFactory)
         {
             _context = context;
             _authService = authService;
+            _emailService = serviceFactory.GetService<EmailService>();
         }
 
         public async Task<List<EmailApproval>> GetPendingApprovalsAsync()

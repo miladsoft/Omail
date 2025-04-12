@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.JSInterop;
 
 namespace Omail.Services
 {
@@ -6,14 +7,16 @@ namespace Omail.Services
     {
         private bool _isDarkMode;
         private readonly ProtectedLocalStorage _localStorage;
+        private readonly IJSRuntime _jsRuntime;
         
         public bool IsDarkMode => _isDarkMode;
         
         public event Action OnThemeChange;
         
-        public ThemeService(ProtectedLocalStorage localStorage)
+        public ThemeService(ProtectedLocalStorage localStorage, IJSRuntime jsRuntime)
         {
             _localStorage = localStorage;
+            _jsRuntime = jsRuntime;
         }
         
         public async Task InitializeAsync()
@@ -22,10 +25,12 @@ namespace Omail.Services
             {
                 var result = await _localStorage.GetAsync<bool>("darkMode");
                 _isDarkMode = result.Success ? result.Value : false;
+                await _jsRuntime.InvokeVoidAsync("setTheme", _isDarkMode);
             }
             catch
             {
                 _isDarkMode = false;
+                await _jsRuntime.InvokeVoidAsync("setTheme", false);
             }
         }
         
@@ -33,6 +38,7 @@ namespace Omail.Services
         {
             _isDarkMode = !_isDarkMode;
             await _localStorage.SetAsync("darkMode", _isDarkMode);
+            await _jsRuntime.InvokeVoidAsync("setTheme", _isDarkMode);
             OnThemeChange?.Invoke();
         }
     }

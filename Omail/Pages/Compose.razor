@@ -1,6 +1,14 @@
 @page "/compose"
+@page "/compose/{EmailId:int}"
+@using Omail.Data.Models
+@attribute [Authorize]
+@inject EmailService EmailService
+@inject NavigationManager NavigationManager
+@inject ILogger<Compose> Logger
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Compose - Omail</PageTitle>
+<PageTitle>@(isNewEmail ? "Compose" : "Edit Draft") - Omail</PageTitle>
 
 <div class="space-y-4">
     <div class="flex justify-between items-center">
@@ -12,13 +20,16 @@
                 colors="primary:#121331,secondary:#818cf8"
                 class="w-8 h-8 mr-2">
             </lord-icon>
-            Compose Email
+            @(isNewEmail ? "Compose Email" : "Edit Draft")
         </h1>
         <div class="flex space-x-2">
-            <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 px-3 py-1 rounded-lg border border-omail-200 dark:border-omail-700 transition-all duration-300">
+            <button @onclick="DiscardAndReturn" class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 px-3 py-1 rounded-lg transition-all duration-300">
+                Discard
+            </button>
+            <button @onclick="SaveDraft" class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 px-3 py-1 rounded-lg border border-omail-200 dark:border-omail-700 transition-all duration-300">
                 Save Draft
             </button>
-            <button class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
+            <button @onclick="SendEmail" class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
                 <lord-icon
                     src="https://cdn.lordicon.com/iltqorsz.json"
                     trigger="hover"
@@ -30,113 +41,694 @@
         </div>
     </div>
 
-    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">To:</label>
-                <div class="flex flex-wrap items-center gap-2 border-b border-omail-200 dark:border-omail-700 pb-2">
-                    <div class="bg-omail-100 dark:bg-omail-700 rounded-full px-3 py-1 flex items-center">
-                        <span class="text-omail-800 dark:text-omail-200 text-sm">john.doe@example.com</span>
-                        <button class="ml-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <input type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-omail-800 dark:text-omail-200 placeholder-omail-400 text-sm" placeholder="Type email address..."/>
-                </div>
-            </div>
-            
-            <div class="flex justify-between">
-                <div class="flex space-x-3">
-                    <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 text-sm flex items-center">
-                        <span>Cc</span>
-                    </button>
-                    <button class="text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100 text-sm flex items-center">
-                        <span>Bcc</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div>
-                <input type="text" class="w-full border-0 border-b border-omail-200 dark:border-omail-700 focus:ring-0 pb-2 text-omail-800 dark:text-omail-200 bg-transparent" placeholder="Subject"/>
-            </div>
-            
-            <div class="border rounded-lg dark:border-omail-700 p-4 min-h-[200px]">
-                <!-- This would be a rich text editor in a real implementation -->
-                <textarea class="w-full min-h-[200px] border-0 focus:ring-0 bg-transparent text-omail-800 dark:text-omail-200" placeholder="Write your message here..."></textarea>
-            </div>
-            
-            <div>
-                <div class="flex items-center space-x-4">
-                    <button class="flex items-center text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/xhbsnkyp.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-1">
-                        </lord-icon>
-                        <span class="text-sm">Attach Files</span>
-                    </button>
-                    
-                    <button class="flex items-center text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-100">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/wfydcujn.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-1">
-                        </lord-icon>
-                        <span class="text-sm">Add Images</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Attachments Preview -->
-            <div class="border-t border-omail-200 dark:border-omail-700 pt-4 mt-4">
-                <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200 mb-2">Attachments (2)</h3>
+    @if (isLoading)
+    {
+        <div class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+            <p class="mt-4 text-omail-600 dark:text-omail-400">Loading...</p>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
+            <EditForm Model="emailModel" OnValidSubmit="SendEmail" class="space-y-4">
+                <DataAnnotationsValidator />
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="flex items-center p-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-omail-50 dark:bg-omail-800">
-                        <div class="bg-omail-200 dark:bg-omail-700 p-2 rounded mr-3">
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">To:</label>
+                    <div class="flex flex-wrap items-center gap-2 border-b border-omail-200 dark:border-omail-700 pb-2">
+                        @foreach (var recipient in selectedRecipients)
+                        {
+                            <div class="bg-omail-100 dark:bg-omail-700 rounded-full px-3 py-1 flex items-center">
+                                <span class="text-omail-800 dark:text-omail-200 text-sm">@recipient.FullName</span>
+                                <button @onclick="() => RemoveRecipient(recipient)" type="button" class="ml-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                        <input @bind-value="recipientSearch" @bind-value:event="oninput" @onkeydown="HandleRecipientKeyDown" type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-omail-800 dark:text-omail-200 placeholder-omail-400 text-sm" placeholder="Type email address..."/>
+                        
+                        @if (!string.IsNullOrEmpty(recipientSearch) && filteredUsers.Any())
+                        {
+                            <div class="absolute mt-12 w-64 bg-white dark:bg-omail-800 shadow-lg rounded-lg z-10 max-h-48 overflow-y-auto border border-omail-200 dark:border-omail-700">
+                                @foreach (var user in filteredUsers)
+                                {
+                                    <div @onclick="() => AddRecipient(user)" class="px-4 py-2 hover:bg-omail-100 dark:hover:bg-omail-700 cursor-pointer">
+                                        <div class="text-sm font-medium text-omail-900 dark:text-white">@user.FullName</div>
+                                        <div class="text-xs text-omail-500 dark:text-omail-400">@user.Email</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <ValidationMessage For="@(() => emailModel.To)" class="text-red-500 text-xs mt-1" />
+                </div>
+
+                @if (!showCc && !showBcc)
+                {
+                    <div>
+                        <button type="button" @onclick="() => showCc = true" class="text-xs text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 mr-2">Add Cc</button>
+                        <button type="button" @onclick="() => showBcc = true" class="text-xs text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200">Add Bcc</button>
+                    </div>
+                }
+                
+                @if (showCc)
+                {
+                    <div>
+                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Cc:</label>
+                        <div class="flex flex-wrap items-center gap-2 border-b border-omail-200 dark:border-omail-700 pb-2">
+                            @foreach (var recipient in selectedCcRecipients)
+                            {
+                                <div class="bg-omail-100 dark:bg-omail-700 rounded-full px-3 py-1 flex items-center">
+                                    <span class="text-omail-800 dark:text-omail-200 text-sm">@recipient.FullName</span>
+                                    <button @onclick="() => RemoveCcRecipient(recipient)" type="button" class="ml-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                            <input @bind-value="ccRecipientSearch" @bind-value:event="oninput" @onkeydown="HandleCcRecipientKeyDown" type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-omail-800 dark:text-omail-200 placeholder-omail-400 text-sm" placeholder="Type email address..."/>
+                            
+                            @if (!string.IsNullOrEmpty(ccRecipientSearch) && filteredCcUsers.Any())
+                            {
+                                <div class="absolute mt-12 w-64 bg-white dark:bg-omail-800 shadow-lg rounded-lg z-10 max-h-48 overflow-y-auto border border-omail-200 dark:border-omail-700">
+                                    @foreach (var user in filteredCcUsers)
+                                    {
+                                        <div @onclick="() => AddCcRecipient(user)" class="px-4 py-2 hover:bg-omail-100 dark:hover:bg-omail-700 cursor-pointer">
+                                            <div class="text-sm font-medium text-omail-900 dark:text-white">@user.FullName</div>
+                                            <div class="text-xs text-omail-500 dark:text-omail-400">@user.Email</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                
+                @if (showBcc)
+                {
+                    <div>
+                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Bcc:</label>
+                        <div class="flex flex-wrap items-center gap-2 border-b border-omail-200 dark:border-omail-700 pb-2">
+                            @foreach (var recipient in selectedBccRecipients)
+                            {
+                                <div class="bg-omail-100 dark:bg-omail-700 rounded-full px-3 py-1 flex items-center">
+                                    <span class="text-omail-800 dark:text-omail-200 text-sm">@recipient.FullName</span>
+                                    <button @onclick="() => RemoveBccRecipient(recipient)" type="button" class="ml-2 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                            <input @bind-value="bccRecipientSearch" @bind-value:event="oninput" @onkeydown="HandleBccRecipientKeyDown" type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-omail-800 dark:text-omail-200 placeholder-omail-400 text-sm" placeholder="Type email address..."/>
+                            
+                            @if (!string.IsNullOrEmpty(bccRecipientSearch) && filteredBccUsers.Any())
+                            {
+                                <div class="absolute mt-12 w-64 bg-white dark:bg-omail-800 shadow-lg rounded-lg z-10 max-h-48 overflow-y-auto border border-omail-200 dark:border-omail-700">
+                                    @foreach (var user in filteredBccUsers)
+                                    {
+                                        <div @onclick="() => AddBccRecipient(user)" class="px-4 py-2 hover:bg-omail-100 dark:hover:bg-omail-700 cursor-pointer">
+                                            <div class="text-sm font-medium text-omail-900 dark:text-white">@user.FullName</div>
+                                            <div class="text-xs text-omail-500 dark:text-omail-400">@user.Email</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Subject:</label>
+                    <InputText @bind-Value="emailModel.Subject" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-omail-500 focus:border-omail-500" placeholder="Enter subject" />
+                    <ValidationMessage For="@(() => emailModel.Subject)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Message:</label>
+                    <InputTextArea @bind-Value="emailModel.Body" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-omail-500 focus:border-omail-500" rows="10" placeholder="Write your message here..." />
+                    <ValidationMessage For="@(() => emailModel.Body)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Attachments:</label>
+                    <div class="border border-dashed border-omail-300 dark:border-omail-700 rounded-lg p-4">
+                        <InputFile OnChange="HandleFileSelection" multiple class="hidden" id="fileInput" />
+                        <label for="fileInput" class="flex flex-col items-center justify-center cursor-pointer">
                             <lord-icon
-                                src="https://cdn.lordicon.com/nocvdjmh.json"
+                                src="https://cdn.lordicon.com/xhdhjyqy.json"
                                 trigger="hover"
                                 colors="primary:#121331,secondary:#818cf8"
-                                class="w-6 h-6">
+                                class="w-12 h-12">
                             </lord-icon>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-medium text-omail-800 dark:text-omail-200 truncate">Presentation.pptx</p>
-                            <p class="text-xs text-omail-500 dark:text-omail-400">2.4 MB</p>
-                        </div>
-                        <button class="text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-200 ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                            <p class="mt-2 text-sm text-omail-600 dark:text-omail-400">Click to add files or drag and drop</p>
+                            <p class="text-xs text-omail-500 dark:text-omail-500">Max file size: 10MB</p>
+                        </label>
                     </div>
                     
-                    <div class="flex items-center p-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-omail-50 dark:bg-omail-800">
-                        <div class="bg-omail-200 dark:bg-omail-700 p-2 rounded mr-3">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/puvaffet.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-6 h-6">
-                            </lord-icon>
+                    @if (attachments.Any())
+                    {
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            @foreach (var attachment in attachments)
+                            {
+                                <div class="flex items-center bg-omail-50 dark:bg-omail-800/40 rounded-lg p-2">
+                                    <div>
+                                        <lord-icon
+                                            src="https://cdn.lordicon.com/puvaffet.json"
+                                            trigger="hover"
+                                            colors="primary:#121331,secondary:#818cf8"
+                                            class="w-8 h-8">
+                                        </lord-icon>
+                                    </div>
+                                    <div class="ml-2 flex-1 min-w-0">
+                                        <p class="text-sm text-omail-800 dark:text-omail-200 truncate">@attachment.FileName</p>
+                                        <p class="text-xs text-omail-500 dark:text-omail-400">@FormatFileSize(attachment.FileSize)</p>
+                                    </div>
+                                    <button type="button" @onclick="() => RemoveAttachment(attachment)" class="text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-medium text-omail-800 dark:text-omail-200 truncate">Report-Q2-2023.pdf</p>
-                            <p class="text-xs text-omail-500 dark:text-omail-400">1.8 MB</p>
-                        </div>
-                        <button class="text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-200 ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
+                    }
                 </div>
+                
+                <div class="flex justify-end pt-4 space-x-2">
+                    <button type="button" @onclick="DiscardAndReturn" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 px-4 py-2 rounded-lg">
+                        Discard
+                    </button>
+                    <button type="button" @onclick="SaveDraft" class="text-omail-700 dark:text-omail-300 hover:text-omail-800 dark:hover:text-omail-200 px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg">
+                        Save as Draft
+                    </button>
+                    <button type="submit" class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg">
+                        Send
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    }
+</div>
+
+@if (showConfirmation)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-2">@confirmationTitle</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@confirmationMessage</p>
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelConfirmation" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmAction" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                    @confirmationButtonText
+                </button>
             </div>
         </div>
     </div>
-</div>
+}
+
+@code {
+    [Parameter]
+    public int? EmailId { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? Reply { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? ReplyAll { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? Forward { get; set; }
+    
+    private EmailModel emailModel = new EmailModel();
+    private List<Employee> allUsers = new List<Employee>();
+    private List<Employee> selectedRecipients = new List<Employee>();
+    private List<Employee> selectedCcRecipients = new List<Employee>();
+    private List<Employee> selectedBccRecipients = new List<Employee>();
+    private List<EmailAttachment> attachments = new List<EmailAttachment>();
+    private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+    
+    private string recipientSearch = string.Empty;
+    private string ccRecipientSearch = string.Empty;
+    private string bccRecipientSearch = string.Empty;
+    private bool isLoading = true;
+    private bool isNewEmail = true;
+    private bool showCc = false;
+    private bool showBcc = false;
+    private EmailMessage existingEmail;
+    private Employee currentUser;
+
+    // Confirmation dialog properties
+    private bool showConfirmation = false;
+    private string confirmationTitle;
+    private string confirmationMessage;
+    private string confirmationButtonText = "Confirm";
+    private Func<Task> confirmationAction;
+    
+    private List<Employee> filteredUsers => FilterUsers(recipientSearch, selectedRecipients);
+    private List<Employee> filteredCcUsers => FilterUsers(ccRecipientSearch, selectedCcRecipients);
+    private List<Employee> filteredBccUsers => FilterUsers(bccRecipientSearch, selectedBccRecipients);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Get current user
+            currentUser = await AuthService.GetCurrentUserAsync();
+            if (currentUser == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            
+            // Load all users for recipient selection
+            allUsers = await LoadAllUsers();
+            
+            // Handle email mode (new, edit, reply, forward)
+            if (EmailId.HasValue)
+            {
+                await LoadExistingEmail(EmailId.Value);
+                isNewEmail = false;
+            }
+            else if (Reply.HasValue)
+            {
+                await PrepareReply(Reply.Value, false);
+            }
+            else if (ReplyAll.HasValue)
+            {
+                await PrepareReply(ReplyAll.Value, true);
+            }
+            else if (Forward.HasValue)
+            {
+                await PrepareForward(Forward.Value);
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task<List<Employee>> LoadAllUsers()
+    {
+        // In a real app, get this from a service
+        // This is placeholder data - replace with actual service call
+        return await Task.FromResult(new List<Employee>
+        {
+            new Employee { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", SectionId = 1 },
+            new Employee { Id = 2, FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", SectionId = 1 },
+            new Employee { Id = 3, FirstName = "Robert", LastName = "Johnson", Email = "robert.johnson@example.com", SectionId = 2 },
+            new Employee { Id = 4, FirstName = "Emily", LastName = "Williams", Email = "emily.williams@example.com", SectionId = 2 },
+            new Employee { Id = 5, FirstName = "Michael", LastName = "Brown", Email = "michael.brown@example.com", SectionId = 3 }
+        });
+    }
+
+    private List<Employee> FilterUsers(string searchText, List<Employee> excludeList)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+            return new List<Employee>();
+            
+        return allUsers
+            .Where(u => !excludeList.Contains(u) && 
+                      (u.FullName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                       u.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+    }
+
+    private async Task LoadExistingEmail(int emailId)
+    {
+        existingEmail = await EmailService.GetEmailByIdAsync(emailId);
+        if (existingEmail == null || existingEmail.SenderId != currentUser.Id)
+        {
+            NavigationManager.NavigateTo("/drafts");
+            return;
+        }
+        
+        emailModel.Subject = existingEmail.Subject;
+        emailModel.Body = existingEmail.Body;
+        
+        // Load recipients
+        foreach (var recipient in existingEmail.Recipients)
+        {
+            var employee = allUsers.FirstOrDefault(u => u.Id == recipient.RecipientId);
+            if (employee != null)
+            {
+                switch (recipient.Type)
+                {
+                    case RecipientType.To:
+                        selectedRecipients.Add(employee);
+                        break;
+                    case RecipientType.Cc:
+                        selectedCcRecipients.Add(employee);
+                        showCc = true;
+                        break;
+                    case RecipientType.Bcc:
+                        selectedBccRecipients.Add(employee);
+                        showBcc = true;
+                        break;
+                }
+            }
+        }
+        
+        // Load attachments
+        attachments = existingEmail.Attachments.ToList();
+    }
+
+    private async Task PrepareReply(int emailId, bool replyAll)
+    {
+        var originalEmail = await EmailService.GetEmailByIdAsync(emailId);
+        if (originalEmail == null)
+        {
+            NavigationManager.NavigateTo("/inbox");
+            return;
+        }
+        
+        // Add original sender as recipient
+        var sender = allUsers.FirstOrDefault(u => u.Id == originalEmail.SenderId);
+        if (sender != null)
+        {
+            selectedRecipients.Add(sender);
+        }
+        
+        // For Reply All, add all other recipients except current user
+        if (replyAll)
+        {
+            var toRecipients = originalEmail.Recipients
+                .Where(r => r.Type == RecipientType.To && r.RecipientId != currentUser.Id)
+                .Select(r => r.RecipientId);
+                
+            var ccRecipients = originalEmail.Recipients
+                .Where(r => r.Type == RecipientType.Cc && r.RecipientId != currentUser.Id)
+                .Select(r => r.RecipientId);
+            
+            foreach (var recipientId in toRecipients)
+            {
+                var recipient = allUsers.FirstOrDefault(u => u.Id == recipientId);
+                if (recipient != null)
+                {
+                    selectedRecipients.Add(recipient);
+                }
+            }
+            
+            foreach (var recipientId in ccRecipients)
+            {
+                var recipient = allUsers.FirstOrDefault(u => u.Id == recipientId);
+                if (recipient != null)
+                {
+                    selectedCcRecipients.Add(recipient);
+                    showCc = true;
+                }
+            }
+        }
+        
+        // Set subject with Re: prefix
+        emailModel.Subject = !originalEmail.Subject.StartsWith("Re:", StringComparison.OrdinalIgnoreCase)
+            ? $"Re: {originalEmail.Subject}"
+            : originalEmail.Subject;
+        
+        // Format reply text
+        var sentDate = originalEmail.SentAt?.ToString("f") ?? originalEmail.CreatedAt.ToString("f");
+        emailModel.Body = $"\n\n----------\nOn {sentDate}, {originalEmail.Sender?.FullName ?? "Unknown"} wrote:\n\n{originalEmail.Body}";
+    }
+
+    private async Task PrepareForward(int emailId)
+    {
+        var originalEmail = await EmailService.GetEmailByIdAsync(emailId);
+        if (originalEmail == null)
+        {
+            NavigationManager.NavigateTo("/inbox");
+            return;
+        }
+        
+        // Set subject with Fwd: prefix
+        emailModel.Subject = !originalEmail.Subject.StartsWith("Fwd:", StringComparison.OrdinalIgnoreCase)
+            ? $"Fwd: {originalEmail.Subject}"
+            : originalEmail.Subject;
+        
+        // Format forwarded text
+        var sentDate = originalEmail.SentAt?.ToString("f") ?? originalEmail.CreatedAt.ToString("f");
+        var recipientsList = string.Join(", ", originalEmail.Recipients
+            .Where(r => r.Type == RecipientType.To)
+            .Select(r => r.Recipient?.FullName ?? "Unknown"));
+            
+        emailModel.Body = $"\n\n----------\nForwarded Message\nFrom: {originalEmail.Sender?.FullName ?? "Unknown"} <{originalEmail.Sender?.Email}>\n" +
+                         $"Date: {sentDate}\n" +
+                         $"Subject: {originalEmail.Subject}\n" +
+                         $"To: {recipientsList}\n\n" +
+                         $"{originalEmail.Body}";
+        
+        // Include attachments from original email
+        attachments = originalEmail.Attachments.ToList();
+    }
+
+    private void AddRecipient(Employee employee)
+    {
+        selectedRecipients.Add(employee);
+        recipientSearch = string.Empty;
+    }
+
+    private void RemoveRecipient(Employee employee)
+    {
+        selectedRecipients.Remove(employee);
+    }
+
+    private void AddCcRecipient(Employee employee)
+    {
+        selectedCcRecipients.Add(employee);
+        ccRecipientSearch = string.Empty;
+    }
+
+    private void RemoveCcRecipient(Employee employee)
+    {
+        selectedCcRecipients.Remove(employee);
+    }
+
+    private void AddBccRecipient(Employee employee)
+    {
+        selectedBccRecipients.Add(employee);
+        bccRecipientSearch = string.Empty;
+    }
+
+    private void RemoveBccRecipient(Employee employee)
+    {
+        selectedBccRecipients.Remove(employee);
+    }
+
+    private void HandleRecipientKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Tab" && filteredUsers.Count > 0)
+        {
+            AddRecipient(filteredUsers.First());
+        }
+    }
+
+    private void HandleCcRecipientKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Tab" && filteredCcUsers.Count > 0)
+        {
+            AddCcRecipient(filteredCcUsers.First());
+        }
+    }
+
+    private void HandleBccRecipientKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Tab" && filteredBccUsers.Count > 0)
+        {
+            AddBccRecipient(filteredBccUsers.First());
+        }
+    }
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles(10)) // Limit to 10 files
+        {
+            // Check file size (10MB limit)
+            if (file.Size > 10 * 1024 * 1024)
+            {
+                // Show error
+                continue;
+            }
+
+            uploadedFiles.Add(file);
+            
+            // In a real app, you'd upload the file to server storage
+            // For now, we just add it to our attachments list with metadata
+            var attachment = new EmailAttachment
+            {
+                FileName = file.Name,
+                FileSize = file.Size,
+                ContentType = file.ContentType,
+                FilePath = $"uploads/{Guid.NewGuid()}/{file.Name}", // Placeholder path
+                UploadedAt = DateTime.UtcNow
+            };
+            
+            attachments.Add(attachment);
+        }
+    }
+
+    private void RemoveAttachment(EmailAttachment attachment)
+    {
+        attachments.Remove(attachment);
+    }
+
+    private async Task SaveDraft()
+    {
+        if (string.IsNullOrWhiteSpace(emailModel.Subject) && string.IsNullOrWhiteSpace(emailModel.Body) && !selectedRecipients.Any())
+        {
+            // Don't save empty drafts
+            NavigationManager.NavigateTo("/drafts");
+            return;
+        }
+        
+        try
+        {
+            var email = new EmailMessage
+            {
+                Id = existingEmail?.Id ?? 0,
+                Subject = emailModel.Subject ?? "[No subject]",
+                Body = emailModel.Body ?? string.Empty,
+                CreatedAt = DateTime.UtcNow,
+                Status = EmailStatus.Draft
+            };
+            
+            var recipientIds = selectedRecipients.Select(r => r.Id).ToList();
+            var ccIds = selectedCcRecipients.Select(r => r.Id).ToList();
+            var bccIds = selectedBccRecipients.Select(r => r.Id).ToList();
+            
+            var savedEmail = await EmailService.SaveDraftAsync(email, recipientIds, ccIds, bccIds);
+            
+            NavigationManager.NavigateTo("/drafts");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error saving draft");
+            // Show error notification
+        }
+    }
+
+    private async Task SendEmail()
+    {
+        if (!selectedRecipients.Any())
+        {
+            // Show validation error - need at least one recipient
+            return;
+        }
+        
+        try
+        {
+            var email = new EmailMessage
+            {
+                Id = existingEmail?.Id ?? 0,
+                Subject = emailModel.Subject ?? "[No subject]",
+                Body = emailModel.Body ?? string.Empty,
+                CreatedAt = DateTime.UtcNow,
+                Status = EmailStatus.Draft // Will be updated by service
+            };
+            
+            var recipientIds = selectedRecipients.Select(r => r.Id).ToList();
+            var ccIds = selectedCcRecipients.Select(r => r.Id).ToList();
+            var bccIds = selectedBccRecipients.Select(r => r.Id).ToList();
+            
+            var sentEmail = await EmailService.SendEmailAsync(email, recipientIds, ccIds, bccIds);
+            
+            // Check if email requires approval
+            if (sentEmail.Status == EmailStatus.PendingApproval)
+            {
+                // Show success notification with approval info
+                await JSRuntime.InvokeVoidAsync("alert", "Your email has been submitted for approval.");
+            }
+            
+            NavigationManager.NavigateTo("/sent");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error sending email");
+            // Show error notification
+        }
+    }
+
+    private void DiscardConfirmation()
+    {
+        if (string.IsNullOrWhiteSpace(emailModel.Subject) && string.IsNullOrWhiteSpace(emailModel.Body) && !selectedRecipients.Any())
+        {
+            // No changes to discard
+            DiscardAndReturn();
+            return;
+        }
+        
+        confirmationTitle = "Discard Email?";
+        confirmationMessage = "Are you sure you want to discard this email? All changes will be lost.";
+        confirmationButtonText = "Discard";
+        confirmationAction = async () => {
+            DiscardAndReturn();
+            CancelConfirmation();
+        };
+        showConfirmation = true;
+    }
+
+    private void DiscardAndReturn()
+    {
+        if (Reply.HasValue || ReplyAll.HasValue || Forward.HasValue)
+        {
+            NavigationManager.NavigateTo("/inbox");
+        }
+        else if (EmailId.HasValue)
+        {
+            NavigationManager.NavigateTo("/drafts");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/inbox");
+        }
+    }
+
+    private void CancelConfirmation()
+    {
+        showConfirmation = false;
+        confirmationAction = null;
+    }
+
+    private async Task ConfirmAction()
+    {
+        if (confirmationAction != null)
+        {
+            await confirmationAction();
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1) {
+            order++;
+            len = len / 1024;
+        }
+
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    public class EmailModel
+    {
+        [Required(ErrorMessage = "Subject is required")]
+        public string Subject { get; set; }
+
+        [Required(ErrorMessage = "Message body is required")]
+        public string Body { get; set; }
+
+        [Required(ErrorMessage = "At least one recipient is required")]
+        public string To { get; set; }
+    }
+}

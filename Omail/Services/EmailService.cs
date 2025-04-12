@@ -8,16 +8,16 @@ namespace Omail.Services
     {
         private readonly AppDbContext _context;
         private readonly AuthService _authService;
-        private readonly ApprovalService _approvalService;
+        private readonly ServiceFactory _serviceFactory;
 
         public EmailService(
             AppDbContext context, 
             AuthService authService,
-            ApprovalService approvalService)
+            ServiceFactory serviceFactory)
         {
             _context = context;
             _authService = authService;
-            _approvalService = approvalService;
+            _serviceFactory = serviceFactory;
         }
 
         public async Task<List<EmailMessage>> GetInboxAsync(int? limit = null)
@@ -26,7 +26,7 @@ namespace Omail.Services
             if (currentUser == null)
                 return new List<EmailMessage>();
 
-            var query = _context.Emails
+            IQueryable<EmailMessage> query = _context.Emails
                 .Include(e => e.Sender)
                 .Include(e => e.Recipients)
                 .ThenInclude(r => r.Recipient)
@@ -48,7 +48,7 @@ namespace Omail.Services
             if (currentUser == null)
                 return new List<EmailMessage>();
 
-            var query = _context.Emails
+            IQueryable<EmailMessage> query = _context.Emails
                 .Include(e => e.Recipients)
                 .ThenInclude(r => r.Recipient)
                 .Include(e => e.Attachments)
@@ -69,7 +69,7 @@ namespace Omail.Services
             if (currentUser == null)
                 return new List<EmailMessage>();
 
-            var query = _context.Emails
+            IQueryable<EmailMessage> query = _context.Emails
                 .Include(e => e.Recipients)
                 .ThenInclude(r => r.Recipient)
                 .Include(e => e.Attachments)
@@ -90,7 +90,7 @@ namespace Omail.Services
             if (currentUser == null)
                 return new List<EmailMessage>();
 
-            var query = _context.Emails
+            IQueryable<EmailMessage> query = _context.Emails
                 .Include(e => e.Sender)
                 .Include(e => e.Recipients)
                 .ThenInclude(r => r.Recipient)
@@ -249,7 +249,9 @@ namespace Omail.Services
                 
                 if (manager != null)
                 {
-                    await _approvalService.CreateApprovalAsync(email.Id, manager.Id);
+                    // Get ApprovalService through the factory to avoid circular dependency
+                    var approvalService = _serviceFactory.GetService<ApprovalService>();
+                    await approvalService.CreateApprovalAsync(email.Id, manager.Id);
                 }
             }
 

@@ -1,4 +1,9 @@
 @page "/inbox"
+@using System.Security.Claims
+@attribute [Authorize]
+@inject EmailService EmailService
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
 <PageTitle>Inbox - Omail</PageTitle>
 
@@ -13,11 +18,12 @@
                 class="w-8 h-8 mr-2">
             </lord-icon>
             Inbox
-            <span class="ml-2 bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">24</span>
+            <span class="ml-2 bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">@(emails?.Count ?? 0)</span>
         </h1>
         <div class="flex space-x-2">
             <div class="relative">
                 <input type="text" placeholder="Search emails..."
+                       @bind-value="searchQuery" @bind-value:event="oninput"
                        class="pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/50 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 w-48 md:w-64 transition-all duration-300"/>
                 <lord-icon
                     src="https://cdn.lordicon.com/msoeawqm.json"
@@ -26,7 +32,7 @@
                     class="absolute left-3 top-2.5 w-5 h-5">
                 </lord-icon>
             </div>
-            <button class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
+            <button @onclick="@(() => NavigationManager.NavigateTo("/compose"))" class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
                 <lord-icon
                     src="https://cdn.lordicon.com/wloilxuq.json"
                     trigger="hover"
@@ -39,90 +45,15 @@
     </div>
 
     <div class="grid grid-cols-12 gap-4">
-        <!-- Email folders sidebar -->
-        <div class="col-span-12 md:col-span-3 space-y-2">
-            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
-                <div class="p-4">
-                    <a href="inbox" class="flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 bg-omail-100/50 dark:bg-omail-600/40 rounded-lg mb-1 font-medium border-l-4 border-omail-600 dark:border-omail-100">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/tkaubbni.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-3">
-                        </lord-icon>
-                        <span>Inbox</span>
-                        <span class="ml-auto bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">24</span>
-                    </a>
-                    <a href="sent" class="flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-lg mb-1">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/iltqorsz.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-3">
-                        </lord-icon>
-                        <span>Sent</span>
-                    </a>
-                    <a href="drafts" class="flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-lg mb-1">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/puvaffet.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-3">
-                        </lord-icon>
-                        <span>Drafts</span>
-                        <span class="ml-auto bg-omail-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
-                    </a>
-                    <a href="trash" class="flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-lg">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/gsqxdxog.json"
-                            trigger="hover"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-5 h-5 mr-3">
-                        </lord-icon>
-                        <span>Trash</span>
-                    </a>
-                </div>
-                <div class="border-t border-omail-100 dark:border-omail-700 p-4">
-                    <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Labels</h3>
-                    <div class="space-y-1">
-                        <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
-                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                            <span>Important</span>
-                        </a>
-                        <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                            <span>Work</span>
-                        </a>
-                        <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
-                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                            <span>Personal</span>
-                        </a>
-                        <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
-                            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                            <span>Urgent</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-4">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-medium text-omail-800 dark:text-omail-200">Storage</h3>
-                    <span class="text-xs text-omail-500 dark:text-omail-400">75% used</span>
-                </div>
-                <div class="w-full bg-omail-200 dark:bg-omail-700 rounded-full h-2">
-                    <div class="bg-omail-600 h-2 rounded-full" style="width: 75%"></div>
-                </div>
-                <p class="text-xs text-omail-500 dark:text-omail-400 mt-1">7.5 GB of 10 GB used</p>
-            </div>
-        </div>
+        <SidebarComponent ActivePage="inbox" />
 
         <!-- Email list -->
         <div class="col-span-12 md:col-span-9">
             <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
                 <div class="border-b border-omail-200 dark:border-omail-700 p-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <input type="checkbox" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500"/>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md">
+                        <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500"/>
+                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="RefreshInbox">
                             <lord-icon
                                 src="https://cdn.lordicon.com/nxooksci.json"
                                 trigger="hover"
@@ -130,7 +61,7 @@
                                 class="w-5 h-5">
                             </lord-icon>
                         </button>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md">
+                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="MoveSelectedToTrash" disabled="@(!selectedEmails.Any())">
                             <lord-icon
                                 src="https://cdn.lordicon.com/gsqxdxog.json"
                                 trigger="hover"
@@ -138,18 +69,15 @@
                                 class="w-5 h-5">
                             </lord-icon>
                         </button>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/kbtmbyzy.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
-                            </lord-icon>
-                        </button>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <span class="text-sm text-omail-700 dark:text-omail-300">1-20 of 24</span>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md">
+                        @if (emails != null)
+                        {
+                            <span class="text-sm text-omail-700 dark:text-omail-300">
+                                @(currentPage * pageSize + 1)-@Math.Min((currentPage + 1) * pageSize, filteredEmails.Count) of @filteredEmails.Count
+                            </span>
+                        }
+                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="PreviousPage" disabled="@(currentPage == 0)">
                             <lord-icon
                                 src="https://cdn.lordicon.com/iifryyua.json"
                                 trigger="hover"
@@ -157,7 +85,7 @@
                                 class="w-5 h-5">
                             </lord-icon>
                         </button>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md">
+                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="NextPage" disabled="@((currentPage + 1) * pageSize >= (filteredEmails?.Count ?? 0))">
                             <lord-icon
                                 src="https://cdn.lordicon.com/jxwksgwv.json"
                                 trigger="hover"
@@ -168,62 +96,261 @@
                     </div>
                 </div>
 
-                <!-- Email items -->
-                <div class="divide-y divide-omail-200 dark:divide-omail-700">
-                    @for (int i = 1; i <= 10; i++)
-                    {
-                        <a href="email-detail/1" class="block hover:bg-omail-50 dark:hover:bg-omail-700/50 transition-colors duration-150 @(i % 3 == 0 ? "bg-omail-50/50 dark:bg-omail-700/30" : "")">
-                            <div class="flex items-center px-4 py-3">
-                                <input type="checkbox" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3"/>
-                                <div class="flex-shrink-0 mr-3">
-                                    <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
-                                        @(i % 4 == 0 ? "MS" : i % 3 == 0 ? "JD" : i % 2 == 0 ? "AK" : "TS")
+                <!-- Loading state -->
+                @if (isLoading)
+                {
+                    <div class="py-12 flex flex-col items-center justify-center text-center">
+                        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+                        <p class="mt-4 text-omail-600 dark:text-omail-400">Loading emails...</p>
+                    </div>
+                }
+                else if (filteredEmails.Count == 0)
+                {
+                    <div class="py-12 flex flex-col items-center justify-center text-center">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/msoeawqm.json"
+                            trigger="loop"
+                            delay="2000"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-16 h-16 mb-4">
+                        </lord-icon>
+                        <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No emails found</h3>
+                        <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
+                            @(string.IsNullOrEmpty(searchQuery) ? "Your inbox is empty." : "No emails match your search criteria.")
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <!-- Email items -->
+                    <div class="divide-y divide-omail-200 dark:divide-omail-700">
+                        @foreach (var email in pagedEmails)
+                        {
+                            var recipient = email.Recipients.FirstOrDefault(r => r.RecipientId == currentUserId);
+                            var isRead = recipient?.IsRead ?? false;
+                            
+                            <a href="@($"email-detail/{email.Id}")" class="block hover:bg-omail-50 dark:hover:bg-omail-700/50 transition-colors duration-150 @(!isRead ? "bg-omail-50/50 dark:bg-omail-700/30" : "")">
+                                <div class="flex items-center px-4 py-3">
+                                    <input type="checkbox" checked="@selectedEmails.Contains(email.Id)" @onclick="() => ToggleEmailSelection(email.Id)" @onclick:stopPropagation="true" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3"/>
+                                    <div class="flex-shrink-0 mr-3">
+                                        <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                                            @(email.Sender?.Initials ?? "??")
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-sm font-medium @(!isRead ? "text-omail-900 dark:text-white" : "text-omail-700 dark:text-omail-300") truncate">
+                                                @email.Sender?.FullName
+                                            </p>
+                                            <p class="ml-2 flex-shrink-0 text-xs text-omail-500 dark:text-omail-400">
+                                                @FormatDate(email.SentAt ?? email.CreatedAt)
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm @(!isRead ? "font-semibold text-omail-800 dark:text-omail-100" : "font-medium text-omail-600 dark:text-omail-300") truncate">
+                                                @email.Subject
+                                            </p>
+                                            <p class="text-sm @(!isRead ? "text-omail-700 dark:text-omail-300" : "text-omail-500 dark:text-omail-400") truncate">
+                                                @(email.Body?.Length > 100 ? email.Body.Substring(0, 100) + "..." : email.Body)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="ml-3 flex-shrink-0 flex items-center">
+                                        @if (!isRead)
+                                        {
+                                            <span class="inline-block w-2 h-2 bg-omail-600 rounded-full mr-2"></span>
+                                        }
+                                        @if (email.Attachments.Any())
+                                        {
+                                            <lord-icon
+                                                src="https://cdn.lordicon.com/xhbsnkyp.json"
+                                                trigger="hover"
+                                                colors="primary:#818cf8"
+                                                class="w-5 h-5">
+                                            </lord-icon>
+                                        }
                                     </div>
                                 </div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-sm font-medium text-omail-900 dark:text-omail-100 truncate">
-                                            @(i % 4 == 0 ? "Marketing Team" : i % 3 == 0 ? "John Doe" : i % 2 == 0 ? "Anna K." : "Tech Support")
-                                        </p>
-                                        <p class="ml-2 flex-shrink-0 text-xs text-omail-500 dark:text-omail-400">
-                                            @(i % 3 == 0 ? "10:24 AM" : i % 2 == 0 ? "Yesterday" : $"{i} days ago")
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-omail-800 dark:text-omail-200 font-medium truncate">
-                                            @(i % 4 == 0 ? "Weekly Newsletter - Latest Updates and News" : 
-                                              i % 3 == 0 ? "Meeting reminder for tomorrow's project review" : 
-                                              i % 2 == 0 ? "Document review request: Please provide feedback" : 
-                                              "Your support ticket #283" + i + " has been updated")
-                                        </p>
-                                        <p class="text-sm text-omail-500 dark:text-omail-400 truncate">
-                                            @(i % 4 == 0 ? "Check out what's new this week in our latest newsletter edition..." : 
-                                              i % 3 == 0 ? "Hi there, just a friendly reminder about our scheduled meeting tomorrow at 2 PM..." : 
-                                              i % 2 == 0 ? "I've attached the document for your review. Please provide your feedback by..." : 
-                                              "Your support request has been updated. Here's the latest status update regarding your issue...")
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="ml-3 flex-shrink-0 flex items-center">
-                                    @if (i % 5 == 0)
-                                    {
-                                        <span class="inline-block w-2 h-2 bg-omail-600 rounded-full mr-2"></span>
-                                    }
-                                    @if (i % 4 == 0)
-                                    {
-                                        <lord-icon
-                                            src="https://cdn.lordicon.com/xhbsnkyp.json"
-                                            trigger="hover"
-                                            colors="primary:#818cf8"
-                                            class="w-5 h-5">
-                                        </lord-icon>
-                                    }
-                                </div>
-                            </div>
-                        </a>
-                    }
-                </div>
+                            </a>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+@code {
+    private List<EmailMessage> emails;
+    private List<EmailMessage> filteredEmails = new List<EmailMessage>();
+    private List<int> selectedEmails = new List<int>();
+    private bool selectAll = false;
+    private bool isLoading = true;
+    private string searchQuery = "";
+    private int currentPage = 0;
+    private int pageSize = 10;
+    private int currentUserId;
+    private System.Timers.Timer refreshTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get current user ID
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            currentUserId = userId;
+        }
+
+        await RefreshInbox();
+        
+        // Setup a refresh timer (every 30 seconds)
+        refreshTimer = new System.Timers.Timer(30000);
+        refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(RefreshInbox);
+        refreshTimer.Start();
+    }
+
+    private async Task RefreshInbox()
+    {
+        isLoading = true;
+        try
+        {
+            emails = await EmailService.GetInboxAsync();
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            // Handle error
+            Console.Error.WriteLine($"Error loading inbox: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredEmails = emails?.ToList() ?? new List<EmailMessage>();
+        }
+        else
+        {
+            var query = searchQuery.ToLower();
+            filteredEmails = emails?.Where(e => 
+                e.Subject?.ToLower().Contains(query) == true || 
+                e.Body?.ToLower().Contains(query) == true || 
+                e.Sender?.FullName?.ToLower().Contains(query) == true ||
+                e.Sender?.Email?.ToLower().Contains(query) == true
+            ).ToList() ?? new List<EmailMessage>();
+        }
+
+        // Reset pagination when filters change
+        currentPage = 0;
+    }
+
+    private IEnumerable<EmailMessage> pagedEmails => 
+        filteredEmails
+            .Skip(currentPage * pageSize)
+            .Take(pageSize);
+
+    private void NextPage()
+    {
+        if ((currentPage + 1) * pageSize < filteredEmails.Count)
+        {
+            currentPage++;
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+        }
+    }
+
+    private void ToggleEmailSelection(int emailId)
+    {
+        if (selectedEmails.Contains(emailId))
+        {
+            selectedEmails.Remove(emailId);
+        }
+        else
+        {
+            selectedEmails.Add(emailId);
+        }
+    }
+
+    private void ToggleSelectAll()
+    {
+        selectAll = !selectAll;
+
+        if (selectAll)
+        {
+            selectedEmails = pagedEmails.Select(e => e.Id).ToList();
+        }
+        else
+        {
+            selectedEmails.Clear();
+        }
+    }
+
+    private async Task MoveSelectedToTrash()
+    {
+        if (!selectedEmails.Any())
+            return;
+
+        isLoading = true;
+        
+        try
+        {
+            foreach (var emailId in selectedEmails.ToList())
+            {
+                await EmailService.MoveToTrashAsync(emailId);
+                selectedEmails.Remove(emailId);
+            }
+            
+            await RefreshInbox();
+        }
+        catch (Exception ex)
+        {
+            // Handle error
+            Console.Error.WriteLine($"Error moving emails to trash: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        var today = DateTime.Today;
+        var dateOnly = date.Date;
+        
+        if (dateOnly == today)
+            return date.ToString("h:mm tt");
+        
+        if (dateOnly == today.AddDays(-1))
+            return "Yesterday";
+        
+        if (date > today.AddDays(-7))
+            return date.ToString("ddd"); // Day name
+        
+        if (date.Year == today.Year)
+            return date.ToString("MMM d"); // Month Day
+        
+        return date.ToString("MMM d, yyyy"); // Month Day, Year
+    }
+
+    public void Dispose()
+    {
+        refreshTimer?.Stop();
+        refreshTimer?.Dispose();
+    }
+
+    @inject AuthenticationStateProvider AuthenticationStateProvider
+}

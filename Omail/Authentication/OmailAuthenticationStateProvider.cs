@@ -8,13 +8,13 @@ namespace Omail.Authentication
 {
     public class OmailAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly ProtectedLocalStorage _localStorage;
+        private readonly ProtectedSessionStorage _sessionStorage;
         private readonly AppDbContext _context;
         private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public OmailAuthenticationStateProvider(ProtectedLocalStorage localStorage, AppDbContext context)
+        public OmailAuthenticationStateProvider(ProtectedSessionStorage sessionStorage, AppDbContext context)
         {
-            _localStorage = localStorage;
+            _sessionStorage = sessionStorage;
             _context = context;
         }
 
@@ -22,7 +22,7 @@ namespace Omail.Authentication
         {
             try
             {
-                var userIdResult = await _localStorage.GetAsync<int>("userId");
+                var userIdResult = await _sessionStorage.GetAsync<int>("userId");
                 
                 if (!userIdResult.Success)
                 {
@@ -68,6 +68,15 @@ namespace Omail.Authentication
         public async Task NotifyUserAuthenticationAsync()
         {
             var authState = await GetAuthenticationStateAsync();
+            NotifyAuthenticationStateChanged(Task.FromResult(authState));
+        }
+
+        public async Task MarkUserAsLoggedOutAsync()
+        {
+            await _sessionStorage.DeleteAsync("userId");
+            await _sessionStorage.DeleteAsync("userEmail");
+            await _sessionStorage.DeleteAsync("userName");
+            var authState = await Task.FromResult(new AuthenticationState(_anonymous));
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
     }

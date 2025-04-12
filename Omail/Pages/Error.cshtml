@@ -1,0 +1,39 @@
+@page
+@model Omail.Pages.ErrorModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error - Omail</title>
+    <link href="~/css/style.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-omail-50 dark:bg-gradient-to-br dark:from-omail-900 dark:to-omail-800 min-h-screen flex items-center justify-center">
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden p-8 max-w-lg w-full">
+        <h1 class="text-2xl font-bold text-omail-800 dark:text-white mb-4">Error</h1>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <h2 class="text-lg font-semibold mb-2">An error occurred while processing your request.</h2>
+            @if (Model.ShowRequestId)
+            {
+                <p class="text-sm">
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+        </div>
+        
+        <p class="text-omail-600 dark:text-omail-300 mb-6">
+            @(Model.IsProduction
+                ? "The application has encountered an unexpected error. We apologize for the inconvenience."
+                : "Development environment - see details above for debugging.")
+        </p>
+        
+        <a href="/" class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-colors duration-300">
+            Return to Home
+        </a>
+    </div>
+</body>
+
+</html>

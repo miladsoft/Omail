@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Omail.Authentication;
 using Omail.Data;
 using Omail.Data.Models;
 using System.Security.Claims;
@@ -12,16 +13,16 @@ namespace Omail.Services
     public class AuthService
     {
         private readonly AppDbContext _context;
-        private readonly ProtectedLocalStorage _localStorage;
+        private readonly ProtectedSessionStorage _sessionStorage;
         private readonly AuthenticationStateProvider _authStateProvider;
 
         public AuthService(
             AppDbContext context,
-            ProtectedLocalStorage localStorage,
+            ProtectedSessionStorage sessionStorage,
             AuthenticationStateProvider authStateProvider)
         {
             _context = context;
-            _localStorage = localStorage;
+            _sessionStorage = sessionStorage;
             _authStateProvider = authStateProvider;
         }
 
@@ -54,19 +55,18 @@ namespace Omail.Services
             if (!VerifyPasswordHash(password, user.PasswordHash))
                 return false;
 
-            // Store user info in local storage
-            await _localStorage.SetAsync("userId", user.Id);
-            await _localStorage.SetAsync("userEmail", user.Email);
-            await _localStorage.SetAsync("userName", user.FullName);
+            // Store user info in session storage
+            await _sessionStorage.SetAsync("userId", user.Id);
+            await _sessionStorage.SetAsync("userEmail", user.Email);
+            await _sessionStorage.SetAsync("userName", user.FullName);
 
             return true;
         }
 
         public async Task LogoutAsync()
         {
-            await _localStorage.DeleteAsync("userId");
-            await _localStorage.DeleteAsync("userEmail");
-            await _localStorage.DeleteAsync("userName");
+            var authStateProvider = (OmailAuthenticationStateProvider)_authStateProvider;
+            await authStateProvider.MarkUserAsLoggedOutAsync();
         }
 
         public async Task<Employee> RegisterAsync(Employee employee, string password)

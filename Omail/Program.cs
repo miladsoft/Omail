@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Omail.Authentication;
@@ -16,6 +17,9 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=omail.db"));
 
+// Register service factory to resolve circular dependencies
+builder.Services.AddScoped<ServiceFactory>();
+
 // Register services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
@@ -24,6 +28,11 @@ builder.Services.AddScoped<ThemeService>();
 
 // Register authentication
 builder.Services.AddScoped<AuthenticationStateProvider, OmailAuthenticationStateProvider>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<ProtectedLocalStorage>();
+
+// Add authorization
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -39,6 +48,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
