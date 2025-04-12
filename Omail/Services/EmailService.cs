@@ -112,7 +112,6 @@ namespace Omail.Services
         {
             try
             {
-                // Fix the query to use the correct column name
                 return await _context.Emails
                     .Include(e => e.Sender)
                     .Include(e => e.Recipients)
@@ -144,7 +143,6 @@ namespace Omail.Services
             }
             else // Update existing draft
             {
-                // Remove existing recipients
                 var existingRecipients = await _context.Set<EmailRecipient>()
                     .Where(r => r.EmailId == email.Id)
                     .ToListAsync();
@@ -154,7 +152,6 @@ namespace Omail.Services
 
             await _context.SaveChangesAsync();
 
-            // Add recipients
             await AddRecipientsAsync(email.Id, recipientIds, RecipientType.To);
             
             if (ccIds != null && ccIds.Any())
@@ -173,7 +170,6 @@ namespace Omail.Services
             if (currentUser == null)
                 throw new UnauthorizedAccessException("User not authenticated");
 
-            // Check if any recipients are in a different department and require approval
             bool requiresApproval = false;
             var allRecipientIds = new List<int>(recipientIds);
             if (ccIds != null) allRecipientIds.AddRange(ccIds);
@@ -214,7 +210,6 @@ namespace Omail.Services
             }
             else // Update existing draft
             {
-                // Remove existing recipients
                 var existingRecipients = await _context.Set<EmailRecipient>()
                     .Where(r => r.EmailId == email.Id)
                     .ToListAsync();
@@ -224,7 +219,6 @@ namespace Omail.Services
 
             await _context.SaveChangesAsync();
 
-            // Add recipients
             await AddRecipientsAsync(email.Id, recipientIds, RecipientType.To);
             
             if (ccIds != null && ccIds.Any())
@@ -233,16 +227,13 @@ namespace Omail.Services
             if (bccIds != null && bccIds.Any())
                 await AddRecipientsAsync(email.Id, bccIds, RecipientType.Bcc);
 
-            // If approval is required, create an approval request
             if (requiresApproval)
             {
-                // Find department manager
                 var manager = await _context.Employees
                     .FirstOrDefaultAsync(e => e.SectionId == currentUser.SectionId && e.IsManager);
                 
                 if (manager != null)
                 {
-                    // Get ApprovalService through the factory to avoid circular dependency
                     var approvalService = _serviceFactory.GetService<ApprovalService>();
                     await approvalService.CreateApprovalAsync(email.Id, manager.Id);
                 }
@@ -262,7 +253,6 @@ namespace Omail.Services
             if (email == null)
                 throw new KeyNotFoundException("Email not found");
 
-            // Check if user has access to this email
             if (email.SenderId != currentUser.Id && 
                 !await _context.Set<EmailRecipient>().AnyAsync(r => r.EmailId == emailId && r.RecipientId == currentUser.Id))
             {
@@ -284,7 +274,6 @@ namespace Omail.Services
             if (email == null)
                 throw new KeyNotFoundException("Email not found");
 
-            // Check if user has access to this email
             if (email.SenderId != currentUser.Id && 
                 !await _context.Set<EmailRecipient>().AnyAsync(r => r.EmailId == emailId && r.RecipientId == currentUser.Id))
             {
@@ -306,7 +295,6 @@ namespace Omail.Services
             if (email == null)
                 throw new KeyNotFoundException("Email not found");
 
-            // Check if user has access to this email
             if (email.SenderId != currentUser.Id)
             {
                 throw new UnauthorizedAccessException("You don't have access to this email");
@@ -347,6 +335,121 @@ namespace Omail.Services
             }
             
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Gets email statistics for a specific user
+        /// </summary>
+        /// <param name="userId">The user ID to retrieve stats for</param>
+        /// <returns>Email statistics for the user</returns>
+        public async Task<EmailStatsModel> GetUserEmailStatsAsync(int userId)
+        {
+            try
+            {
+                var result = new EmailStatsModel();
+                
+                var sentEmails = await _context.Emails
+                    .Where(e => e.SenderId == userId && !e.IsDeleted && e.Status == EmailStatus.Sent)
+                    .CountAsync();
+                
+                var receivedEmails = await _context.Emails
+                    .Include(e => e.Recipients)
+                    .Where(e => e.Recipients.Any(r => r.RecipientId == userId) && !e.IsDeleted)
+                    .CountAsync();
+                
+                result.SentEmails = sentEmails;
+                result.ReceivedEmails = receivedEmails;
+                result.TotalEmails = sentEmails + receivedEmails;
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error getting user email statistics");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets recent emails associated with a user
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <param name="count">Maximum number of emails to retrieve</param>
+        /// <returns>List of recent emails</returns>
+        public async Task<List<EmailItemModel>> GetRecentUserEmailsAsync(int userId, int count = 5)
+        {
+            try
+            {
+                var result = new List<EmailItemModel>();
+                
+                var emails = await _context.Emails
+                    .Include(e => e.Sender)
+                    .Include(e => e.Recipients)
+                        .ThenInclude(r => r.Recipient)
+                    .Include(e => e.Attachments)
+                    .Where(e => 
+                        (e.SenderId == userId || e.Recipients.Any(r => r.RecipientId == userId)) 
+                        && !e.IsDeleted)
+                    .OrderByDescending(e => e.SentAt ?? e.CreatedAt)
+                    .Take(count)
+                    .ToListAsync();
+                
+                foreach (var email in emails)
+                {
+                    var recipient = email.Recipients.FirstOrDefault()?.Recipient;
+                    bool isSender = email.SenderId == userId;
+                    
+                    var item = new EmailItemModel
+                    {
+                        Id = email.Id,
+                        Subject = email.Subject,
+                        Preview = TruncateBody(email.Body, 100),
+                        Sender = isSender ? "Me" : email.Sender?.FullName ?? "Unknown",
+                        Recipient = isSender ? recipient?.FullName ?? "Unknown" : "Me",
+                        IsSender = isSender,
+                        Date = email.SentAt ?? email.CreatedAt,
+                        HasAttachments = email.Attachments.Any()
+                    };
+                    
+                    result.Add(item);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error getting recent user emails");
+                throw;
+            }
+        }
+
+        private string TruncateBody(string body, int maxLength)
+        {
+            var text = System.Text.RegularExpressions.Regex.Replace(body ?? "", "<[^>]*>", "");
+            
+            if (text.Length <= maxLength)
+                return text;
+                
+            return text.Substring(0, maxLength) + "...";
+        }
+
+        public class EmailStatsModel
+        {
+            public int TotalEmails { get; set; }
+            public int SentEmails { get; set; }
+            public int ReceivedEmails { get; set; }
+        }
+
+        public class EmailItemModel
+        {
+            public int Id { get; set; }
+            public string Subject { get; set; }
+            public string Preview { get; set; }
+            public string Sender { get; set; }
+            public string Recipient { get; set; }
+            public bool IsSender { get; set; }
+            public DateTime Date { get; set; }
+            public bool HasAttachments { get; set; }
         }
     }
 }

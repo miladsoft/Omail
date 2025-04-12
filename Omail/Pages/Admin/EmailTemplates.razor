@@ -10,33 +10,24 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
-                <lord-icon
-                    src="https://cdn.lordicon.com/pkmkagva.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-10 h-10 mr-3">
-                </lord-icon>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-omail-600 dark:text-omail-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
                 Email Templates
             </h1>
             <p class="text-omail-600 dark:text-omail-300 mt-2">Manage system email templates for notifications and communications</p>
         </div>
         <div class="flex flex-wrap gap-3">
             <button @onclick="CreateNewTemplate" class="flex items-center space-x-2 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
-                <lord-icon
-                    src="https://cdn.lordicon.com/wloilxuq.json"
-                    trigger="hover"
-                    colors="primary:#ffffff"
-                    class="w-5 h-5">
-                </lord-icon>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <span>New Template</span>
             </button>
             <button @onclick="@(() => NavigationManager.NavigateTo("/admin"))" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
-                <lord-icon
-                    src="https://cdn.lordicon.com/iifryyua.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5">
-                </lord-icon>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
                 <span>Back to Dashboard</span>
             </button>
         </div>
@@ -50,12 +41,9 @@
                    @bind-value:event="oninput" 
                    placeholder="Search templates..." 
                    class="w-full pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300"/>
-            <lord-icon
-                src="https://cdn.lordicon.com/msoeawqm.json"
-                trigger="hover"
-                colors="primary:#121331,secondary:#818cf8"
-                class="absolute left-3 top-2.5 w-5 h-5">
-            </lord-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-400 dark:text-omail-500 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
         </div>
     </div>
 
@@ -78,13 +66,9 @@
         else if (filteredTemplates.Count == 0)
         {
             <div class="py-12 flex flex-col items-center justify-center text-center">
-                <lord-icon
-                    src="https://cdn.lordicon.com/msoeawqm.json"
-                    trigger="loop"
-                    delay="2000"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-16 h-16 mb-4">
-                </lord-icon>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-omail-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
                 <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No templates found</h3>
                 <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
                     @if (string.IsNullOrEmpty(searchQuery) && emailTemplates.Count == 0)
@@ -97,12 +81,9 @@
                     }
                 </p>
                 <button @onclick="CreateNewTemplate" class="mt-4 flex items-center px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
-                    <lord-icon
-                        src="https://cdn.lordicon.com/wloilxuq.json"
-                        trigger="hover"
-                        colors="primary:#ffffff"
-                        class="w-5 h-5 mr-2">
-                    </lord-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
                     Create First Template
                 </button>
             </div>
@@ -117,39 +98,23 @@
                             <div>
                                 <h4 class="text-lg font-medium text-omail-800 dark:text-white mb-1">@template.Name</h4>
                                 <p class="text-omail-500 dark:text-omail-400 text-sm">@template.Description</p>
-                                <div class="flex items-center mt-2">
-                                    <span class="px-2 py-0.5 text-xs bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 rounded-full">
-                                        @template.Category
-                                    </span>
-                                    <span class="ml-2 text-sm text-omail-500 dark:text-omail-400">
-                                        Last updated: @template.LastUpdated.ToString("MMM dd, yyyy")
-                                    </span>
-                                </div>
                             </div>
                             <div class="flex space-x-2">
-                                <button @onclick="() => PreviewTemplate(template)" class="p-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white rounded-lg hover:bg-omail-100 dark:hover:bg-omail-700/50">
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/tyounuzx.json"
-                                        trigger="hover"
-                                        colors="primary:#121331,secondary:#818cf8"
-                                        class="w-5 h-5">
-                                    </lord-icon>
+                                <button @onclick="() => EditTemplate(template)" class="p-1 text-omail-500 hover:text-omail-800 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
                                 </button>
-                                <button @onclick="() => EditTemplate(template)" class="p-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white rounded-lg hover:bg-omail-100 dark:hover:bg-omail-700/50">
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/wloilxuq.json"
-                                        trigger="hover"
-                                        colors="primary:#121331,secondary:#818cf8"
-                                        class="w-5 h-5">
-                                    </lord-icon>
+                                <button @onclick="() => PreviewTemplate(template)" class="p-1 text-omail-500 hover:text-omail-800 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                 </button>
-                                <button @onclick="() => DeleteTemplateConfirmation(template)" class="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/gsqxdxog.json"
-                                        trigger="hover"
-                                        colors="primary:#e74c3c,secondary:#c0392b"
-                                        class="w-5 h-5">
-                                    </lord-icon>
+                                <button @onclick="() => DeleteTemplateConfirmation(template)" class="p-1 text-omail-500 hover:text-red-600 dark:hover:text-red-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -212,14 +177,15 @@
                         <div class="bg-omail-50 dark:bg-omail-700/30 border-b border-omail-200 dark:border-omail-700 px-4 py-2 flex justify-between items-center">
                             <div class="text-sm text-omail-800 dark:text-white">HTML Editor</div>
                             <div class="space-x-1">
-                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
-                                    Bold
+                                <button type="button" class="p-1 text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                    </svg>
                                 </button>
-                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
-                                    Italic
-                                </button>
-                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
-                                    Link
+                                <button type="button" class="p-1 text-omail-600 dark:text-omail-300 hover:text-omail-800 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>

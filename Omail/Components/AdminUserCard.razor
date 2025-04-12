@@ -1,0 +1,106 @@
+@inject NavigationManager NavigationManager
+
+<div class="bg-white dark:bg-omail-800/70 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-omail-100 dark:border-omail-700">
+    <div class="p-4 border-b border-omail-100 dark:border-omail-700 flex items-center justify-between">
+        <div class="flex items-center">
+            <div class="flex-shrink-0 h-10 w-10 relative">
+                @if (string.IsNullOrEmpty(User.ProfilePicture))
+                {
+                    <div class="h-10 w-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                        @User.Initials
+                    </div>
+                }
+                else
+                {
+                    <img class="h-10 w-10 rounded-full" src="@User.ProfilePicture" alt="@User.FullName" />
+                }
+                @if (User.IsManager)
+                {
+                    <span class="absolute bottom-0 right-0 transform translate-x-1/4 -translate-y-1/4">
+                        <span class="block h-3 w-3 rounded-full ring-2 ring-white dark:ring-omail-800 bg-green-500"></span>
+                    </span>
+                }
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-omail-900 dark:text-white">@User.FullName</h3>
+                <p class="text-xs text-omail-500 dark:text-omail-400">@User.Email</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+            <button @onclick="ViewUser" class="p-1 text-omail-500 hover:text-omail-700 dark:hover:text-omail-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            </button>
+            <button @onclick="EditUser" class="p-1 text-omail-500 hover:text-omail-700 dark:hover:text-omail-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+            </button>
+            <button @onclick="() => OnDeleteClick.InvokeAsync(User)" class="p-1 text-omail-500 hover:text-red-600 dark:hover:text-red-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="p-4">
+        <div class="grid grid-cols-2 gap-4 mb-3">
+            <div>
+                <p class="text-xs font-medium text-omail-500 dark:text-omail-400">Department</p>
+                <p class="text-sm text-omail-800 dark:text-omail-200">@User.Department</p>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-omail-500 dark:text-omail-400">Position</p>
+                <p class="text-sm text-omail-800 dark:text-omail-200">@(string.IsNullOrEmpty(User.Position) ? "-" : User.Position)</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-between mt-4 pt-3 border-t border-omail-100 dark:border-omail-700">
+            <div>
+                <span class="px-2 py-1 text-xs rounded-full @(User.IsActive ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400")">
+                    @(User.IsActive ? "Active" : "Inactive")
+                </span>
+            </div>
+            <div class="text-xs text-omail-500 dark:text-omail-400">
+                Joined @User.HireDate.ToString("MMM yyyy")
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public UserModel User { get; set; }
+    [Parameter] public EventCallback<UserModel> OnDeleteClick { get; set; }
+    
+    private void ViewUser()
+    {
+        NavigationManager.NavigateTo($"admin/users/{User.Id}");
+    }
+    
+    private void EditUser()
+    {
+        NavigationManager.NavigateTo($"admin/users/edit/{User.Id}");
+    }
+    
+    public class UserModel
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
+        public string Initials => $"{FirstName?.FirstOrDefault() ?? '?'}{LastName?.FirstOrDefault() ?? '?'}";
+        public string Email { get; set; }
+        public string Position { get; set; }
+        public string Department { get; set; }
+        public int DepartmentId { get; set; }
+        public int? SectionId { get; set; }
+        public bool IsManager { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime HireDate { get; set; }
+        public string ProfilePicture { get; set; }
+    }
+}

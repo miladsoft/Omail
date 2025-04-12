@@ -13,50 +13,58 @@
         Description="Manage system notifications and alerts" 
         PrimaryButtonText="Back to Dashboard" 
         PrimaryButtonUrl="admin"
-        PrimaryButtonIcon="https://cdn.lordicon.com/iifryyua.json" />
+        PrimaryButtonIcon="" />
     
     <div class="space-y-4">
         <!-- Filter Controls -->
         <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
             <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <label for="filter-type" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Filter by Type</label>
+                <div class="flex-grow">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Search notifications..." 
+                            @bind-value="searchQuery" 
+                            @bind-value:event="oninput" 
+                            class="w-full px-4 py-2 pl-10 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400" />
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
                     <select 
-                        id="filter-type" 
-                        @bind="selectedTypeFilter" 
-                        class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                        @bind="selectedTypeFilter"
+                        class="px-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400">
                         <option value="all">All Types</option>
-                        <option value="approval">Approval Requests</option>
-                        <option value="user">User Notifications</option>
-                        <option value="system">System Alerts</option>
+                        <option value="system">System</option>
+                        <option value="user">User</option>
+                        <option value="approval">Approval</option>
                     </select>
-                </div>
-                <div class="flex-1">
-                    <label for="filter-status" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Filter by Status</label>
+                    
                     <select 
-                        id="filter-status" 
-                        @bind="selectedStatusFilter" 
-                        class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                        @bind="selectedStatusFilter"
+                        class="px-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400">
                         <option value="all">All Status</option>
-                        <option value="unread">Unread</option>
                         <option value="read">Read</option>
+                        <option value="unread">Unread</option>
                     </select>
-                </div>
-                <div class="flex-1">
-                    <label for="filter-date" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Filter by Date</label>
+                    
                     <select 
-                        id="filter-date" 
-                        @bind="selectedDateFilter" 
-                        class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                        @bind="selectedDateFilter"
+                        class="px-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400">
                         <option value="all">All Time</option>
                         <option value="today">Today</option>
-                        <option value="yesterday">Yesterday</option>
-                        <option value="week">Last 7 days</option>
-                        <option value="month">Last 30 days</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
                     </select>
                 </div>
-                <div class="self-end">
-                    <button @onclick="ApplyFilters" class="w-full md:w-auto px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700 transition-colors duration-200">
+                
+                <div class="md:flex-shrink-0">
+                    <button @onclick="ApplyFilters" class="w-full md:w-auto px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
                         Apply Filters
                     </button>
                 </div>
@@ -65,17 +73,11 @@
         
         <!-- Notifications List -->
         <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
-            <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex items-center justify-between">
-                <div class="flex items-center">
-                    <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Notifications</h3>
-                    <div class="ml-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
-                        @filteredNotifications.Count
-                    </div>
-                </div>
-                
+            <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white">All Notifications</h3>
                 @if (filteredNotifications.Any(n => !n.IsRead))
                 {
-                    <button @onclick="MarkAllAsRead" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm">
+                    <button @onclick="MarkAllAsRead" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
                         Mark all as read
                     </button>
                 }
@@ -88,19 +90,22 @@
                     <p class="mt-4 text-omail-600 dark:text-omail-400">Loading notifications...</p>
                 </div>
             }
-            else if (filteredNotifications.Count == 0)
+            else if (!filteredNotifications.Any())
             {
                 <div class="py-12 flex flex-col items-center justify-center text-center">
-                    <lord-icon
-                        src="https://cdn.lordicon.com/msoeawqm.json"
-                        trigger="loop"
-                        delay="2000"
-                        colors="primary:#121331,secondary:#818cf8"
-                        class="w-16 h-16 mb-4">
-                    </lord-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-omail-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
                     <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No notifications found</h3>
-                    <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
-                        There are no notifications matching your filter criteria.
+                    <p class="text-sm text-omail-500 dark:text-omail-400 max-w-md">
+                        @if (notifications.Count == 0)
+                        {
+                            <span>You don't have any notifications yet.</span>
+                        }
+                        else
+                        {
+                            <span>No notifications match your current filters.</span>
+                        }
                     </p>
                 </div>
             }
@@ -109,101 +114,140 @@
                 <div class="divide-y divide-omail-200 dark:divide-omail-700">
                     @foreach (var notification in filteredNotifications)
                     {
-                        <div class="p-6 flex items-start hover:bg-omail-50 dark:hover:bg-omail-700/30 transition-colors duration-150 @(notification.IsRead ? "" : "bg-omail-50 dark:bg-omail-800/70")">
-                            <div class="flex-shrink-0">
-                                @if (notification.Type == "approval")
-                                {
-                                    <div class="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center text-yellow-700 dark:text-yellow-300">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                }
-                                else if (notification.Type == "user")
-                                {
-                                    <div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-700 dark:text-blue-300">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                    </div>
-                                }
-                                else if (notification.Type == "system")
-                                {
-                                    <div class="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 dark:text-purple-300">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="h-10 w-10 rounded-full bg-omail-100 dark:bg-omail-900/40 flex items-center justify-center text-omail-700 dark:text-omail-300">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                }
-                            </div>
-                            
-                            <div class="ml-4 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="text-lg font-medium text-omail-800 dark:text-white">@notification.Title</h4>
-                                    <p class="text-sm text-omail-500 dark:text-omail-400">@notification.Time</p>
-                                </div>
-                                <p class="text-omail-600 dark:text-omail-300 mt-1">@notification.Message</p>
-                                
-                                <div class="mt-3 flex items-center">
-                                    <a href="@notification.Link" class="inline-flex items-center text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        View Details
-                                    </a>
-                                    
-                                    @if (!notification.IsRead)
+                        <div class="p-5 hover:bg-omail-50 dark:hover:bg-omail-700/30 @(!notification.IsRead ? "bg-omail-50 dark:bg-omail-700/20" : "")">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    @if (notification.Type == "approval")
                                     {
-                                        <button @onclick="() => MarkAsRead(notification)" class="inline-flex items-center text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        <div class="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center text-yellow-700 dark:text-yellow-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Mark as Read
-                                        </button>
+                                        </div>
                                     }
+                                    else if (notification.Type == "user")
+                                    {
+                                        <div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-700 dark:text-blue-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    else if (notification.Type == "system")
+                                    {
+                                        <div class="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 dark:text-purple-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="h-10 w-10 rounded-full bg-omail-100 dark:bg-omail-900/40 flex items-center justify-center text-omail-700 dark:text-omail-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex justify-between">
+                                        <h4 class="text-base font-medium text-omail-800 dark:text-white">@notification.Title</h4>
+                                        <div class="flex items-center">
+                                            <span class="text-xs text-omail-500 dark:text-omail-400">@notification.Time</span>
+                                            <div class="flex space-x-2 ml-4">
+                                                <button @onclick="() => MarkAsRead(notification)" class="text-omail-500 hover:text-omail-700 dark:hover:text-omail-300" title="Mark as @(notification.IsRead ? "unread" : "read")">
+                                                    @if (notification.IsRead)
+                                                    {
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                    }
+                                                    else
+                                                    {
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                        </svg>
+                                                    }
+                                                </button>
+                                                <button @onclick="() => DeleteNotification(notification)" class="text-red-500 hover:text-red-700 dark:hover:text-red-300" title="Delete">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-1 text-sm text-omail-600 dark:text-omail-300">@notification.Message</p>
+                                    
+                                    <div class="mt-3 flex">
+                                        <a href="@notification.Link" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm inline-flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                            View details
+                                        </a>
+                                        
+                                        <span class="mx-2 text-omail-300 dark:text-omail-600">•</span>
+                                        
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-@GetTypeColorClass(notification.Type)-100 text-@GetTypeColorClass(notification.Type)-800 dark:bg-@GetTypeColorClass(notification.Type)-900/40 dark:text-@GetTypeColorClass(notification.Type)-300">
+                                            @notification.Type.ToUpperInvariant()
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     }
                 </div>
-                
-                <!-- Pagination (if needed) -->
-                @if (totalPages > 1)
-                {
-                    <div class="px-6 py-3 border-t border-omail-200 dark:border-omail-700 flex items-center justify-between">
-                        <button @onclick="PreviousPage" disabled="@(currentPage == 0)" class="@(currentPage == 0 ? "opacity-50 cursor-not-allowed" : "") px-3 py-1 border border-omail-300 dark:border-omail-700 rounded-md text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
-                            Previous
-                        </button>
-                        
-                        <div class="text-sm text-omail-500 dark:text-omail-400">
-                            Page @(currentPage + 1) of @totalPages
-                        </div>
-                        
-                        <button @onclick="NextPage" disabled="@(currentPage == totalPages - 1)" class="@(currentPage == totalPages - 1 ? "opacity-50 cursor-not-allowed" : "") px-3 py-1 border border-omail-300 dark:border-omail-700 rounded-md text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
-                            Next
-                        </button>
-                    </div>
-                }
             }
         </div>
+        
+        <!-- Pagination -->
+        @if (totalPages > 1)
+        {
+            <div class="flex justify-between items-center mt-4">
+                <div class="text-sm text-omail-600 dark:text-omail-400">
+                    Showing <span class="font-medium text-omail-800 dark:text-white">@(currentPage * pageSize + 1)</span> to 
+                    <span class="font-medium text-omail-800 dark:text-white">@Math.Min((currentPage + 1) * pageSize, filteredNotifications.Count())</span> of 
+                    <span class="font-medium text-omail-800 dark:text-white">@filteredNotifications.Count()</span> notifications
+                </div>
+                <div class="flex space-x-2">
+                    <button 
+                        @onclick="PreviousPage" 
+                        disabled="@(currentPage == 0)"
+                        class="px-3 py-1 rounded-md border border-omail-200 dark:border-omail-700 @(currentPage == 0 ? "bg-omail-50 dark:bg-omail-900 text-omail-400 dark:text-omail-600 cursor-not-allowed" : "bg-white dark:bg-omail-800 text-omail-700 dark:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700/50")">
+                        Previous
+                    </button>
+                    @for (int i = 0; i < totalPages; i++)
+                    {
+                        int pageNumber = i;
+                        <button 
+                            @onclick="() => GoToPage(pageNumber)" 
+                            class="px-3 py-1 rounded-md border @(currentPage == pageNumber ? "bg-omail-600 border-omail-600 text-white" : "bg-white dark:bg-omail-800 border-omail-200 dark:border-omail-700 text-omail-700 dark:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700/50")">
+                            @(pageNumber + 1)
+                        </button>
+                    }
+                    <button 
+                        @onclick="NextPage" 
+                        disabled="@(currentPage == totalPages - 1)"
+                        class="px-3 py-1 rounded-md border border-omail-200 dark:border-omail-700 @(currentPage == totalPages - 1 ? "bg-omail-50 dark:bg-omail-900 text-omail-400 dark:text-omail-600 cursor-not-allowed" : "bg-white dark:bg-omail-800 text-omail-700 dark:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700/50")">
+                        Next
+                    </button>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
 @code {
-    private bool isLoading = true;
-    private List<AdminNotification> notifications = new List<AdminNotification>();
-    private List<AdminNotification> filteredNotifications => AppliedFilters();
+    private List<Notification> notifications = new List<Notification>();
+    private IEnumerable<Notification> filteredNotifications => ApplyNotificationFilters();
     
-    // Filters
+    private bool isLoading = true;
+    
+    // Filter state
+    private string searchQuery = "";
     private string selectedTypeFilter = "all";
     private string selectedStatusFilter = "all";
     private string selectedDateFilter = "all";
@@ -211,13 +255,10 @@
     // Pagination
     private int currentPage = 0;
     private int pageSize = 10;
-    private int totalPages => (int)Math.Ceiling(filteredNotifications.Count / (double)pageSize);
+    private int totalPages => (int)Math.Ceiling(filteredNotifications.Count() / (double)pageSize);
     
-    // Page selection for current view
-    private List<AdminNotification> pagedNotifications => filteredNotifications
-        .Skip(currentPage * pageSize)
-        .Take(pageSize)
-        .ToList();
+    private bool showDeleteConfirmation = false;
+    private Notification notificationToDelete;
     
     protected override async Task OnInitializedAsync()
     {
@@ -229,100 +270,94 @@
         try
         {
             isLoading = true;
-            
-            // This would typically come from a service
-            // For now, let's create sample data
-            notifications = new List<AdminNotification>
+            // In a real application, this would come from a service
+            // For now, let's create sample notifications
+            notifications = new List<Notification>()
             {
-                new AdminNotification
+                new Notification
                 {
                     Id = 1,
                     Type = "user",
                     Title = "New User Registration",
-                    Message = "Jane Smith has registered and needs approval",
+                    Message = "Jane Doe (jane.doe@example.com) has registered and is awaiting approval.",
                     Time = "Just now",
-                    Date = DateTime.Now,
+                    CreatedAt = DateTime.Now,
                     Link = "/admin/users",
                     IsRead = false
                 },
-                new AdminNotification
+                new Notification
                 {
                     Id = 2,
                     Type = "approval",
                     Title = "Email Approval Required",
-                    Message = "John Doe's email to external client needs review",
-                    Time = "1 hour ago",
-                    Date = DateTime.Now.AddHours(-1),
+                    Message = "John Smith has requested approval for an email to external recipients (Big Client Inc.)",
+                    Time = "10 minutes ago",
+                    CreatedAt = DateTime.Now.AddMinutes(-10),
                     Link = "/admin/approval-workflow",
                     IsRead = false
                 },
-                new AdminNotification
+                new Notification
                 {
                     Id = 3,
                     Type = "system",
-                    Title = "System Update Available",
-                    Message = "Omail v1.1 update is available for installation",
-                    Time = "Yesterday",
-                    Date = DateTime.Now.AddDays(-1),
-                    Link = "/admin/system-settings",
+                    Title = "System Backup Completed",
+                    Message = "Automatic weekly backup has completed successfully. Backup size: 2.3 GB",
+                    Time = "1 hour ago",
+                    CreatedAt = DateTime.Now.AddHours(-1),
+                    Link = "/admin/backup",
                     IsRead = true
                 },
-                new AdminNotification
+                new Notification
                 {
                     Id = 4,
+                    Type = "approval",
+                    Title = "Department Budget Approval",
+                    Message = "Marketing department has submitted a budget request for Q3 that requires your approval",
+                    Time = "3 hours ago",
+                    CreatedAt = DateTime.Now.AddHours(-3),
+                    Link = "/admin/approval-workflow",
+                    IsRead = false
+                },
+                new Notification
+                {
+                    Id = 5,
+                    Type = "user",
+                    Title = "User Role Change",
+                    Message = "Administrator has changed Michael Brown's role from 'User' to 'Manager'",
+                    Time = "Yesterday",
+                    CreatedAt = DateTime.Now.AddDays(-1),
+                    Link = "/admin/users",
+                    IsRead = true
+                },
+                new Notification
+                {
+                    Id = 6,
                     Type = "system",
-                    Title = "Storage Alert",
-                    Message = "Email storage is at 85% capacity",
+                    Title = "Storage Space Warning",
+                    Message = "The system is approaching 90% of allocated storage capacity. Consider upgrading or cleaning up.",
                     Time = "2 days ago",
-                    Date = DateTime.Now.AddDays(-2),
+                    CreatedAt = DateTime.Now.AddDays(-2),
                     Link = "/admin/system-settings",
                     IsRead = true
                 },
-                new AdminNotification
+                new Notification
                 {
-                    Id = 5,
-                    Type = "approval",
-                    Title = "Department Creation Approval",
-                    Message = "New Marketing department creation requires approval",
-                    Time = "3 days ago",
-                    Date = DateTime.Now.AddDays(-3),
-                    Link = "/admin/organizations",
-                    IsRead = false
-                },
-                new AdminNotification
-                {
-                    Id = 6,
+                    Id = 7,
                     Type = "user",
-                    Title = "User Password Reset",
-                    Message = "Michael Johnson has requested a password reset",
-                    Time = "1 week ago",
-                    Date = DateTime.Now.AddDays(-7),
-                    Link = "/admin/users",
+                    Title = "Multiple Login Attempts",
+                    Message = "Multiple failed login attempts detected for user robert.johnson@example.com from IP 192.168.1.45",
+                    Time = "3 days ago",
+                    CreatedAt = DateTime.Now.AddDays(-3),
+                    Link = "/admin/system-logs",
                     IsRead = true
                 }
             };
             
-            // For simplicity, add more data
-            for (int i = 7; i <= 25; i++)
-            {
-                var randomType = new[] { "user", "approval", "system" }[new Random().Next(3)];
-                var randomDaysAgo = new Random().Next(1, 30);
-                var randomIsRead = new Random().Next(2) == 0;
-                
-                notifications.Add(new AdminNotification
-                {
-                    Id = i,
-                    Type = randomType,
-                    Title = $"Sample Notification {i}",
-                    Message = $"This is a sample {randomType} notification for testing purposes",
-                    Time = $"{randomDaysAgo} days ago",
-                    Date = DateTime.Now.AddDays(-randomDaysAgo),
-                    Link = $"/admin/{(randomType == "user" ? "users" : randomType == "approval" ? "approval-workflow" : "system-settings")}",
-                    IsRead = randomIsRead
-                });
-            }
-            
-            await Task.Delay(500); // Simulate loading
+            await Task.Delay(500); // Simulate loading delay
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("console.error", $"Error loading notifications: {ex.Message}");
         }
         finally
         {
@@ -330,9 +365,20 @@
         }
     }
     
-    private List<AdminNotification> AppliedFilters()
+    private IEnumerable<Notification> ApplyNotificationFilters()
     {
         var result = notifications.AsEnumerable();
+        
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            string search = searchQuery.ToLower();
+            result = result.Where(n => 
+                n.Title.ToLower().Contains(search) ||
+                n.Message.ToLower().Contains(search) ||
+                n.Type.ToLower().Contains(search)
+            );
+        }
         
         // Apply type filter
         if (selectedTypeFilter != "all")
@@ -341,81 +387,103 @@
         }
         
         // Apply status filter
-        if (selectedStatusFilter == "read")
+        if (selectedStatusFilter != "all")
         {
-            result = result.Where(n => n.IsRead);
-        }
-        else if (selectedStatusFilter == "unread")
-        {
-            result = result.Where(n => !n.IsRead);
+            bool isRead = selectedStatusFilter == "read";
+            result = result.Where(n => n.IsRead == isRead);
         }
         
         // Apply date filter
-        if (selectedDateFilter == "today")
+        if (selectedDateFilter != "all")
         {
-            result = result.Where(n => n.Date.Date == DateTime.Today);
-        }
-        else if (selectedDateFilter == "yesterday")
-        {
-            result = result.Where(n => n.Date.Date == DateTime.Today.AddDays(-1));
-        }
-        else if (selectedDateFilter == "week")
-        {
-            result = result.Where(n => (DateTime.Now - n.Date).TotalDays <= 7);
-        }
-        else if (selectedDateFilter == "month")
-        {
-            result = result.Where(n => (DateTime.Now - n.Date).TotalDays <= 30);
+            DateTime cutoffDate = selectedDateFilter switch
+            {
+                "today" => DateTime.Today,
+                "week" => DateTime.Today.AddDays(-7),
+                "month" => DateTime.Today.AddMonths(-1),
+                _ => DateTime.MinValue
+            };
+            
+            result = result.Where(n => n.CreatedAt >= cutoffDate);
         }
         
-        // Sort by date (newest first)
-        result = result.OrderByDescending(n => n.Date);
+        // Sort by creation date (newest first)
+        result = result.OrderByDescending(n => n.CreatedAt);
         
-        return result.ToList();
+        return result;
     }
     
     private void ApplyFilters()
     {
-        currentPage = 0; // Reset to first page when applying filters
+        // Reset to first page when applying filters
+        currentPage = 0;
+        StateHasChanged();
     }
     
-    private async Task MarkAsRead(AdminNotification notification)
+    private async Task MarkAsRead(Notification notification)
     {
-        notification.IsRead = true;
-        // In a real app, you'd call a service to update the database
+        notification.IsRead = !notification.IsRead;
+        // In a real application, you would call a service to update the database
         await Task.CompletedTask;
     }
     
     private async Task MarkAllAsRead()
     {
-        foreach (var notification in filteredNotifications)
+        foreach (var notification in filteredNotifications.Where(n => !n.IsRead))
         {
             notification.IsRead = true;
         }
-        // In a real app, you'd call a service to update the database
+        // In a real application, you would call a service to update the database
+        await Task.CompletedTask;
+    }
+    
+    private async Task DeleteNotification(Notification notification)
+    {
+        notifications.Remove(notification);
+        // In a real application, you would call a service to delete from the database
         await Task.CompletedTask;
     }
     
     private void PreviousPage()
     {
         if (currentPage > 0)
+        {
             currentPage--;
+        }
     }
     
     private void NextPage()
     {
         if (currentPage < totalPages - 1)
+        {
             currentPage++;
+        }
     }
     
-    public class AdminNotification
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+    }
+    
+    private string GetTypeColorClass(string type)
+    {
+        return type switch
+        {
+            "approval" => "yellow",
+            "user" => "blue",
+            "system" => "purple",
+            _ => "omail"
+        };
+    }
+    
+    public class Notification
     {
         public int Id { get; set; }
-        public string Type { get; set; }
+        public string Type { get; set; } // "system", "user", "approval", etc.
         public string Title { get; set; }
         public string Message { get; set; }
-        public string Time { get; set; }
-        public DateTime Date { get; set; }
+        public string Time { get; set; } // Formatted time string for display
+        public DateTime CreatedAt { get; set; } // Actual timestamp for filtering
         public string Link { get; set; }
         public bool IsRead { get; set; }
     }

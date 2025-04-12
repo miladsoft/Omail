@@ -1,0 +1,351 @@
+@page "/admin/users/import"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Import Users - Omail Admin</PageTitle>
+
+<div class="space-y-6">
+    <AdminHeader 
+        Title="Bulk Import Users" 
+        Description="Upload a CSV file to import multiple users at once" 
+        PrimaryButtonText="Back to Users" 
+        PrimaryButtonUrl="admin/users"
+        PrimaryButtonIcon="" />
+    
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700">
+            <h3 class="text-lg font-medium text-omail-800 dark:text-white">CSV Import</h3>
+        </div>
+        
+        <div class="p-6">
+            <div class="mb-8">
+                <h4 class="text-md font-medium text-omail-800 dark:text-white mb-2">Instructions</h4>
+                <p class="text-sm text-omail-600 dark:text-omail-400 mb-4">
+                    Please prepare a CSV file with the following columns. The first row should contain the column headers.
+                </p>
+                <div class="bg-omail-50 dark:bg-omail-800/70 rounded-lg p-4 overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 text-left text-omail-800 dark:text-omail-200">Column</th>
+                                <th class="px-4 py-2 text-left text-omail-800 dark:text-omail-200">Description</th>
+                                <th class="px-4 py-2 text-left text-omail-800 dark:text-omail-200">Required</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-omail-200 dark:divide-omail-700">
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">FirstName</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">User's first name</td>
+                                <td class="px-4 py-2 text-green-600 dark:text-green-400">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">LastName</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">User's last name</td>
+                                <td class="px-4 py-2 text-green-600 dark:text-green-400">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Email</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Email address (must be unique)</td>
+                                <td class="px-4 py-2 text-green-600 dark:text-green-400">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Position</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Job position or title</td>
+                                <td class="px-4 py-2 text-red-600 dark:text-red-400">No</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">PhoneNumber</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Contact phone number</td>
+                                <td class="px-4 py-2 text-red-600 dark:text-red-400">No</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Department</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Department name (must exist)</td>
+                                <td class="px-4 py-2 text-green-600 dark:text-green-400">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Section</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">Section name (must exist in the department)</td>
+                                <td class="px-4 py-2 text-green-600 dark:text-green-400">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">IsManager</td>
+                                <td class="px-4 py-2 text-omail-600 dark:text-omail-400">TRUE if user is a manager, otherwise FALSE</td>
+                                <td class="px-4 py-2 text-red-600 dark:text-red-400">No</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6">
+                    <a href="/templates/user_import_template.csv" class="inline-flex items-center text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                        Download Template CSV
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-omail-200 dark:border-omail-700 pt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-md font-medium text-omail-800 dark:text-white">Upload CSV File</h4>
+                    <div>
+                        <label class="flex items-center">
+                            <InputCheckbox @bind-Value="sendWelcomeEmails" class="h-4 w-4 text-omail-600 focus:ring-omail-500 border-omail-300 dark:border-omail-700 rounded"/>
+                            <span class="ml-2 text-sm text-omail-600 dark:text-omail-400">Send welcome emails to imported users</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-omail-300 dark:border-omail-600 rounded-lg hover:border-omail-400 dark:hover:border-omail-500 transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-omail-500 dark:text-omail-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    <p class="mb-2 text-sm text-omail-600 dark:text-omail-400">
+                        <span class="font-medium">Click to upload</span> or drag and drop
+                    </p>
+                    <p class="text-xs text-omail-500 dark:text-omail-500">
+                        CSV file only (MAX. 100 users)
+                    </p>
+                    <InputFile OnChange="OnFileSelected" class="hidden" id="file_upload" />
+                    <label for="file_upload" class="mt-4 px-4 py-2 bg-omail-600 hover:bg-omail-700 text-white rounded-lg cursor-pointer">
+                        Select File
+                    </label>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(selectedFileName))
+                {
+                    <div class="mt-4 flex items-center justify-between bg-omail-50 dark:bg-omail-800/70 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-600 dark:text-omail-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span class="text-omail-700 dark:text-omail-300">@selectedFileName</span>
+                        </div>
+                        <button @onclick="ClearFile" class="text-omail-500 hover:text-omail-700 dark:hover:text-omail-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button @onclick="ProcessImport" class="px-6 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700 flex items-center">
+                            @if (isImporting)
+                            {
+                                <div class="animate-spin rounded-full h-4 w-4 border-2 border-t-2 border-omail-200 mr-2"></div>
+                                <span>Importing...</span>
+                            }
+                            else
+                            {
+                                <span>Import Users</span>
+                            }
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    @if (showResults)
+    {
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-omail-800 dark:text-white">Import Results</h3>
+                <div class="flex items-center space-x-4">
+                    <div class="text-green-600 dark:text-green-400 text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>@successCount imported successfully</span>
+                    </div>
+                    @if (errorCount > 0)
+                    {
+                        <div class="text-red-600 dark:text-red-400 text-sm flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>@errorCount failed</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="p-6">
+                @if (importErrors.Any())
+                {
+                    <div class="mb-6">
+                        <h4 class="text-md font-medium text-omail-800 dark:text-white mb-2">Errors</h4>
+                        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg p-4 max-h-64 overflow-y-auto">
+                            <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-400 space-y-2">
+                                @foreach (var error in importErrors)
+                                {
+                                    <li>@error</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+                
+                @if (importedUsers.Any())
+                {
+                    <div>
+                        <h4 class="text-md font-medium text-omail-800 dark:text-white mb-2">Imported Users</h4>
+                        <div class="bg-omail-50 dark:bg-omail-800/70 rounded-lg p-4 overflow-x-auto">
+                            <table class="min-w-full divide-y divide-omail-200 dark:divide-omail-700">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Name</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Email</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Department</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Section</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-omail-200 dark:divide-omail-700">
+                                    @foreach (var user in importedUsers)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-omail-800 dark:text-omail-200">@user.FullName</td>
+                                            <td class="px-4 py-2 text-sm text-omail-600 dark:text-omail-400">@user.Email</td>
+                                            <td class="px-4 py-2 text-sm text-omail-600 dark:text-omail-400">@user.Department</td>
+                                            <td class="px-4 py-2 text-sm text-omail-600 dark:text-omail-400">@user.Section</td>
+                                            <td class="px-4 py-2">
+                                                @if (user.IsManager)
+                                                {
+                                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Manager</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="px-2 py-1 text-xs rounded-full bg-omail-100 text-omail-800 dark:bg-omail-800/50 dark:text-omail-300">User</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                
+                <div class="mt-6 flex justify-end">
+                    <button @onclick="GoToUserList" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700 transition-colors">
+                        Go to User List
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool sendWelcomeEmails = true;
+    private IBrowserFile selectedFile;
+    private string selectedFileName;
+    private bool isImporting = false;
+    private bool showResults = false;
+    private int successCount = 0;
+    private int errorCount = 0;
+    private List<string> importErrors = new List<string>();
+    private List<ImportedUserViewModel> importedUsers = new List<ImportedUserViewModel>();
+    
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        selectedFileName = e.File.Name;
+        
+        // Reset results
+        showResults = false;
+        successCount = 0;
+        errorCount = 0;
+        importErrors.Clear();
+        importedUsers.Clear();
+    }
+    
+    private void ClearFile()
+    {
+        selectedFile = null;
+        selectedFileName = null;
+    }
+    
+    private async Task ProcessImport()
+    {
+        if (selectedFile == null)
+            return;
+            
+        try
+        {
+            isImporting = true;
+            
+            // Read the file contents
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10485760); // 10MB max
+            using var reader = new StreamReader(stream);
+            var content = await reader.ReadToEndAsync();
+            
+            // Process the CSV content (in a real app this would call a service method)
+            await Task.Delay(1500); // Simulate processing time
+            
+            // In a real app, parse CSV and call AuthService
+            // var result = await AuthService.ImportUsersAsync(content, sendWelcomeEmails);
+            
+            // For demonstration purposes, we'll create mock results
+            // This would come from the service in a real app
+            successCount = new Random().Next(3, 10);
+            errorCount = new Random().Next(0, 3);
+            
+            if (errorCount > 0)
+            {
+                importErrors.Add("Row 3: Email address 'john.doe@example.com' already exists in the system.");
+                if (errorCount > 1)
+                    importErrors.Add("Row 5: Section 'Marketing' does not exist in department 'Sales'.");
+                if (errorCount > 2)
+                    importErrors.Add("Row 7: Missing required field 'Email'.");
+            }
+            
+            // Add sample imported users
+            for (int i = 0; i < successCount; i++)
+            {
+                importedUsers.Add(new ImportedUserViewModel
+                {
+                    FirstName = $"User{i+1}",
+                    LastName = "Imported",
+                    Email = $"user{i+1}@example.com",
+                    Department = i % 3 == 0 ? "IT" : (i % 3 == 1 ? "HR" : "Finance"),
+                    Section = i % 3 == 0 ? "Development" : (i % 3 == 1 ? "Recruitment" : "Accounting"),
+                    IsManager = i % 5 == 0
+                });
+            }
+            
+            showResults = true;
+        }
+        catch (Exception ex)
+        {
+            importErrors.Add($"Error processing file: {ex.Message}");
+            errorCount++;
+            showResults = true;
+        }
+        finally
+        {
+            isImporting = false;
+        }
+    }
+    
+    private void GoToUserList()
+    {
+        NavigationManager.NavigateTo("admin/users");
+    }
+    
+    private class ImportedUserViewModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
+        public string Email { get; set; }
+        public string Department { get; set; }
+        public string Section { get; set; }
+        public bool IsManager { get; set; }
+    }
+}

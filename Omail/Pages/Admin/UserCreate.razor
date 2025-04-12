@@ -1,0 +1,341 @@
+@page "/admin/users/new"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Create User - Omail Admin</PageTitle>
+
+<div class="space-y-6">
+    <AdminHeader 
+        Title="Create New User" 
+        Description="Add a new user to the system" 
+        PrimaryButtonText="Back to Users" 
+        PrimaryButtonUrl="admin/users"
+        PrimaryButtonIcon="" />
+    
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700">
+            <h3 class="text-lg font-medium text-omail-800 dark:text-white">User Information</h3>
+        </div>
+        
+        <div class="p-6">
+            <EditForm Model="@userModel" OnValidSubmit="CreateUser" class="space-y-6">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-red-500 text-sm mb-4" />
+                
+                <!-- User Basic Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">First Name</label>
+                        <InputText 
+                            id="firstName" 
+                            @bind-Value="userModel.FirstName" 
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                        <ValidationMessage For="@(() => userModel.FirstName)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                    
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Last Name</label>
+                        <InputText 
+                            id="lastName" 
+                            @bind-Value="userModel.LastName" 
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                        <ValidationMessage For="@(() => userModel.LastName)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email Address</label>
+                    <InputText 
+                        id="email" 
+                        @bind-Value="userModel.Email" 
+                        type="email"
+                        class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                    />
+                    <ValidationMessage For="@(() => userModel.Email)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Password</label>
+                        <InputText 
+                            id="password" 
+                            @bind-Value="userModel.Password" 
+                            type="password"
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                        <ValidationMessage For="@(() => userModel.Password)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                    
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Confirm Password</label>
+                        <InputText 
+                            id="confirmPassword" 
+                            @bind-Value="userModel.ConfirmPassword" 
+                            type="password"
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                        <ValidationMessage For="@(() => userModel.ConfirmPassword)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                </div>
+                
+                <!-- Department and Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="department" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Department</label>
+                        <select 
+                            id="department" 
+                            @onchange="DepartmentChanged"
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50">
+                            <option value="">-- Select Department --</option>
+                            @foreach (var department in departments)
+                            {
+                                <option value="@department.Id">@department.Name</option>
+                            }
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="section" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Section</label>
+                        <InputSelect 
+                            id="section" 
+                            @bind-Value="userModel.SectionId"
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 @(sections.Count == 0 ? "bg-omail-100 dark:bg-omail-800/50 cursor-not-allowed" : "")">
+                            <option value="0">-- Select Section --</option>
+                            @foreach (var sec in sections)
+                            {
+                                <option value="@sec.Id">@sec.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => userModel.SectionId)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                </div>
+                
+                <!-- Additional Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="position" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Position</label>
+                        <InputText 
+                            id="position" 
+                            @bind-Value="userModel.Position" 
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                    </div>
+                    
+                    <div>
+                        <label for="phoneNumber" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Phone Number</label>
+                        <InputText 
+                            id="phoneNumber" 
+                            @bind-Value="userModel.PhoneNumber" 
+                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" 
+                        />
+                        <ValidationMessage For="@(() => userModel.PhoneNumber)" class="text-red-500 text-xs mt-1" />
+                    </div>
+                </div>
+                
+                <!-- User Status -->
+                <div class="flex flex-col md:flex-row gap-6 pt-4 border-t border-omail-200 dark:border-omail-700">
+                    <div class="flex items-center">
+                        <InputCheckbox 
+                            id="isActive" 
+                            @bind-Value="userModel.IsActive"
+                            class="h-4 w-4 text-omail-600 focus:ring-omail-500 border-omail-300 dark:border-omail-700 rounded" 
+                        />
+                        <label for="isActive" class="ml-2 block text-sm text-omail-700 dark:text-omail-300">
+                            Active Account
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <InputCheckbox 
+                            id="isManager" 
+                            @bind-Value="userModel.IsManager"
+                            class="h-4 w-4 text-omail-600 focus:ring-omail-500 border-omail-300 dark:border-omail-700 rounded" 
+                        />
+                        <label for="isManager" class="ml-2 block text-sm text-omail-700 dark:text-omail-300">
+                            Manager Role
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <InputCheckbox 
+                            id="sendWelcomeEmail" 
+                            @bind-Value="sendWelcomeEmail"
+                            class="h-4 w-4 text-omail-600 focus:ring-omail-500 border-omail-300 dark:border-omail-700 rounded" 
+                        />
+                        <label for="sendWelcomeEmail" class="ml-2 block text-sm text-omail-700 dark:text-omail-300">
+                            Send Welcome Email
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="pt-4 flex justify-end space-x-3 border-t border-omail-200 dark:border-omail-700">
+                    <button type="button" @onclick="@(() => NavigationManager.NavigateTo("admin/users"))" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span>Creating...</span>
+                        }
+                        else
+                        {
+                            <span>Create User</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@if (showErrorMessage)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-red-600 dark:text-red-400 mb-2">Error</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@errorMessage</p>
+            <div class="flex justify-end">
+                <button @onclick="() => showErrorMessage = false" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private UserCreateModel userModel = new UserCreateModel
+    {
+        IsActive = true,
+        HireDate = DateTime.Today
+    };
+    
+    private bool sendWelcomeEmail = true;
+    private bool isProcessing = false;
+    private bool showErrorMessage = false;
+    private string errorMessage = string.Empty;
+    
+    private List<Department> departments = new List<Department>();
+    private List<Section> sections = new List<Section>();
+    private int selectedDepartmentId = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDepartments();
+    }
+    
+    private async Task LoadDepartments()
+    {
+        try
+        {
+            departments = await AuthService.GetAllDepartmentsAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading departments: {ex.Message}";
+            showErrorMessage = true;
+        }
+    }
+    
+    private async Task DepartmentChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int departmentId))
+        {
+            selectedDepartmentId = departmentId;
+            if (departmentId > 0)
+            {
+                await LoadSections(departmentId);
+                userModel.SectionId = 0; // Reset section selection
+            }
+            else
+            {
+                sections.Clear();
+            }
+        }
+    }
+    
+    private async Task LoadSections(int departmentId)
+    {
+        try
+        {
+            sections = await AuthService.GetSectionsByDepartmentAsync(departmentId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading sections: {ex.Message}";
+            showErrorMessage = true;
+        }
+    }
+    
+    private async Task CreateUser()
+    {
+        try
+        {
+            isProcessing = true;
+
+            // Check if we need to add SectionId
+            if (userModel.SectionId == 0 && sections.Count > 0)
+            {
+                userModel.SectionId = sections.First().Id;
+            }
+
+            // Update the method call to match the expected parameters
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            await AuthService.CreateUserAsync(userModel, userModel.Password, currentUser.Id);
+
+            await JSRuntime.InvokeVoidAsync("alert", "User created successfully!");
+            NavigationManager.NavigateTo("/admin/users");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error creating user: {ex.Message}");
+            Console.Error.WriteLine($"Error creating user: {ex.Message}");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+    
+    public class UserCreateModel
+    {
+        [Required(ErrorMessage = "First name is required")]
+        [StringLength(100, ErrorMessage = "First name cannot be longer than 100 characters")]
+        public string FirstName { get; set; }
+        
+        [Required(ErrorMessage = "Last name is required")]
+        [StringLength(100, ErrorMessage = "Last name cannot be longer than 100 characters")]
+        public string LastName { get; set; }
+        
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+        
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters long")]
+        public string Password { get; set; }
+        
+        [Compare(nameof(Password), ErrorMessage = "Passwords do not match")]
+        public string ConfirmPassword { get; set; }
+        
+        [StringLength(15, ErrorMessage = "Phone number cannot be longer than 15 characters")]
+        public string PhoneNumber { get; set; }
+        
+        [StringLength(100, ErrorMessage = "Position cannot be longer than 100 characters")]
+        public string Position { get; set; }
+        
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a section")]
+        public int SectionId { get; set; }
+        
+        public bool IsManager { get; set; }
+        
+        public bool IsActive { get; set; }
+        
+        public DateTime HireDate { get; set; }
+    }
+}

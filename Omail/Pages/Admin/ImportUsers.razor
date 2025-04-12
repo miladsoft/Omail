@@ -1,0 +1,556 @@
+@page "/admin/users/import"
+@attribute [Authorize(Roles = "Manager")]
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject AuthService AuthService
+
+<PageTitle>Import Users - Omail Admin</PageTitle>
+
+<div class="space-y-6">
+    <AdminHeader 
+        Title="Bulk Import Users" 
+        Description="Import multiple users from a CSV file" 
+        PrimaryButtonText="Back to Users" 
+        PrimaryButtonUrl="admin/users"
+        PrimaryButtonIcon="" />
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Import Panel -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700">
+                    <h3 class="text-lg font-medium text-omail-800 dark:text-white">CSV File Upload</h3>
+                </div>
+                
+                <div class="p-6">
+                    @if (isUploading)
+                    {
+                        <div class="flex flex-col items-center justify-center py-10">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-omail-600"></div>
+                            <p class="mt-3 text-omail-600 dark:text-omail-400">Uploading and validating file...</p>
+                        </div>
+                    }
+                    else if (previewData.Count > 0)
+                    {
+                        <div class="bg-omail-50 dark:bg-omail-700/30 rounded-lg p-4 mb-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Preview Mode</h3>
+                                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-200">
+                                        <p>Displaying preview of the CSV data. Please verify the records before proceeding with the import.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-omail-200 dark:divide-omail-700">
+                                <thead class="bg-omail-50 dark:bg-omail-700/30">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">First Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Last Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Email</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Department</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-transparent divide-y divide-omail-200 dark:divide-omail-700">
+                                    @foreach (var record in previewData.Take(10))
+                                    {
+                                        <tr class="hover:bg-omail-50 dark:hover:bg-omail-800/50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-omail-800 dark:text-omail-200">@record.FirstName</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-omail-800 dark:text-omail-200">@record.LastName</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-omail-800 dark:text-omail-200">@record.Email</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-omail-800 dark:text-omail-200">@record.Department</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                @if (record.IsValid)
+                                                {
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400">
+                                                        Valid
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400">
+                                                        Invalid
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        @if (previewData.Count > 10)
+                        {
+                            <div class="mt-2 text-sm text-omail-500 dark:text-omail-400">
+                                Showing 10 of @previewData.Count records. All records will be imported.
+                            </div>
+                        }
+                        
+                        <div class="mt-6 flex justify-between items-center">
+                            <button @onclick="ClearPreview" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                                Cancel
+                            </button>
+                            
+                            <div>
+                                <span class="text-sm text-omail-600 dark:text-omail-400 mr-4">
+                                    Total: @previewData.Count records, @previewData.Count(r => r.IsValid) valid
+                                </span>
+                                <button 
+                                    @onclick="ProcessImport" 
+                                    disabled="@(previewData.Count(r => r.IsValid) == 0)"
+                                    class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Import Users
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bg-white dark:bg-omail-800/30 border-2 border-dashed border-omail-300 dark:border-omail-700 rounded-lg p-12 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-omail-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <div class="mt-4 text-sm text-omail-700 dark:text-omail-300">
+                                <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-omail-700 rounded-md font-medium text-omail-600 dark:text-omail-300 hover:text-omail-500 dark:hover:text-omail-200 focus-within:outline-none">
+                                    <span>Upload a CSV file</span>
+                                    <InputFile id="file-upload" OnChange="HandleFileSelected" class="sr-only" accept=".csv" />
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="mt-1 text-xs text-omail-500 dark:text-omail-400">CSV file up to 10MB</p>
+                            
+                            <div class="mt-6">
+                                <button @onclick="DownloadTemplate" class="inline-flex items-center text-sm font-medium text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                                    <svg class="h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download CSV Template
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions Panel -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700">
+                    <h3 class="text-lg font-medium text-omail-800 dark:text-white">Import Instructions</h3>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4 text-sm text-omail-600 dark:text-omail-300">
+                        <p>Follow these steps to import users:</p>
+                        
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>Download the CSV template or prepare a CSV file with the correct format.</li>
+                            <li>Fill in the user data in the CSV file. Required fields are marked with an asterisk (*).</li>
+                            <li>Upload the completed CSV file using the upload form.</li>
+                            <li>Verify the preview data to ensure everything looks correct.</li>
+                            <li>Click "Import Users" to complete the process.</li>
+                        </ol>
+                        
+                        <p class="font-medium mt-4">Required CSV Format:</p>
+                        
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li><span class="font-medium">FirstName*</span> - User's first name</li>
+                            <li><span class="font-medium">LastName*</span> - User's last name</li>
+                            <li><span class="font-medium">Email*</span> - User's email address</li>
+                            <li><span class="font-medium">Department</span> - Department name</li>
+                            <li><span class="font-medium">Section</span> - Section name</li>
+                            <li><span class="font-medium">Position</span> - Job title</li>
+                            <li><span class="font-medium">IsManager</span> - "true" or "false"</li>
+                            <li><span class="font-medium">IsActive</span> - "true" or "false"</li>
+                        </ul>
+                        
+                        <div class="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-md mt-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Important Note</h3>
+                                    <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-200">
+                                        <p>A random temporary password will be generated for each imported user. 
+                                           Users will receive a welcome email with instructions to set a new password.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Progress Dialog -->
+@if (isImporting)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-4">Importing Users</h3>
+            <div class="mb-4">
+                <div class="relative pt-1">
+                    <div class="flex mb-2 items-center justify-between">
+                        <div>
+                            <span class="text-xs font-semibold inline-block text-omail-600 dark:text-omail-300">
+                                @importProgress% Complete
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-semibold inline-block text-omail-600 dark:text-omail-300">
+                                @importCompleted of @importTotal
+                            </span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-omail-200 dark:bg-omail-700">
+                        <div style="width:@importProgress%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-omail-600"></div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-omail-600 dark:text-omail-400 mb-4">Please wait while users are being imported. This may take a few moments depending on the number of records.</p>
+        </div>
+    </div>
+}
+
+<!-- Result Dialog -->
+@if (showResultDialog)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <div class="flex justify-between items-start">
+                <h3 class="text-lg font-bold text-omail-900 dark:text-white">Import Result</h3>
+                <button @onclick="CloseResultDialog" class="text-omail-500 hover:text-omail-700 dark:hover:text-omail-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mt-4 space-y-4">
+                <div class="bg-@(importSucceeded ? "green" : "red")-100 dark:bg-@(importSucceeded ? "green" : "red")-900/30 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            @if (importSucceeded)
+                            {
+                                <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            }
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-@(importSucceeded ? "green" : "red")-800 dark:text-@(importSucceeded ? "green" : "red")-300">
+                                @(importSucceeded ? "Import Successful" : "Import Failed")
+                            </h3>
+                            <div class="mt-2 text-sm text-@(importSucceeded ? "green" : "red")-700 dark:text-@(importSucceeded ? "green" : "red")-200">
+                                <p>@importMessage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button @onclick="CloseResultDialog" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        Close
+                    </button>
+                    @if (importSucceeded)
+                    {
+                        <button @onclick="ViewUsers" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                            View Users
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isUploading = false;
+    private bool isImporting = false;
+    private bool showResultDialog = false;
+    private bool importSucceeded = false;
+    private string importMessage = "";
+    private int importProgress = 0;
+    private int importTotal = 0;
+    private int importCompleted = 0;
+    
+    private List<UserImportRecord> previewData = new List<UserImportRecord>();
+    
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            isUploading = true;
+            
+            // Get the first file from the input
+            var file = e.File;
+            
+            // Check file size
+            if (file.Size > 10 * 1024 * 1024) // 10 MB limit
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "File size exceeds the 10MB limit");
+                return;
+            }
+            
+            // Check file extension
+            var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+            if (extension != ".csv")
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Please upload a CSV file");
+                return;
+            }
+            
+            // Read the file content
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var content = await reader.ReadToEndAsync();
+            
+            // Parse the CSV
+            previewData = ParseCsvContent(content);
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error processing file: {ex.Message}");
+            previewData.Clear();
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+    
+    private List<UserImportRecord> ParseCsvContent(string content)
+    {
+        var result = new List<UserImportRecord>();
+        
+        // Split the content into lines
+        var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        
+        // Skip if file is empty
+        if (lines.Length <= 1)
+            return result;
+        
+        // Get headers from the first line
+        var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+        
+        // Validate headers
+        var requiredHeaders = new[] { "FirstName", "LastName", "Email" };
+        if (requiredHeaders.Any(rh => !headers.Contains(rh, StringComparer.OrdinalIgnoreCase)))
+        {
+            // Missing required headers
+            return result;
+        }
+        
+        // Process data rows
+        for (int i = 1; i < lines.Length; i++)
+        {
+            var line = lines[i].Trim();
+            if (string.IsNullOrEmpty(line))
+                continue;
+            
+            var values = line.Split(',').Select(v => v.Trim()).ToArray();
+            
+            // Skip if row does not have enough fields
+            if (values.Length < 3)
+                continue;
+            
+            // Map CSV data to the record
+            var record = new UserImportRecord();
+            
+            // Get index of each field in the headers
+            int firstNameIndex = GetHeaderIndex(headers, "FirstName");
+            int lastNameIndex = GetHeaderIndex(headers, "LastName");
+            int emailIndex = GetHeaderIndex(headers, "Email");
+            int departmentIndex = GetHeaderIndex(headers, "Department");
+            int sectionIndex = GetHeaderIndex(headers, "Section");
+            int positionIndex = GetHeaderIndex(headers, "Position");
+            int isManagerIndex = GetHeaderIndex(headers, "IsManager");
+            int isActiveIndex = GetHeaderIndex(headers, "IsActive");
+            
+            // Set basic properties
+            record.FirstName = firstNameIndex >= 0 && firstNameIndex < values.Length ? values[firstNameIndex] : "";
+            record.LastName = lastNameIndex >= 0 && lastNameIndex < values.Length ? values[lastNameIndex] : "";
+            record.Email = emailIndex >= 0 && emailIndex < values.Length ? values[emailIndex] : "";
+            record.Department = departmentIndex >= 0 && departmentIndex < values.Length ? values[departmentIndex] : "";
+            record.Section = sectionIndex >= 0 && sectionIndex < values.Length ? values[sectionIndex] : "";
+            record.Position = positionIndex >= 0 && positionIndex < values.Length ? values[positionIndex] : "";
+            
+            // Parse boolean values
+            if (isManagerIndex >= 0 && isManagerIndex < values.Length)
+            {
+                bool.TryParse(values[isManagerIndex], out bool isManager);
+                record.IsManager = isManager;
+            }
+            
+            if (isActiveIndex >= 0 && isActiveIndex < values.Length)
+            {
+                bool.TryParse(values[isActiveIndex], out bool isActive);
+                record.IsActive = isActive;
+            }
+            
+            // Validate the record
+            record.IsValid = !string.IsNullOrWhiteSpace(record.FirstName) && 
+                            !string.IsNullOrWhiteSpace(record.LastName) && 
+                            !string.IsNullOrWhiteSpace(record.Email) &&
+                            IsValidEmail(record.Email);
+            
+            result.Add(record);
+        }
+        
+        return result;
+    }
+    
+    private int GetHeaderIndex(List<string> headers, string headerName)
+    {
+        return headers.FindIndex(h => h.Equals(headerName, StringComparison.OrdinalIgnoreCase));
+    }
+    
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
+    private void ClearPreview()
+    {
+        previewData.Clear();
+    }
+    
+    private async Task ProcessImport()
+    {
+        try
+        {
+            isImporting = true;
+            importProgress = 0;
+            importTotal = previewData.Count(r => r.IsValid);
+            importCompleted = 0;
+            
+            // Filter valid records
+            var validRecords = previewData.Where(r => r.IsValid).ToList();
+            
+            if (validRecords.Count == 0)
+            {
+                importMessage = "No valid records found to import.";
+                importSucceeded = false;
+                showResultDialog = true;
+                return;
+            }
+            
+            // Import records one by one
+            for (int i = 0; i < validRecords.Count; i++)
+            {
+                var record = validRecords[i];
+                
+                try
+                {
+                    // In a real application, you'd call a service method to import the user
+                    // For demo purposes, let's just simulate the import
+                    await Task.Delay(100); // Simulate processing time
+                    
+                    // Update progress
+                    importCompleted++;
+                    importProgress = (int)(((double)importCompleted / importTotal) * 100);
+                }
+                catch
+                {
+                    // Log the error but continue with other records
+                    continue;
+                }
+            }
+            
+            // Show result
+            importSucceeded = importCompleted > 0;
+            importMessage = importSucceeded
+                ? $"Successfully imported {importCompleted} out of {importTotal} users."
+                : "Failed to import any users. Please check the format of your CSV file and try again.";
+            
+            showResultDialog = true;
+            
+            // Clear preview data if import was successful
+            if (importSucceeded)
+            {
+                previewData.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            importSucceeded = false;
+            importMessage = $"Error during import: {ex.Message}";
+            showResultDialog = true;
+        }
+        finally
+        {
+            isImporting = false;
+        }
+    }
+    
+    private async Task DownloadTemplate()
+    {
+        var template = "FirstName,LastName,Email,Department,Section,Position,IsManager,IsActive\n" +
+                       "John,Doe,john.doe@example.com,Information Technology,Software Development,Developer,false,true\n" +
+                       "Jane,Smith,jane.smith@example.com,Human Resources,Recruitment,Manager,true,true\n";
+                       
+        // Convert string to byte array
+        var bytes = System.Text.Encoding.UTF8.GetBytes(template);
+        
+        // Create a base64 string
+        var base64 = Convert.ToBase64String(bytes);
+        
+        // Trigger download using JavaScript
+        await JSRuntime.InvokeVoidAsync(
+            "downloadFile", 
+            "user_import_template.csv", 
+            "text/csv", 
+            base64);
+    }
+    
+    private void CloseResultDialog()
+    {
+        showResultDialog = false;
+    }
+    
+    private void ViewUsers()
+    {
+        NavigationManager.NavigateTo("admin/users");
+    }
+    
+    public class UserImportRecord
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Department { get; set; }
+        public string Section { get; set; }
+        public string Position { get; set; }
+        public bool IsManager { get; set; }
+        public bool IsActive { get; set; } = true;
+        public bool IsValid { get; set; }
+    }
+}
