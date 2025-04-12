@@ -1,0 +1,13 @@
+@page "/logout"
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject OmailAuthenticationStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LogoutAsync();
+        await AuthStateProvider.NotifyUserAuthenticationAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,105 @@
+using Microsoft.EntityFrameworkCore;
+using Omail.Data.Models;
+
+namespace Omail.Data
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Section> Sections { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<EmailMessage> Emails { get; set; }
+        public DbSet<EmailApproval> EmailApprovals { get; set; }
+        public DbSet<EmailAttachment> EmailAttachments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure relationships
+            modelBuilder.Entity<Department>()
+                .HasOne(d => d.Organization)
+                .WithMany(o => o.Departments)
+                .HasForeignKey(d => d.OrganizationId);
+
+            modelBuilder.Entity<Section>()
+                .HasOne(s => s.Department)
+                .WithMany(d => d.Sections)
+                .HasForeignKey(s => s.DepartmentId);
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Section)
+                .WithMany(s => s.Employees)
+                .HasForeignKey(e => e.SectionId);
+
+            modelBuilder.Entity<EmailMessage>()
+                .HasOne(e => e.Sender)
+                .WithMany(s => s.SentEmails)
+                .HasForeignKey(e => e.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Many-to-many relationship between emails and recipients
+            modelBuilder.Entity<EmailRecipient>()
+                .HasKey(er => new { er.EmailId, er.RecipientId });
+
+            modelBuilder.Entity<EmailRecipient>()
+                .HasOne(er => er.Email)
+                .WithMany(e => e.Recipients)
+                .HasForeignKey(er => er.EmailId);
+
+            modelBuilder.Entity<EmailRecipient>()
+                .HasOne(er => er.Recipient)
+                .WithMany(e => e.ReceivedEmails)
+                .HasForeignKey(er => er.RecipientId);
+
+            // Email approvals
+            modelBuilder.Entity<EmailApproval>()
+                .HasOne(a => a.Email)
+                .WithMany(e => e.Approvals)
+                .HasForeignKey(a => a.EmailId);
+
+            modelBuilder.Entity<EmailApproval>()
+                .HasOne(a => a.Approver)
+                .WithMany(e => e.PendingApprovals)
+                .HasForeignKey(a => a.ApproverId);
+
+            // Email attachments
+            modelBuilder.Entity<EmailAttachment>()
+                .HasOne(a => a.Email)
+                .WithMany(e => e.Attachments)
+                .HasForeignKey(a => a.EmailId);
+
+            // Add seed data
+            SeedData(modelBuilder);
+        }
+
+        private void SeedData(ModelBuilder modelBuilder)
+        {
+            // Seed organizations
+            modelBuilder.Entity<Organization>().HasData(
+                new Organization { Id = 1, Name = "Omail Corporation", Description = "Main organization" }
+            );
+
+            // Seed departments
+            modelBuilder.Entity<Department>().HasData(
+                new Department { Id = 1, Name = "Information Technology", OrganizationId = 1 },
+                new Department { Id = 2, Name = "Human Resources", OrganizationId = 1 },
+                new Department { Id = 3, Name = "Finance", OrganizationId = 1 }
+            );
+
+            // Seed sections
+            modelBuilder.Entity<Section>().HasData(
+                new Section { Id = 1, Name = "Software Development", DepartmentId = 1 },
+                new Section { Id = 2, Name = "Network Operations", DepartmentId = 1 },
+                new Section { Id = 3, Name = "Recruitment", DepartmentId = 2 },
+                new Section { Id = 4, Name = "Accounting", DepartmentId = 3 }
+            );
+
+            // Add more seed data here if needed
+        }
+    }
+}

@@ -1,0 +1,120 @@
+@page "/login"
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject OmailAuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Login - Omail</PageTitle>
+
+<div class="min-h-screen flex items-center justify-center bg-omail-50 dark:bg-gradient-to-br dark:from-omail-900 dark:to-omail-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white dark:bg-omail-800/60 p-8 rounded-xl shadow-lg">
+        <div>
+            <div class="flex justify-center">
+                <div class="text-3xl font-bold text-omail-600 dark:text-omail-100 tracking-tight transition-colors duration-300 flex items-center">
+                    Omail
+                    <span class="text-omail-100 bg-gradient-to-r from-omail-500 to-omail-600 dark:from-omail-600 dark:to-omail-700 px-2 py-0.5 rounded ml-1 text-sm align-top font-bold transition-all duration-300">UI</span>
+                </div>
+            </div>
+            <h2 class="mt-6 text-center text-2xl font-extrabold text-omail-900 dark:text-white">
+                Sign in to your account
+            </h2>
+        </div>
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin" class="mt-8 space-y-6">
+            <DataAnnotationsValidator />
+            
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline">@errorMessage</span>
+                </div>
+            }
+            
+            <div class="rounded-md -space-y-px">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email address</label>
+                    <InputText id="email" @bind-Value="loginModel.Email" class="appearance-none relative block w-full px-3 py-2 border border-omail-300 dark:border-omail-700 placeholder-omail-500 text-omail-900 dark:text-white dark:bg-omail-900/60 rounded focus:outline-none focus:ring-omail-500 focus:border-omail-500 focus:z-10 sm:text-sm" placeholder="Email address" />
+                    <ValidationMessage For="@(() => loginModel.Email)" class="text-red-500 text-xs mt-1" />
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Password</label>
+                    <InputText id="password" type="password" @bind-Value="loginModel.Password" class="appearance-none relative block w-full px-3 py-2 border border-omail-300 dark:border-omail-700 placeholder-omail-500 text-omail-900 dark:text-white dark:bg-omail-900/60 rounded focus:outline-none focus:ring-omail-500 focus:border-omail-500 focus:z-10 sm:text-sm" placeholder="Password" />
+                    <ValidationMessage For="@(() => loginModel.Password)" class="text-red-500 text-xs mt-1" />
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-omail-600 focus:ring-omail-500 border-omail-300 rounded">
+                    <label for="remember-me" class="ml-2 block text-sm text-omail-700 dark:text-omail-300">
+                        Remember me
+                    </label>
+                </div>
+
+                <div class="text-sm">
+                    <a href="#" class="font-medium text-omail-600 hover:text-omail-500 dark:text-omail-400 dark:hover:text-omail-300">
+                        Forgot your password?
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-omail-500 group-hover:text-omail-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    Sign in
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Redirect if already logged in
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/inbox");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var result = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
+
+            if (result)
+            {
+                await AuthStateProvider.NotifyUserAuthenticationAsync();
+                NavigationManager.NavigateTo("/inbox");
+            }
+            else
+            {
+                errorMessage = "Invalid email or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string Password { get; set; }
+    }
+}

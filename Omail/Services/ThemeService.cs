@@ -1,50 +1,39 @@
-using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
-namespace Omail.Services;
-
-public class ThemeService
+namespace Omail.Services
 {
-    private readonly IJSRuntime _jsRuntime;
-    private const string StorageKey = "omail-theme";
-    private bool _isDarkMode;
-
-    public event Action? OnThemeChange;
-
-    public bool IsDarkMode 
+    public class ThemeService
     {
-        get => _isDarkMode;
-        set 
+        private bool _isDarkMode;
+        private readonly ProtectedLocalStorage _localStorage;
+        
+        public bool IsDarkMode => _isDarkMode;
+        
+        public event Action OnThemeChange;
+        
+        public ThemeService(ProtectedLocalStorage localStorage)
         {
-            if (_isDarkMode != value)
+            _localStorage = localStorage;
+        }
+        
+        public async Task InitializeAsync()
+        {
+            try
             {
-                _isDarkMode = value;
-                OnThemeChange?.Invoke();
-                UpdateThemeAsync();
+                var result = await _localStorage.GetAsync<bool>("darkMode");
+                _isDarkMode = result.Success ? result.Value : false;
+            }
+            catch
+            {
+                _isDarkMode = false;
             }
         }
-    }
-
-    public ThemeService(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
-
-    public async Task InitializeAsync()
-    {
-        var theme = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", StorageKey);
-        _isDarkMode = theme == "dark";
-        await UpdateThemeAsync();
-    }
-
-    private async Task UpdateThemeAsync()
-    {
-        var theme = _isDarkMode ? "dark" : "light";
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", StorageKey, theme);
-        await _jsRuntime.InvokeVoidAsync("document.documentElement.classList.toggle", "dark", _isDarkMode);
-    }
-
-    public async Task ToggleThemeAsync()
-    {
-        IsDarkMode = !IsDarkMode;
+        
+        public async Task ToggleThemeAsync()
+        {
+            _isDarkMode = !_isDarkMode;
+            await _localStorage.SetAsync("darkMode", _isDarkMode);
+            OnThemeChange?.Invoke();
+        }
     }
 }
