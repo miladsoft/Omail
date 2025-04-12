@@ -1,0 +1,556 @@
+@page "/admin/organizations"
+@page "/admin/organizations/manage"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject ILogger<OrganizationManagement> Logger
+
+<PageTitle>Organization Management - Omail</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/sbiheqdr.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-10 h-10 mr-3">
+                </lord-icon>
+                Organization Management
+            </h1>
+            <p class="text-omail-600 dark:text-omail-300 mt-2">Manage departments, sections, and organizational structure</p>
+        </div>
+        
+        <div>
+            <button @onclick="@(() => NavigationManager.NavigateTo("/admin"))" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iifryyua.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Back to Dashboard</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Organization Info Card -->
+        <div class="col-span-1">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white mb-4">Organization Info</h3>
+                
+                @if (isLoading)
+                {
+                    <div class="animate-pulse space-y-3">
+                        <div class="h-4 bg-omail-300 dark:bg-omail-700 rounded w-3/4"></div>
+                        <div class="h-4 bg-omail-300 dark:bg-omail-700 rounded w-1/2"></div>
+                        <div class="h-4 bg-omail-300 dark:bg-omail-700 rounded w-2/3"></div>
+                    </div>
+                }
+                else if (organization != null)
+                {
+                    <EditForm Model="organization" OnValidSubmit="SaveOrganizationInfo" class="space-y-4">
+                        <DataAnnotationsValidator />
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Name</label>
+                            <InputText @bind-Value="organization.Name" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                            <ValidationMessage For="@(() => organization.Name)" class="text-red-500 text-xs mt-1" />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Description</label>
+                            <InputTextArea @bind-Value="organization.Description" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" rows="3" />
+                            <ValidationMessage For="@(() => organization.Description)" class="text-red-500 text-xs mt-1" />
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="w-full px-4 py-2 bg-omail-600 hover:bg-omail-700 text-white rounded-lg transition-colors duration-300">
+                                Save Changes
+                            </button>
+                        </div>
+                    </EditForm>
+                    
+                    <div class="mt-6">
+                        <div class="flex items-center justify-between text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">
+                            <span>Departments</span>
+                            <span class="bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
+                                @(organization.Departments?.Count ?? 0)
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">
+                            <span>Total Sections</span>
+                            <span class="bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
+                                @(totalSections)
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm font-medium text-omail-700 dark:text-omail-300">
+                            <span>Total Employees</span>
+                            <span class="bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
+                                @(totalEmployees)
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <!-- Department Management -->
+        <div class="col-span-1 lg:col-span-2">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Departments</h3>
+                    <button @onclick="AddNewDepartment" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white p-2 rounded-lg hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </div>
+                
+                @if (isLoading)
+                {
+                    <div class="p-6 space-y-4">
+                        @for (int i = 0; i < 3; i++)
+                        {
+                            <div class="animate-pulse border border-omail-200 dark:border-omail-700 rounded-lg p-4">
+                                <div class="h-5 bg-omail-300 dark:bg-omail-700 rounded w-1/4 mb-4"></div>
+                                <div class="h-4 bg-omail-300 dark:bg-omail-700 rounded w-3/4 mb-2"></div>
+                                <div class="h-4 bg-omail-300 dark:bg-omail-700 rounded w-1/2"></div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (departments == null || !departments.Any())
+                {
+                    <div class="p-6 flex justify-center">
+                        <div class="text-center">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/msoeawqm.json"
+                                trigger="loop"
+                                delay="2000"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-16 h-16 mx-auto mb-4">
+                            </lord-icon>
+                            <p class="text-omail-600 dark:text-omail-400">No departments found</p>
+                            <button @onclick="AddNewDepartment" class="mt-4 px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                                Add Department
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-6 space-y-6">
+                        @foreach (var department in departments)
+                        {
+                            <div class="border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden">
+                                <div class="bg-omail-50 dark:bg-omail-700/50 px-4 py-3 flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-medium text-omail-800 dark:text-white">@department.Name</h4>
+                                        <p class="text-sm text-omail-500 dark:text-omail-400">@department.Sections.Count section@(department.Sections.Count != 1 ? "s" : "")</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button @onclick="() => EditDepartment(department)" class="p-1 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button @onclick="() => DeleteDepartment(department)" class="p-1 text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4">
+                                    @if (string.IsNullOrEmpty(department.Description))
+                                    {
+                                        <p class="text-sm text-omail-500 dark:text-omail-400 italic">No description</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-sm text-omail-700 dark:text-omail-300 mb-4">@department.Description</p>
+                                    }
+                                    
+                                    @if (department.Sections.Any())
+                                    {
+                                        <div class="mt-4">
+                                            <h5 class="text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Sections</h5>
+                                            <div class="space-y-2">
+                                                @foreach (var section1 in department.Sections)
+                                                {
+                                                    <div class="flex items-center justify-between bg-omail-50 dark:bg-omail-800/50 p-2 rounded">
+                                                        <div>
+                                                            <p class="text-sm font-medium text-omail-800 dark:text-white">@section1.Name</p>
+                                                            <p class="text-xs text-omail-500 dark:text-omail-400">@section1.Employees.Count employee@(section1.Employees.Count != 1 ? "s" : "")</p>
+                                                        </div>
+                                                        <div class="flex space-x-1">
+                                                            <button @onclick="() => EditSection(section1)" class="p-1 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                </svg>
+                                                            </button>
+                                                            <button @onclick="() => DeleteSection(section1)" class="p-1 text-red-500 hover:text-red-700">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    
+                                    <div class="mt-4">
+                                        <button @onclick="() => AddNewSection(department)" class="flex items-center space-x-1 text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            <span>Add Section</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Department Dialog -->
+@if (showDepartmentDialog)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-4">
+                @(selectedDepartment.Id > 0 ? "Edit Department" : "Add Department")
+            </h3>
+            
+            <EditForm Model="selectedDepartment" OnValidSubmit="SaveDepartment" class="space-y-4">
+                <DataAnnotationsValidator />
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Name</label>
+                    <InputText @bind-Value="selectedDepartment.Name" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                    <ValidationMessage For="@(() => selectedDepartment.Name)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Description</label>
+                    <InputTextArea @bind-Value="selectedDepartment.Description" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" rows="3" />
+                    <ValidationMessage For="@(() => selectedDepartment.Description)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" @onclick="CloseDepartmentDialog" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                        @(selectedDepartment.Id > 0 ? "Save Changes" : "Add Department")
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<!-- Section Dialog -->
+@if (showSectionDialog)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-4">
+                @(selectedSection.Id > 0 ? "Edit Section" : "Add Section")
+            </h3>
+            
+            <EditForm Model="selectedSection" OnValidSubmit="SaveSection" class="space-y-4">
+                <DataAnnotationsValidator />
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Name</label>
+                    <InputText @bind-Value="selectedSection.Name" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                    <ValidationMessage For="@(() => selectedSection.Name)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Description</label>
+                    <InputTextArea @bind-Value="selectedSection.Description" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" rows="3" />
+                    <ValidationMessage For="@(() => selectedSection.Description)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" @onclick="CloseSectionDialog" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                        @(selectedSection.Id > 0 ? "Save Changes" : "Add Section")
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<!-- Confirmation Dialog -->
+@if (showConfirmation)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-2">@confirmationTitle</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@confirmationMessage</p>
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelConfirmation" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmAction" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    @confirmationButtonText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private bool isLoading = true;
+    private Organization organization;
+    private List<Department> departments;
+    private int totalSections = 0;
+    private int totalEmployees = 0;
+    
+    // Department dialog
+    private bool showDepartmentDialog = false;
+    private Department selectedDepartment = new Department();
+    
+    // Section dialog
+    private bool showSectionDialog = false;
+    private Section selectedSection = new Section();
+    
+    // Confirmation dialog
+    private bool showConfirmation = false;
+    private string confirmationTitle;
+    private string confirmationMessage;
+    private string confirmationButtonText = "Confirm";
+    private Func<Task> confirmationAction;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Get organization
+            organization = await AuthService.GetOrganizationAsync();
+            
+            // Get departments with sections and employees
+            departments = await AuthService.GetDepartmentsWithSectionsAsync();
+            
+            // Calculate counts
+            totalSections = departments.Sum(d => d.Sections.Count);
+            totalEmployees = departments.Sum(d => d.Sections.Sum(s => s.Employees.Count));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading organization data");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private async Task SaveOrganizationInfo()
+    {
+        try
+        {
+            await AuthService.UpdateOrganizationAsync(organization);
+            await JSRuntime.InvokeVoidAsync("alert", "Organization information updated successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating organization");
+            await JSRuntime.InvokeVoidAsync("alert", "Error updating organization information");
+        }
+    }
+    
+    #region Department Management
+    
+    private void AddNewDepartment()
+    {
+        selectedDepartment = new Department
+        {
+            OrganizationId = organization.Id
+        };
+        showDepartmentDialog = true;
+    }
+    
+    private void EditDepartment(Department department)
+    {
+        selectedDepartment = new Department
+        {
+            Id = department.Id,
+            Name = department.Name,
+            Description = department.Description,
+            OrganizationId = department.OrganizationId
+        };
+        showDepartmentDialog = true;
+    }
+    
+    private async Task SaveDepartment()
+    {
+        try
+        {
+            if (selectedDepartment.Id > 0)
+            {
+                // Update department
+                await AuthService.UpdateDepartmentAsync(selectedDepartment);
+            }
+            else
+            {
+                // Create department
+                await AuthService.CreateDepartmentAsync(selectedDepartment);
+            }
+            
+            showDepartmentDialog = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error saving department");
+            await JSRuntime.InvokeVoidAsync("alert", "Error saving department");
+        }
+    }
+    
+    private void DeleteDepartment(Department department)
+    {
+        confirmationTitle = "Delete Department";
+        confirmationMessage = $"Are you sure you want to delete {department.Name}? This will also delete all sections and reassign employees.";
+        confirmationButtonText = "Delete";
+        confirmationAction = async () => 
+        {
+            try
+            {
+                await AuthService.DeleteDepartmentAsync(department.Id);
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error deleting department");
+                await JSRuntime.InvokeVoidAsync("alert", "Error deleting department");
+            }
+        };
+        showConfirmation = true;
+    }
+    
+    private void CloseDepartmentDialog()
+    {
+        showDepartmentDialog = false;
+    }
+    
+    #endregion
+    
+    #region Section Management
+    
+    private void AddNewSection(Department department)
+    {
+        selectedSection = new Section
+        {
+            DepartmentId = department.Id
+        };
+        showSectionDialog = true;
+    }
+    
+    private void EditSection(Section section)
+    {
+        selectedSection = new Section
+        {
+            Id = section.Id,
+            Name = section.Name,
+            Description = section.Description,
+            DepartmentId = section.DepartmentId
+        };
+        showSectionDialog = true;
+    }
+    
+    private async Task SaveSection()
+    {
+        try
+        {
+            if (selectedSection.Id > 0)
+            {
+                // Update section
+                await AuthService.UpdateSectionAsync(selectedSection);
+            }
+            else
+            {
+                // Create section
+                await AuthService.CreateSectionAsync(selectedSection);
+            }
+            
+            showSectionDialog = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error saving section");
+            await JSRuntime.InvokeVoidAsync("alert", "Error saving section");
+        }
+    }
+    
+    private void DeleteSection(Section section)
+    {
+        confirmationTitle = "Delete Section";
+        confirmationMessage = $"Are you sure you want to delete {section.Name}? Employees in this section will need to be reassigned.";
+        confirmationButtonText = "Delete";
+        confirmationAction = async () => 
+        {
+            try
+            {
+                await AuthService.DeleteSectionAsync(section.Id);
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error deleting section");
+                await JSRuntime.InvokeVoidAsync("alert", "Error deleting section");
+            }
+        };
+        showConfirmation = true;
+    }
+    
+    private void CloseSectionDialog()
+    {
+        showSectionDialog = false;
+    }
+    
+    #endregion
+    
+    private void CancelConfirmation()
+    {
+        showConfirmation = false;
+        confirmationAction = () => Task.CompletedTask; // Replace null with an empty completed task
+    }
+    
+    private async Task ConfirmAction()
+    {
+        if (confirmationAction != null)
+        {
+            await confirmationAction();
+        }
+        
+        showConfirmation = false;
+        confirmationAction = null;
+    }
+}

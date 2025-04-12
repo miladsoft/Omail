@@ -40,51 +40,43 @@ window.iconHandler = {
         'settings': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />',
         'search': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />',
         'portfolio': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />',
+        // Add admin-specific icons
+        'dashboard': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />',
+        'users': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />',
+        'organization': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />',
+        'analytics': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />',
+        'email-templates': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />'
     },
     
-    // Get SVG for a specific icon type
     getSvg: function(iconType, className = 'w-5 h-5') {
-        const path = this.iconMap[iconType] || this.iconMap['inbox'];
+        const path = this.iconMap[iconType.toLowerCase()] || this.iconMap['inbox']; // Default to inbox if not found
         return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" fill="none" viewBox="0 0 24 24" stroke="currentColor">${path}</svg>`;
     },
     
-    // Replace all lord-icon elements with SVGs
     replaceAllIcons: function() {
         document.querySelectorAll('lord-icon').forEach(icon => {
             this.replaceLordIcon(icon);
         });
     },
     
-    // Replace a single lord-icon with SVG
     replaceLordIcon: function(icon) {
-        // Extract icon type from src attribute
-        const src = icon.getAttribute('src') || '';
-        const parts = src.split('/');
-        const fileName = parts[parts.length - 1].replace('.json', '');
-        
-        // Map to icon type
-        let iconType = 'inbox';
-        if (fileName.includes('tkaubbni')) iconType = 'inbox';
-        else if (fileName.includes('wloilxuq')) iconType = 'compose';
-        else if (fileName.includes('iltqorsz')) iconType = 'sent';
-        else if (fileName.includes('puvaffet')) iconType = 'drafts';
-        else if (fileName.includes('gsqxdxog')) iconType = 'trash';
-        else if (fileName.includes('hwuyodym')) iconType = 'settings';
-        else if (fileName.includes('msoeawqm')) iconType = 'search'; 
-        else if (fileName.includes('fihkmkwt')) iconType = 'portfolio';
-        
-        // Get class names
+        const iconType = icon.getAttribute('data-icon-type') || 'inbox';
         const className = icon.getAttribute('class') || 'w-5 h-5';
+        const svgHtml = this.getSvg(iconType, className);
         
-        // Create replacement element
-        const span = document.createElement('span');
-        span.className = className;
-        span.innerHTML = this.getSvg(iconType, '');
+        // Create a wrapper to hold the SVG
+        const wrapper = document.createElement('div');
+        wrapper.className = icon.className;
+        wrapper.innerHTML = svgHtml;
         
-        // Replace the original icon
-        if (icon.parentNode) {
-            icon.parentNode.replaceChild(span, icon);
-        }
+        // Replace the lord-icon with the wrapper
+        icon.parentNode.replaceChild(wrapper.firstChild, icon);
+    },
+    
+    renderIconInElement: function(element, iconType) {
+        if (!element) return;
+        const iconHtml = this.getSvg(iconType, element.className);
+        element.outerHTML = iconHtml;
     }
 };
 
@@ -102,6 +94,54 @@ window.loadingHandler = {
         if (loadingEl) {
             loadingEl.style.display = 'flex';
         }
+    }
+};
+
+// Admin specific functionality
+window.adminTools = {
+    toggleSection: function(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.classList.toggle('show');
+        }
+    },
+    
+    initAdminUI: function() {
+        // Initialize any admin UI components
+        this.setupNotifications();
+        this.setupCharts();
+    },
+    
+    setupNotifications: function() {
+        // Initialize notification system
+        console.log('Admin notifications initialized');
+    },
+    
+    setupCharts: function() {
+        // Initialize any charts
+        const chartElements = document.querySelectorAll('.admin-chart');
+        if (chartElements.length === 0) return;
+        
+        console.log('Admin charts initialized');
+    },
+    
+    downloadFile: function(fileName, content, contentType) {
+        // Create a blob
+        const blob = new Blob([content], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a link and trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
     }
 };
 

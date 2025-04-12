@@ -1,0 +1,665 @@
+@page "/admin/users"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>User Management - Omail</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/bhfjfgqz.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-10 h-10 mr-3">
+                </lord-icon>
+                User Management
+            </h1>
+            <p class="text-omail-600 dark:text-omail-300 mt-2">Manage employees, permissions, and account settings</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <button @onclick="@(() => NavigationManager.NavigateTo("/admin/users/new"))" class="flex items-center space-x-2 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/hbvyhtse.json"
+                    trigger="hover"
+                    colors="primary:#ffffff"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Add User</span>
+            </button>
+            <button @onclick="ExportUsersToCsv" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/xsdtfyne.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Export</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Controls -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" 
+                            @bind-value="searchQuery" 
+                            @bind-value:event="oninput" 
+                            placeholder="Search users..." 
+                            class="w-full pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300"/>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/msoeawqm.json"
+                        trigger="hover"
+                        colors="primary:#121331,secondary:#818cf8"
+                        class="absolute left-3 top-2.5 w-5 h-5">
+                    </lord-icon>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select @bind="departmentFilter" class="rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                    <option value="0">All Departments</option>
+                    @foreach (var dept in departments)
+                    {
+                        <option value="@dept.Id">@dept.Name</option>
+                    }
+                </select>
+                
+                <select @bind="statusFilter" class="rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                    <option value="-1">All Status</option>
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users List -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex items-center justify-between">
+            <div class="flex items-center">
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Users</h3>
+                <div class="ml-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
+                    @filteredUsers.Count
+                </div>
+            </div>
+            <div class="flex items-center">
+                <span class="text-sm text-omail-600 dark:text-omail-400 mr-4">
+                    Show
+                    <select @bind="pageSize" class="mx-1 rounded border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800 text-omail-800 dark:text-white">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    entries
+                </span>
+                
+                <div class="flex items-center space-x-2">
+                    <button @onclick="PreviousPage" disabled="@(currentPage == 0)" class="@(currentPage == 0 ? "text-omail-400 cursor-not-allowed" : "text-omail-700 dark:text-omail-300 hover:text-omail-900 dark:hover:text-omail-100")">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <span class="text-sm text-omail-600 dark:text-omail-400">
+                        Page @(currentPage + 1) of @(totalPages)
+                    </span>
+                    <button @onclick="NextPage" disabled="@(currentPage >= totalPages - 1)" class="@(currentPage >= totalPages - 1 ? "text-omail-400 cursor-not-allowed" : "text-omail-700 dark:text-omail-300 hover:text-omail-900 dark:hover:text-omail-100")">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            @if (isLoading)
+            {
+                <div class="py-12 flex flex-col items-center justify-center text-center">
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+                    <p class="mt-4 text-omail-600 dark:text-omail-400">Loading users...</p>
+                </div>
+            }
+            else if (filteredUsers.Count == 0)
+            {
+                <div class="py-12 flex flex-col items-center justify-center text-center">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/msoeawqm.json"
+                        trigger="loop"
+                        delay="2000"
+                        colors="primary:#121331,secondary:#818cf8"
+                        class="w-16 h-16 mb-4">
+                    </lord-icon>
+                    <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No users found</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
+                        @if (string.IsNullOrEmpty(searchQuery) && departmentFilter == 0 && statusFilter == -1)
+                        {
+                            <span>There are no users in the system. Click "Add User" to create your first user.</span>
+                        }
+                        else
+                        {
+                            <span>No users match your search criteria. Try adjusting your filters.</span>
+                        }
+                    </p>
+                </div>
+            }
+            else
+            {
+                <table class="min-w-full divide-y divide-omail-200 dark:divide-omail-700">
+                    <thead class="bg-omail-50 dark:bg-omail-700/30">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                <div class="flex items-center cursor-pointer" @onclick="@(() => SortUsers("name"))">
+                                    User
+                                    @if (sortBy == "name")
+                                    {
+                                        <span class="ml-1">
+                                            @(sortDirection == "asc" ? "↑" : "↓")
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                <div class="flex items-center cursor-pointer" @onclick="@(() => SortUsers("email"))">
+                                    Email
+                                    @if (sortBy == "email")
+                                    {
+                                        <span class="ml-1">
+                                            @(sortDirection == "asc" ? "↑" : "↓")
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                <div class="flex items-center cursor-pointer" @onclick="@(() => SortUsers("section"))">
+                                    Section
+                                    @if (sortBy == "section")
+                                    {
+                                        <span class="ml-1">
+                                            @(sortDirection == "asc" ? "↑" : "↓")
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                <div class="flex items-center cursor-pointer" @onclick="@(() => SortUsers("status"))">
+                                    Status
+                                    @if (sortBy == "status")
+                                    {
+                                        <span class="ml-1">
+                                            @(sortDirection == "asc" ? "↑" : "↓")
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                <div class="flex items-center cursor-pointer" @onclick="@(() => SortUsers("role"))">
+                                    Role
+                                    @if (sortBy == "role")
+                                    {
+                                        <span class="ml-1">
+                                            @(sortDirection == "asc" ? "↑" : "↓")
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-omail-800/50 divide-y divide-omail-200 dark:divide-omail-700">
+                        @{
+                            var pagedUsers = filteredUsers
+                                .Skip(currentPage * pageSize)
+                                .Take(pageSize)
+                                .ToList();
+                        }
+                        
+                        @foreach (var user in pagedUsers)
+                        {
+                            <tr class="hover:bg-omail-50 dark:hover:bg-omail-700/30 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 relative">
+                                            @if (string.IsNullOrEmpty(user.ProfilePicture))
+                                            {
+                                                <div class="h-10 w-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                                                    @user.Initials
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <img class="h-10 w-10 rounded-full" src="@user.ProfilePicture" alt="" />
+                                            }
+                                            @if (user.IsManager)
+                                            {
+                                                <span class="absolute bottom-0 right-0 transform translate-x-1/4 -translate-y-1/4">
+                                                    <span class="block h-3 w-3 rounded-full ring-2 ring-white dark:ring-omail-800 bg-green-400"></span>
+                                                </span>
+                                            }
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-omail-900 dark:text-omail-100">@user.FullName</div>
+                                            <div class="text-xs text-omail-500 dark:text-omail-400">@(string.IsNullOrEmpty(user.Position) ? "-" : user.Position)</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-omail-600 dark:text-omail-300">@user.Email</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-omail-600 dark:text-omail-300">@(user.Section?.Name ?? "-")</div>
+                                    <div class="text-xs text-omail-500 dark:text-omail-400">@(user.Section?.Department?.Name ?? "-")</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full @(user.IsActive ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400" : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400")">
+                                        @(user.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if (user.IsManager)
+                                    {
+                                        <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-400">Manager</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400">Employee</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="/admin/users/edit/@user.Id" class="text-omail-600 hover:text-omail-900 dark:text-omail-400 dark:hover:text-omail-200">
+                                            <lord-icon
+                                                src="https://cdn.lordicon.com/wloilxuq.json"
+                                                trigger="hover"
+                                                colors="primary:#121331,secondary:#818cf8"
+                                                class="w-5 h-5">
+                                            </lord-icon>
+                                        </a>
+                                        <button @onclick="@(() => ToggleUserStatus(user))" class="text-omail-600 hover:text-omail-900 dark:text-omail-400 dark:hover:text-omail-200">
+                                            @if (user.IsActive)
+                                            {
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/nhfyhmlt.json"
+                                                    trigger="hover"
+                                                    colors="primary:#121331,secondary:#818cf8"
+                                                    class="w-5 h-5">
+                                                </lord-icon>
+                                            }
+                                            else
+                                            {
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/mnpvofqe.json"
+                                                    trigger="hover"
+                                                    colors="primary:#121331,secondary:#818cf8"
+                                                    class="w-5 h-5">
+                                                </lord-icon>
+                                            }
+                                        </button>
+                                        <button @onclick="@(() => DeleteUser(user))" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                            <lord-icon
+                                                src="https://cdn.lordicon.com/gsqxdxog.json"
+                                                trigger="hover"
+                                                colors="primary:#e74c3c,secondary:#c0392b"
+                                                class="w-5 h-5">
+                                            </lord-icon>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        
+        @if (filteredUsers.Count > 0)
+        {
+            <div class="px-6 py-3 flex items-center justify-between border-t border-omail-200 dark:border-omail-700">
+                <div class="text-sm text-omail-500 dark:text-omail-400">
+                    Showing @(currentPage * pageSize + 1) to @Math.Min((currentPage + 1) * pageSize, filteredUsers.Count) of @filteredUsers.Count entries
+                </div>
+                <div class="flex-1 flex justify-end">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button @onclick="PreviousPage" disabled="@(currentPage == 0)" 
+                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium @(currentPage == 0 ? "text-omail-400 cursor-not-allowed" : "text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700")">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        
+                        @{
+                            int paginationStart = Math.Max(0, currentPage - 2);
+                            int paginationEnd = Math.Min(totalPages - 1, currentPage + 2);
+                            
+                            if (paginationStart > 0)
+                            {
+                                <button @onclick="@(() => GoToPage(0))" class="relative inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700">
+                                    1
+                                </button>
+                                
+                                if (paginationStart > 1)
+                                {
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium text-omail-700 dark:text-omail-300">
+                                        ...
+                                    </span>
+                                }
+                            }
+                            
+                            @for (int i = paginationStart; i <= paginationEnd; i++)
+                            {
+                                int pageNumber = i;
+                                <button @onclick="@(() => GoToPage(pageNumber))" 
+                                    class="relative inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-700 text-sm font-medium
+                                    @(currentPage == pageNumber 
+                                        ? "z-10 bg-omail-50 dark:bg-omail-700 border-omail-500 dark:border-omail-500 text-omail-600 dark:text-white" 
+                                        : "bg-white dark:bg-omail-800 text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700")">
+                                    @(pageNumber + 1)
+                                </button>
+                            }
+                            
+                            if (paginationEnd < totalPages - 1)
+                            {
+                                if (paginationEnd < totalPages - 2)
+                                {
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium text-omail-700 dark:text-omail-300">
+                                        ...
+                                    </span>
+                                }
+                                
+                                <button @onclick="@(() => GoToPage(totalPages - 1))" class="relative inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700">
+                                    @totalPages
+                                </button>
+                            }
+                        }
+                        
+                        <button @onclick="NextPage" disabled="@(currentPage >= totalPages - 1)" 
+                            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800 text-sm font-medium @(currentPage >= totalPages - 1 ? "text-omail-400 cursor-not-allowed" : "text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700")">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Confirmation Dialog -->
+@if (showConfirmation)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-2">@confirmationTitle</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@confirmationMessage</p>
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelConfirmation" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmAction" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                    @confirmationButtonText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Employee> allUsers = new List<Employee>();
+    private List<Employee> filteredUsers = new List<Employee>();
+    private List<Department> departments = new List<Department>();
+    
+    private string searchQuery = string.Empty;
+    private int departmentFilter = 0;
+    private int statusFilter = -1;
+    
+    private int currentPage = 0;
+    private int pageSize = 10;
+    private int totalPages => (int)Math.Ceiling(filteredUsers.Count / (double)pageSize);
+    
+    private bool isLoading = true;
+    
+    private string sortBy = "name";
+    private string sortDirection = "asc";
+    
+    // Confirmation dialog properties
+    private bool showConfirmation = false;
+    private string confirmationTitle;
+    private string confirmationMessage;
+    private string confirmationButtonText = "Confirm";
+    private Func<Task> confirmationAction;
+    private Employee selectedUser;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load all users
+            allUsers = await AuthService.GetAllUsersAsync();
+            
+            // Load departments for filter
+            departments = await AuthService.GetDepartmentsAsync();
+            
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading users: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void ApplyFilters()
+    {
+        filteredUsers = allUsers;
+        
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredUsers = filteredUsers.Where(u => 
+                u.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                (u.Position?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+            ).ToList();
+        }
+        
+        // Apply department filter
+        if (departmentFilter != 0)
+        {
+            filteredUsers = filteredUsers.Where(u => 
+                u.Section?.DepartmentId == departmentFilter
+            ).ToList();
+        }
+        
+        // Apply status filter
+        if (statusFilter != -1)
+        {
+            filteredUsers = filteredUsers.Where(u => 
+                u.IsActive == (statusFilter == 1)
+            ).ToList();
+        }
+        
+        // Apply sorting
+        SortUsers(sortBy, false);
+        
+        // Reset to first page when filters change
+        currentPage = 0;
+    }
+    
+    private void SortUsers(string column, bool toggleDirection = true)
+    {
+        if (sortBy == column && toggleDirection)
+        {
+            // Toggle direction if clicking the same column
+            sortDirection = sortDirection == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            sortBy = column;
+            // Default to ascending when changing columns
+            if (toggleDirection)
+                sortDirection = "asc";
+        }
+        
+        // Apply sorting
+        switch (column)
+        {
+            case "name":
+                filteredUsers = sortDirection == "asc"
+                    ? filteredUsers.OrderBy(u => u.LastName).ThenBy(u => u.FirstName).ToList()
+                    : filteredUsers.OrderByDescending(u => u.LastName).ThenByDescending(u => u.FirstName).ToList();
+                break;
+            case "email":
+                filteredUsers = sortDirection == "asc"
+                    ? filteredUsers.OrderBy(u => u.Email).ToList()
+                    : filteredUsers.OrderByDescending(u => u.Email).ToList();
+                break;
+            case "section":
+                filteredUsers = sortDirection == "asc"
+                    ? filteredUsers.OrderBy(u => u.Section?.Name ?? "").ThenBy(u => u.Section?.Department?.Name ?? "").ToList()
+                    : filteredUsers.OrderByDescending(u => u.Section?.Name ?? "").ThenByDescending(u => u.Section?.Department?.Name ?? "").ToList();
+                break;
+            case "status":
+                filteredUsers = sortDirection == "asc"
+                    ? filteredUsers.OrderBy(u => u.IsActive).ToList()
+                    : filteredUsers.OrderByDescending(u => u.IsActive).ToList();
+                break;
+            case "role":
+                filteredUsers = sortDirection == "asc"
+                    ? filteredUsers.OrderBy(u => u.IsManager).ToList()
+                    : filteredUsers.OrderByDescending(u => u.IsManager).ToList();
+                break;
+        }
+    }
+    
+    private void NextPage()
+    {
+        if (currentPage < totalPages - 1)
+            currentPage++;
+    }
+    
+    private void PreviousPage()
+    {
+        if (currentPage > 0)
+            currentPage--;
+    }
+    
+    private void GoToPage(int page)
+    {
+        if (page >= 0 && page < totalPages)
+            currentPage = page;
+    }
+    
+    private async Task ExportUsersToCsv()
+    {
+        try
+        {
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Name,Email,Position,Department,Section,Status,Role");
+            
+            foreach (var user in filteredUsers)
+            {
+                csv.AppendLine($"\"{user.FullName}\",\"{user.Email}\",\"{user.Position}\",\"{user.Section?.Department?.Name ?? ""}\",\"{user.Section?.Name ?? ""}\",\"{(user.IsActive ? "Active" : "Inactive")}\",\"{(user.IsManager ? "Manager" : "Employee")}\"");
+            }
+            
+            var fileName = $"users_export_{DateTime.Now:yyyy-MM-dd}.csv";
+            await JSRuntime.InvokeVoidAsync("downloadFile", fileName, csv.ToString(), "text/csv");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error exporting users: {ex.Message}");
+            // Show error notification
+        }
+    }
+    
+    private async Task ToggleUserStatus(Employee user)
+    {
+        selectedUser = user;
+        confirmationTitle = user.IsActive ? "Deactivate User" : "Activate User";
+        confirmationMessage = user.IsActive 
+            ? $"Are you sure you want to deactivate {user.FullName}? They will no longer be able to log in."
+            : $"Are you sure you want to activate {user.FullName}? They will be able to log in again.";
+        confirmationButtonText = user.IsActive ? "Deactivate" : "Activate";
+        confirmationAction = async () => 
+        {
+            try
+            {
+                isLoading = true;
+                user.IsActive = !user.IsActive;
+                await AuthService.UpdateUserAsync(user);
+                showConfirmation = false;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error updating user status: {ex.Message}");
+                // Show error notification
+            }
+            finally
+            {
+                isLoading = false;
+                await LoadData();
+            }
+        };
+        showConfirmation = true;
+    }
+    
+    private async Task DeleteUser(Employee user)
+    {
+        selectedUser = user;
+        confirmationTitle = "Delete User";
+        confirmationMessage = $"Are you sure you want to delete {user.FullName}? This action cannot be undone.";
+        confirmationButtonText = "Delete";
+        confirmationAction = async () => 
+        {
+            try
+            {
+                isLoading = true;
+                await AuthService.DeleteUserAsync(user.Id);
+                showConfirmation = false;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error deleting user: {ex.Message}");
+                // Show error notification
+            }
+            finally
+            {
+                isLoading = false;
+                await LoadData();
+            }
+        };
+        showConfirmation = true;
+    }
+    
+    private void CancelConfirmation()
+    {
+        showConfirmation = false;
+        selectedUser = null;
+        confirmationAction = null;
+    }
+    
+    private async Task ConfirmAction()
+    {
+        if (confirmationAction != null)
+        {
+            await confirmationAction();
+        }
+    }
+}

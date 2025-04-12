@@ -27,10 +27,25 @@ builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<DatabaseSeeder>();
 
+// Ensure logger is properly registered
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.AddDebug();
+});
+
 // Register authentication
 builder.Services.AddScoped<OmailAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => 
     provider.GetRequiredService<OmailAuthenticationStateProvider>());
+builder.Services.AddAuthenticationCore();
+builder.Services.AddAuthorizationCore(options => 
+{
+    // Define policies for different admin roles
+    options.AddPolicy("RequireManager", policy => policy.RequireRole("Manager"));
+    options.AddPolicy("RequireAnalyst", policy => policy.RequireRole("Manager", "Analyst"));
+    options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+});
 
 // Register protected storage
 builder.Services.AddScoped<ProtectedSessionStorage>();
@@ -38,6 +53,9 @@ builder.Services.AddScoped<ProtectedLocalStorage>();
 
 // Add authorization
 builder.Services.AddAuthorization();
+
+// Add logging
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
@@ -58,7 +76,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

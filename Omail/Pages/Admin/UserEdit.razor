@@ -1,0 +1,304 @@
+@page "/admin/users/new"
+@page "/admin/users/edit/{UserId:int}"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Omail.Services
+
+<PageTitle>@(IsNewUser ? "Create User" : "Edit User") - Omail Admin</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/bhfjfgqz.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-10 h-10 mr-3">
+                </lord-icon>
+                @(IsNewUser ? "Create New User" : $"Edit User: {userModel.FirstName} {userModel.LastName}")
+            </h1>
+            <p class="text-omail-600 dark:text-omail-300 mt-2">@(IsNewUser ? "Add a new user to the system" : "Edit user details and permissions")</p>
+        </div>
+        <div>
+            <button @onclick="GoBack" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iifryyua.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Back to Users</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+            <p class="mt-4 text-omail-600 dark:text-omail-400">Loading user data...</p>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
+                <div class="p-6">
+                    <EditForm Model="userModel" OnValidSubmit="HandleValidSubmit" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="department" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Department</label>
+                                <select id="department" @bind="selectedDepartmentId" @bind:event="onchange" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                                    <option value="0">-- Select Department --</option>
+                                    @foreach (var department in departments)
+                                    {
+                                        <option value="@department.Id">@department.Name</option>
+                                    }
+                                </select>
+                                @if (selectedDepartmentId == 0)
+                                {
+                                    <div class="text-red-500 text-xs mt-1">Department is required</div>
+                                }
+                            </div>
+                            
+                            <!-- Section -->
+                            <div>
+                                <label for="section" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Section</label>
+                                <select id="section" @bind="userModel.SectionId" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" disabled="@(selectedDepartmentId == 0)">
+                                    <option value="0">-- Select Section --</option>
+                                    @foreach (var section1 in sections.Where(s => s.DepartmentId == selectedDepartmentId))
+                                    {
+                                        <option value="@section1.Id">@section1.Name</option>
+                                    }
+                                </select>
+                                @if (userModel.SectionId == 0)
+                                {
+                                    <div class="text-red-500 text-xs mt-1">Section is required</div>
+                                }
+                            </div>
+                            
+                            <!-- Hire Date -->
+                            <div>
+                                <label for="hireDate" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Hire Date</label>
+                                <InputDate id="hireDate" @bind-Value="userModel.HireDate" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Confirmation Dialog -->
+@if (showConfirmation)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-2">@confirmationTitle</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@confirmationMessage</p>
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelConfirmation" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmAction" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    @confirmationButtonText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+    
+    private AuthService.UserModel userModel = new AuthService.UserModel();
+    private bool IsNewUser => UserId == 0;
+    private bool isLoading = true;
+    private bool changePassword = false;
+    private List<Department> departments = new List<Department>();
+    private List<Section> sections = new List<Section>();
+    private int selectedDepartmentId = 0;
+    
+    // Confirmation dialog properties
+    private bool showConfirmation = false;
+    private string confirmationTitle;
+    private string confirmationMessage;
+    private string confirmationButtonText = "Confirm";
+    private Func<Task> confirmationAction;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load departments and sections
+            departments = await AuthService.GetDepartmentsAsync();
+            sections = await AuthService.GetSectionsAsync();
+            
+            if (!IsNewUser)
+            {
+                // Load existing user
+                var user = await AuthService.GetUserByIdAsync(UserId);
+                if (user != null)
+                {
+                    userModel = new AuthService.UserModel
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber,
+                        Position = user.Position,
+                        SectionId = user.SectionId,
+                        ProfilePicture = user.ProfilePicture,
+                        IsManager = user.IsManager,
+                        IsActive = user.IsActive,
+                        HireDate = user.HireDate
+                    };
+                    
+                    // Set selected department
+                    var section = sections.FirstOrDefault(s => s.Id == user.SectionId);
+                    if (section != null)
+                    {
+                        selectedDepartmentId = section.DepartmentId;
+                    }
+                }
+                else
+                {
+                    // User not found
+                    NavigationManager.NavigateTo("/admin/users");
+                    return;
+                }
+            }
+            else
+            {
+                // Default values for new user
+                userModel.HireDate = DateTime.Today;
+                userModel.IsActive = true;
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void DepartmentChanged()
+    {
+        // Reset section when department changes
+        userModel.SectionId = 0;
+    }
+    
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isLoading = true;
+            
+            if (IsNewUser)
+            {
+                // Create new user
+                await AuthService.CreateUserAsync(userModel);
+                await JSRuntime.InvokeVoidAsync("alert", "User created successfully");
+            }
+            else
+            {
+                // Update existing user
+                await AuthService.UpdateUserAsync(userModel, changePassword);
+                await JSRuntime.InvokeVoidAsync("alert", "User updated successfully");
+            }
+            
+            // Redirect to user list
+            NavigationManager.NavigateTo("/admin/users");
+        }
+        catch (Exception ex)
+        {
+            // Handle error
+            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void ConfirmDelete()
+    {
+        confirmationTitle = "Delete User";
+        confirmationMessage = $"Are you sure you want to delete {userModel.FirstName} {userModel.LastName}? This action cannot be undone.";
+        confirmationButtonText = "Delete";
+        confirmationAction = DeleteUser;
+        showConfirmation = true;
+    }
+    
+    private async Task DeleteUser()
+    {
+        try
+        {
+            isLoading = true;
+            await AuthService.DeleteUserAsync(UserId);
+            NavigationManager.NavigateTo("/admin/users");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error deleting user: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void CancelConfirmation()
+    {
+        showConfirmation = false;
+        confirmationAction = () => Task.CompletedTask;
+    }
+    
+    private async Task ConfirmAction()
+    {
+        if (confirmationAction != null)
+        {
+            await confirmationAction();
+        }
+        showConfirmation = false;
+    }
+    
+    private async Task UploadProfilePicture()
+    {
+        // This would typically open a file picker and upload the file
+        // For now, we'll just use a placeholder
+        try
+        {
+            // In a real implementation, you would use InputFile component
+            // and handle file uploads properly
+            userModel.ProfilePicture = "/img/avatars/placeholder.png";
+            await JSRuntime.InvokeVoidAsync("alert", "Profile picture upload functionality would be implemented here");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+    }
+    
+    private void RemoveProfilePicture()
+    {
+        userModel.ProfilePicture = null;
+    }
+    
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/admin/users");
+    }
+
+    private void HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        // Handle file selection logic here
+    }
+}

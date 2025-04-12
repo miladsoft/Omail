@@ -671,6 +671,7 @@
         confirmationMessage = "Are you sure you want to discard this email? All changes will be lost.";
         confirmationButtonText = "Discard";
         confirmationAction = async () => {
+            await Task.Yield(); // Add this to make the method genuinely asynchronous
             DiscardAndReturn();
             CancelConfirmation();
         };
@@ -696,7 +697,7 @@
     private void CancelConfirmation()
     {
         showConfirmation = false;
-        confirmationAction = null;
+        confirmationAction = () => Task.CompletedTask; // Replace null with an empty completed task
     }
 
     private async Task ConfirmAction()

@@ -1,0 +1,522 @@
+@page "/admin/email-templates"
+@attribute [Authorize(Roles = "Manager")]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Email Templates - Omail Admin</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/pkmkagva.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-10 h-10 mr-3">
+                </lord-icon>
+                Email Templates
+            </h1>
+            <p class="text-omail-600 dark:text-omail-300 mt-2">Manage system email templates for notifications and communications</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <button @onclick="CreateNewTemplate" class="flex items-center space-x-2 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/wloilxuq.json"
+                    trigger="hover"
+                    colors="primary:#ffffff"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>New Template</span>
+            </button>
+            <button @onclick="@(() => NavigationManager.NavigateTo("/admin"))" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/iifryyua.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Back to Dashboard</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-4">
+        <div class="relative">
+            <input type="text" 
+                   @bind-value="searchQuery" 
+                   @bind-value:event="oninput" 
+                   placeholder="Search templates..." 
+                   class="w-full pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300"/>
+            <lord-icon
+                src="https://cdn.lordicon.com/msoeawqm.json"
+                trigger="hover"
+                colors="primary:#121331,secondary:#818cf8"
+                class="absolute left-3 top-2.5 w-5 h-5">
+            </lord-icon>
+        </div>
+    </div>
+
+    <!-- Templates List -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-omail-200 dark:border-omail-700 flex items-center">
+            <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Email Templates</h3>
+            <div class="ml-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 px-2 py-0.5 rounded-full text-xs">
+                @(filteredTemplates.Count)
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="py-12 flex flex-col items-center justify-center text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+                <p class="mt-4 text-omail-600 dark:text-omail-400">Loading templates...</p>
+            </div>
+        }
+        else if (filteredTemplates.Count == 0)
+        {
+            <div class="py-12 flex flex-col items-center justify-center text-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/msoeawqm.json"
+                    trigger="loop"
+                    delay="2000"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-16 h-16 mb-4">
+                </lord-icon>
+                <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No templates found</h3>
+                <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
+                    @if (string.IsNullOrEmpty(searchQuery) && emailTemplates.Count == 0)
+                    {
+                        <span>You haven't created any email templates yet.</span>
+                    }
+                    else
+                    {
+                        <span>No templates match your search criteria.</span>
+                    }
+                </p>
+                <button @onclick="CreateNewTemplate" class="mt-4 flex items-center px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/wloilxuq.json"
+                        trigger="hover"
+                        colors="primary:#ffffff"
+                        class="w-5 h-5 mr-2">
+                    </lord-icon>
+                    Create First Template
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="divide-y divide-omail-200 dark:divide-omail-700">
+                @foreach (var template in filteredTemplates)
+                {
+                    <div class="p-6 hover:bg-omail-50 dark:hover:bg-omail-700/30 transition-colors duration-150">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h4 class="text-lg font-medium text-omail-800 dark:text-white mb-1">@template.Name</h4>
+                                <p class="text-omail-500 dark:text-omail-400 text-sm">@template.Description</p>
+                                <div class="flex items-center mt-2">
+                                    <span class="px-2 py-0.5 text-xs bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-300 rounded-full">
+                                        @template.Category
+                                    </span>
+                                    <span class="ml-2 text-sm text-omail-500 dark:text-omail-400">
+                                        Last updated: @template.LastUpdated.ToString("MMM dd, yyyy")
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button @onclick="() => PreviewTemplate(template)" class="p-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white rounded-lg hover:bg-omail-100 dark:hover:bg-omail-700/50">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/tyounuzx.json"
+                                        trigger="hover"
+                                        colors="primary:#121331,secondary:#818cf8"
+                                        class="w-5 h-5">
+                                    </lord-icon>
+                                </button>
+                                <button @onclick="() => EditTemplate(template)" class="p-2 text-omail-600 hover:text-omail-800 dark:text-omail-400 dark:hover:text-white rounded-lg hover:bg-omail-100 dark:hover:bg-omail-700/50">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/wloilxuq.json"
+                                        trigger="hover"
+                                        colors="primary:#121331,secondary:#818cf8"
+                                        class="w-5 h-5">
+                                    </lord-icon>
+                                </button>
+                                <button @onclick="() => DeleteTemplateConfirmation(template)" class="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/gsqxdxog.json"
+                                        trigger="hover"
+                                        colors="primary:#e74c3c,secondary:#c0392b"
+                                        class="w-5 h-5">
+                                    </lord-icon>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-omail-50 dark:bg-omail-800/40 rounded-lg text-omail-800 dark:text-omail-200 text-sm">
+                            <div class="line-clamp-2">@template.Subject</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Template Editor Dialog -->
+@if (showTemplateEditor)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-4">
+                @(selectedTemplate.Id > 0 ? "Edit Template" : "Create Template")
+            </h3>
+            
+            <EditForm Model="selectedTemplate" OnValidSubmit="SaveTemplate" class="space-y-4">
+                <DataAnnotationsValidator />
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Template Name</label>
+                    <InputText @bind-Value="selectedTemplate.Name" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                    <ValidationMessage For="@(() => selectedTemplate.Name)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Description</label>
+                    <InputText @bind-Value="selectedTemplate.Description" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                    <ValidationMessage For="@(() => selectedTemplate.Description)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Category</label>
+                    <InputSelect @bind-Value="selectedTemplate.Category" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                        <option value="Notification">Notification</option>
+                        <option value="Welcome">Welcome</option>
+                        <option value="Password Reset">Password Reset</option>
+                        <option value="Approval">Approval</option>
+                        <option value="System">System</option>
+                        <option value="Other">Other</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => selectedTemplate.Category)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Subject Line</label>
+                    <InputText @bind-Value="selectedTemplate.Subject" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                    <ValidationMessage For="@(() => selectedTemplate.Subject)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email Content</label>
+                    <div class="border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden">
+                        <div class="bg-omail-50 dark:bg-omail-700/30 border-b border-omail-200 dark:border-omail-700 px-4 py-2 flex justify-between items-center">
+                            <div class="text-sm text-omail-800 dark:text-white">HTML Editor</div>
+                            <div class="space-x-1">
+                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
+                                    Bold
+                                </button>
+                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
+                                    Italic
+                                </button>
+                                <button type="button" class="px-2 py-1 text-xs bg-omail-200 dark:bg-omail-600 text-omail-800 dark:text-white rounded">
+                                    Link
+                                </button>
+                            </div>
+                        </div>
+                        <InputTextArea @bind-Value="selectedTemplate.Content" rows="12" class="w-full border-0 focus:ring-0 text-omail-800 dark:text-white bg-white dark:bg-omail-800/30" />
+                    </div>
+                    <div class="mt-1 text-xs text-omail-500 dark:text-omail-400">
+                        Available variables: {UserName}, {CompanyName}, {ResetLink}, {ApprovalLink}
+                    </div>
+                    <ValidationMessage For="@(() => selectedTemplate.Content)" class="text-red-500 text-xs mt-1" />
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" @onclick="CloseTemplateEditor" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                        @(selectedTemplate.Id > 0 ? "Save Changes" : "Create Template")
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<!-- Preview Dialog -->
+@if (showPreview)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-omail-900 dark:text-white">Preview: @selectedTemplate.Name</h3>
+                <button @onclick="ClosePreview" class="p-1 text-omail-500 hover:text-omail-700 dark:text-omail-400 dark:hover:text-omail-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden mb-4">
+                <div class="bg-omail-50 dark:bg-omail-700/30 border-b border-omail-200 dark:border-omail-700 px-4 py-2">
+                    <div class="text-sm text-omail-800 dark:text-white"><strong>Subject:</strong> @selectedTemplate.Subject</div>
+                </div>
+                <div class="p-4 bg-white dark:bg-omail-800/80">
+                    <div class="prose dark:prose-invert max-w-none">
+                        @((MarkupString)selectedTemplate.Content)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button @onclick="ClosePreview" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Close Preview
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Confirmation Dialog -->
+@if (showConfirmation)
+{
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-omail-800 p-6 rounded-xl shadow-xl max-w-md w-full">
+            <h3 class="text-lg font-bold text-omail-900 dark:text-white mb-2">@confirmationTitle</h3>
+            <p class="text-omail-600 dark:text-omail-300 mb-6">@confirmationMessage</p>
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelConfirmation" class="px-4 py-2 border border-omail-300 dark:border-omail-700 rounded-lg text-omail-700 dark:text-omail-300 hover:bg-omail-50 dark:hover:bg-omail-700/50">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmAction" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    @confirmationButtonText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private string searchQuery = "";
+    private List<EmailTemplate> emailTemplates = new List<EmailTemplate>();
+    private List<EmailTemplate> filteredTemplates => FilterTemplates();
+    
+    // Template editor
+    private bool showTemplateEditor = false;
+    private EmailTemplate selectedTemplate = new EmailTemplate();
+    
+    // Preview dialog
+    private bool showPreview = false;
+    
+    // Confirmation dialog
+    private bool showConfirmation = false;
+    private string confirmationTitle;
+    private string confirmationMessage;
+    private string confirmationButtonText = "Confirm";
+    private Func<Task> confirmationAction;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTemplates();
+    }
+    
+    private async Task LoadTemplates()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // This would typically come from a service
+            // For now, let's create sample data
+            emailTemplates = new List<EmailTemplate>
+            {
+                new EmailTemplate
+                {
+                    Id = 1,
+                    Name = "Welcome Email",
+                    Description = "Sent to new users after registration",
+                    Subject = "Welcome to Omail - Your Account is Ready!",
+                    Content = "<h2>Welcome {UserName}!</h2><p>Thank you for joining Omail. Your account has been created successfully.</p><p>Get started by exploring your inbox and sending your first email.</p><p>Best regards,<br>{CompanyName} Team</p>",
+                    Category = "Welcome",
+                    LastUpdated = DateTime.Today.AddDays(-5)
+                },
+                new EmailTemplate
+                {
+                    Id = 2,
+                    Name = "Password Reset",
+                    Description = "Sent when a user requests a password reset",
+                    Subject = "Omail - Password Reset Request",
+                    Content = "<h2>Hello {UserName},</h2><p>We received a request to reset your password. Click the link below to create a new password:</p><p><a href='{ResetLink}'>{ResetLink}</a></p><p>If you didn't request this change, please ignore this email or contact support.</p>",
+                    Category = "Password Reset",
+                    LastUpdated = DateTime.Today.AddDays(-2)
+                },
+                new EmailTemplate
+                {
+                    Id = 3,
+                    Name = "Email Approval Required",
+                    Description = "Notification to managers that an email needs approval",
+                    Subject = "Omail - Email Approval Required",
+                    Content = "<h2>Hello {UserName},</h2><p>An email requires your approval before it can be sent.</p><p><strong>From:</strong> {SenderName}<br><strong>Subject:</strong> {EmailSubject}</p><p>Please review and approve or reject this email by clicking the link below:</p><p><a href='{ApprovalLink}'>{ApprovalLink}</a></p>",
+                    Category = "Approval",
+                    LastUpdated = DateTime.Today.AddDays(-10)
+                }
+            };
+            
+            await Task.Delay(500); // Simulate loading
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private List<EmailTemplate> FilterTemplates()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+            return emailTemplates;
+            
+        return emailTemplates.Where(t => 
+            t.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            t.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            t.Subject.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            t.Category.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+    }
+    
+    private void CreateNewTemplate()
+    {
+        selectedTemplate = new EmailTemplate
+        {
+            Category = "Notification",
+            LastUpdated = DateTime.Today
+        };
+        showTemplateEditor = true;
+    }
+    
+    private void EditTemplate(EmailTemplate template)
+    {
+        selectedTemplate = new EmailTemplate
+        {
+            Id = template.Id,
+            Name = template.Name,
+            Description = template.Description,
+            Subject = template.Subject,
+            Content = template.Content,
+            Category = template.Category,
+            LastUpdated = template.LastUpdated
+        };
+        showTemplateEditor = true;
+    }
+    
+    private void PreviewTemplate(EmailTemplate template)
+    {
+        selectedTemplate = template;
+        showPreview = true;
+    }
+    
+    private void DeleteTemplateConfirmation(EmailTemplate template)
+    {
+        selectedTemplate = template;
+        confirmationTitle = "Delete Template";
+        confirmationMessage = $"Are you sure you want to delete the template '{template.Name}'? This action cannot be undone.";
+        confirmationButtonText = "Delete";
+        confirmationAction = DeleteTemplate;
+        showConfirmation = true;
+    }
+    
+    private async Task DeleteTemplate()
+    {
+        try
+        {
+            // In a real app, call a service to delete the template
+            emailTemplates.RemoveAll(t => t.Id == selectedTemplate.Id);
+            await JSRuntime.InvokeVoidAsync("alert", "Template deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error deleting template: {ex.Message}");
+        }
+    }
+    
+    private async Task SaveTemplate()
+    {
+        try
+        {
+            if (selectedTemplate.Id > 0)
+            {
+                // Update existing template
+                var index = emailTemplates.FindIndex(t => t.Id == selectedTemplate.Id);
+                if (index >= 0)
+                {
+                    selectedTemplate.LastUpdated = DateTime.Today;
+                    emailTemplates[index] = selectedTemplate;
+                }
+            }
+            else
+            {
+                // Create new template
+                selectedTemplate.Id = emailTemplates.Count > 0 ? emailTemplates.Max(t => t.Id) + 1 : 1;
+                selectedTemplate.LastUpdated = DateTime.Today;
+                emailTemplates.Add(selectedTemplate);
+            }
+            
+            showTemplateEditor = false;
+            await JSRuntime.InvokeVoidAsync("alert", "Template saved successfully");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error saving template: {ex.Message}");
+        }
+    }
+    
+    private void CloseTemplateEditor()
+    {
+        showTemplateEditor = false;
+    }
+    
+    private void ClosePreview()
+    {
+        showPreview = false;
+    }
+    
+    private void CancelConfirmation()
+    {
+        showConfirmation = false;
+        confirmationAction = null;
+    }
+    
+    private async Task ConfirmAction()
+    {
+        if (confirmationAction != null)
+        {
+            await confirmationAction();
+        }
+        showConfirmation = false;
+    }
+    
+    public class EmailTemplate
+    {
+        public int Id { get; set; }
+        
+        [Required(ErrorMessage = "Template name is required")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
+        public string Name { get; set; }
+        
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
+        public string Description { get; set; }
+        
+        [Required(ErrorMessage = "Subject is required")]
+        [StringLength(200, ErrorMessage = "Subject cannot exceed 200 characters")]
+        public string Subject { get; set; }
+        
+        [Required(ErrorMessage = "Content is required")]
+        public string Content { get; set; }
+        
+        [Required(ErrorMessage = "Category is required")]
+        public string Category { get; set; }
+        
+        public DateTime LastUpdated { get; set; }
+    }
+}

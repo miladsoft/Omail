@@ -1,0 +1,217 @@
+@inject AuthService AuthService
+@inject EmailService EmailService
+@inject ApprovalService ApprovalService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="relative">
+    <button @onclick="ToggleNotifications" class="p-2 text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-300 rounded-full hover:bg-omail-100 dark:hover:bg-omail-800 relative">
+        <span class="sr-only">View notifications</span>
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        @if (notificationCount > 0)
+        {
+            <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-omail-900"></span>
+        }
+    </button>
+    
+    @if (showNotifications)
+    {
+        <div class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-omail-800 ring-1 ring-black ring-opacity-5 z-50">
+            <div class="p-2 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-sm font-medium text-omail-800 dark:text-white">Notifications</h3>
+                @if (notifications.Any(n => !n.IsRead))
+                {
+                    <button @onclick="MarkAllAsRead" class="text-xs text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                        Mark all as read
+                    </button>
+                }
+            </div>
+            <div class="max-h-96 overflow-y-auto py-1">
+                @if (notifications.Count == 0)
+                {
+                    <div class="px-4 py-6 text-center text-sm text-omail-500 dark:text-omail-400">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/iuoutxtw.json"
+                            trigger="loop"
+                            delay="2000"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-14 h-14 mx-auto mb-2">
+                        </lord-icon>
+                        <p>No notifications yet</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var notification in notifications)
+                    {
+                        <a href="@notification.Link" @onclick="() => MarkAsRead(notification)" class="block px-4 py-2 text-sm text-omail-700 dark:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700/30">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    @if (notification.Type == "approval")
+                                    {
+                                        <div class="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center text-yellow-700 dark:text-yellow-300">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    else if (notification.Type == "user")
+                                    {
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-700 dark:text-blue-300">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    else if (notification.Type == "system")
+                                    {
+                                        <div class="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 dark:text-purple-300">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="h-8 w-8 rounded-full bg-omail-100 dark:bg-omail-900/40 flex items-center justify-center text-omail-700 dark:text-omail-300">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-omail-800 dark:text-white">@notification.Title</p>
+                                    <p class="text-xs text-omail-500 dark:text-omail-400">@notification.Message</p>
+                                    <p class="text-xs text-omail-400 dark:text-omail-500 mt-1">@notification.Time</p>
+                                </div>
+                                @if (!notification.IsRead)
+                                {
+                                    <div class="ml-2 flex-shrink-0">
+                                        <span class="inline-block h-2 w-2 rounded-full bg-omail-500"></span>
+                                    </div>
+                                }
+                            </div>
+                        </a>
+                    }
+                }
+            </div>
+            <div class="p-1 border-t border-omail-100 dark:border-omail-700">
+                <a href="admin/notifications" class="block px-4 py-2 text-center text-xs font-medium text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                    View all notifications
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool showNotifications = false;
+    private List<AdminNotification> notifications = new List<AdminNotification>();
+    private int notificationCount => notifications.Count(n => !n.IsRead);
+    private System.Timers.Timer refreshTimer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Load notifications on initialization
+        await LoadNotifications();
+        
+        // Setup a refresh timer (every 60 seconds)
+        refreshTimer = new System.Timers.Timer(60000);
+        refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(LoadNotifications);
+        refreshTimer.Start();
+    }
+    
+    public void Dispose()
+    {
+        refreshTimer?.Stop();
+        refreshTimer?.Dispose();
+    }
+    
+    private async Task LoadNotifications()
+    {
+        try
+        {
+            // This would typically load from a service
+            // For now, let's create some sample notifications
+            if (notifications.Count == 0)
+            {
+                notifications = new List<AdminNotification>
+                {
+                    new AdminNotification
+                    {
+                        Id = 1,
+                        Type = "user",
+                        Title = "New User Registration",
+                        Message = "Jane Smith has registered and needs approval",
+                        Time = "Just now",
+                        Link = "/admin/users",
+                        IsRead = false
+                    },
+                    new AdminNotification
+                    {
+                        Id = 2,
+                        Type = "approval",
+                        Title = "Email Approval Required",
+                        Message = "John Doe's email to external client needs review",
+                        Time = "1 hour ago",
+                        Link = "/admin/approval-workflow",
+                        IsRead = false
+                    },
+                    new AdminNotification
+                    {
+                        Id = 3,
+                        Type = "system",
+                        Title = "System Update Available",
+                        Message = "Omail v1.1 update is available for installation",
+                        Time = "Yesterday",
+                        Link = "/admin/system-settings",
+                        IsRead = true
+                    }
+                };
+            }
+            
+            // In a real app, you'd fetch the latest from a service
+            await Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading notifications: {ex.Message}");
+        }
+    }
+    
+    private void ToggleNotifications()
+    {
+        showNotifications = !showNotifications;
+    }
+    
+    private async Task MarkAsRead(AdminNotification notification)
+    {
+        notification.IsRead = true;
+        // In a real app, you'd call a service to update the database
+        await Task.CompletedTask;
+    }
+    
+    private async Task MarkAllAsRead()
+    {
+        foreach (var notification in notifications)
+        {
+            notification.IsRead = true;
+        }
+        // In a real app, you'd call a service to update the database
+        await Task.CompletedTask;
+    }
+    
+    public class AdminNotification
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public string Title { get; set; }
+        public string Message { get; set; }
+        public string Time { get; set; }
+        public string Link { get; set; }
+        public bool IsRead { get; set; }
+    }
+}

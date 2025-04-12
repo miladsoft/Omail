@@ -1,0 +1,59 @@
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+    <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-omail-800 dark:text-white">@Title</h1>
+        @if (!string.IsNullOrEmpty(Description))
+        {
+            <p class="text-omail-600 dark:text-omail-400 mt-1">@Description</p>
+        }
+    </div>
+    
+    <div class="flex items-center space-x-2 mt-4 sm:mt-0">
+        @if (!string.IsNullOrEmpty(PrimaryButtonUrl))
+        {
+            <button @onclick="@(() => NavigationManager.NavigateTo(PrimaryButtonUrl))" class="flex items-center space-x-2 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                @if (!string.IsNullOrEmpty(PrimaryButtonIcon))
+                {
+                    <lord-icon
+                        src="@PrimaryButtonIcon"
+                        trigger="hover"
+                        colors="primary:#ffffff"
+                        class="w-5 h-5">
+                    </lord-icon>
+                }
+                <span>@PrimaryButtonText</span>
+            </button>
+        }
+        
+        @if (!string.IsNullOrEmpty(SecondaryButtonUrl))
+        {
+            <button @onclick="@(() => NavigationManager.NavigateTo(SecondaryButtonUrl))" class="hidden sm:flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                @if (!string.IsNullOrEmpty(SecondaryButtonIcon))
+                {
+                    <lord-icon
+                        src="@SecondaryButtonIcon"
+                        trigger="hover"
+                        colors="primary:#121331,secondary:#818cf8"
+                        class="w-5 h-5">
+                    </lord-icon>
+                }
+                <span>@SecondaryButtonText</span>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Description { get; set; }
+    [Parameter] public string PrimaryButtonUrl { get; set; }
+    [Parameter] public string PrimaryButtonText { get; set; } 
+    [Parameter] public string PrimaryButtonIcon { get; set; }
+    [Parameter] public string SecondaryButtonUrl { get; set; }
+    [Parameter] public string SecondaryButtonText { get; set; }
+    [Parameter] public string SecondaryButtonIcon { get; set; }
+}

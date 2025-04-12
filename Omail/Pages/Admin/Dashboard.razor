@@ -1,0 +1,460 @@
+@page "/admin"
+@page "/admin/dashboard"
+@attribute [Authorize(Roles = "Manager")]
+@inject EmailService EmailService
+@inject AuthService AuthService
+@inject ApprovalService ApprovalService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Admin Dashboard - Omail</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-omail-800 dark:text-white flex items-center">
+                <lord-icon
+                    src="https://cdn.lordicon.com/gqdnbnwt.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-10 h-10 mr-3">
+                </lord-icon>
+                Admin Dashboard
+            </h1>
+            <p class="text-omail-600 dark:text-omail-300 mt-2">Manage your organization, users and email settings</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <button @onclick="@(() => NavigationManager.NavigateTo("/admin/users/new"))" class="flex items-center space-x-2 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/hbvyhtse.json"
+                    trigger="hover"
+                    colors="primary:#ffffff"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Add User</span>
+            </button>
+            <button @onclick="@(() => NavigationManager.NavigateTo("/admin/organizations/manage"))" class="flex items-center space-x-2 bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-white hover:bg-omail-200 dark:hover:bg-omail-600 px-4 py-2 rounded-lg transition-all duration-300">
+                <lord-icon
+                    src="https://cdn.lordicon.com/sbiheqdr.json"
+                    trigger="hover"
+                    colors="primary:#121331,secondary:#818cf8"
+                    class="w-5 h-5">
+                </lord-icon>
+                <span>Manage Organization</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Total Users</p>
+                    <p class="text-3xl font-bold text-omail-800 dark:text-white mt-2">@usersCount</p>
+                </div>
+                <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/bhfjfgqz.json"
+                        trigger="hover"
+                        colors="primary:#3b82f6,secondary:#818cf8"
+                        class="w-8 h-8">
+                    </lord-icon>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center">
+                <span class="text-green-500 flex items-center text-sm font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"></path>
+                    </svg>
+                    4.5%
+                </span>
+                <span class="text-omail-500 dark:text-omail-400 text-sm ml-2">vs last month</span>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Total Emails</p>
+                    <p class="text-3xl font-bold text-omail-800 dark:text-white mt-2">@emailsCount</p>
+                </div>
+                <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/pkmkagva.json"
+                        trigger="hover"
+                        colors="primary:#a855f7,secondary:#9333ea"
+                        class="w-8 h-8">
+                    </lord-icon>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center">
+                <span class="text-green-500 flex items-center text-sm font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"></path>
+                    </svg>
+                    12.7%
+                </span>
+                <span class="text-omail-500 dark:text-omail-400 text-sm ml-2">vs last month</span>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Pending Approvals</p>
+                    <p class="text-3xl font-bold text-omail-800 dark:text-white mt-2">@pendingApprovalsCount</p>
+                </div>
+                <div class="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/hjeefwhm.json"
+                        trigger="hover"
+                        colors="primary:#eab308,secondary:#facc15"
+                        class="w-8 h-8">
+                    </lord-icon>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center">
+                <span class="text-red-500 flex items-center text-sm font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd"></path>
+                    </svg>
+                    3.2%
+                </span>
+                <span class="text-omail-500 dark:text-omail-400 text-sm ml-2">vs last month</span>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Organizations</p>
+                    <p class="text-3xl font-bold text-omail-800 dark:text-white mt-2">@organizationsCount</p>
+                </div>
+                <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/osuxyevn.json"
+                        trigger="hover"
+                        colors="primary:#10b981,secondary:#22c55e"
+                        class="w-8 h-8">
+                    </lord-icon>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="/admin/organizations" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm font-medium flex items-center">
+                    View all
+                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Data -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Users Card -->
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-5 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Recent Users</h3>
+                <a href="/admin/users" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm font-medium">View all</a>
+            </div>
+            <div class="p-6">
+                @if (recentUsers == null || !recentUsers.Any())
+                {
+                    <div class="flex justify-center items-center py-8">
+                        <div class="text-center">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/msoeawqm.json"
+                                trigger="loop"
+                                delay="2000"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-12 h-12 mx-auto">
+                            </lord-icon>
+                            <p class="mt-2 text-omail-500 dark:text-omail-400">No users found</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-omail-200 dark:divide-omail-700">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">User</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Email</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Position</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-omail-500 dark:text-omail-400 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-omail-800/50 divide-y divide-omail-200 dark:divide-omail-700">
+                                @foreach (var user in recentUsers)
+                                {
+                                    <tr class="hover:bg-omail-50 dark:hover:bg-omail-700/30 transition-colors duration-150">
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 relative">
+                                                    @if (string.IsNullOrEmpty(user.ProfilePicture))
+                                                    {
+                                                        <div class="h-10 w-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                                                            @user.Initials
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <img class="h-10 w-10 rounded-full" src="@user.ProfilePicture" alt="" />
+                                                    }
+                                                    @if (user.IsManager)
+                                                    {
+                                                        <span class="absolute bottom-0 right-0 transform translate-x-1/4 -translate-y-1/4">
+                                                            <span class="block h-3 w-3 rounded-full ring-2 ring-white dark:ring-omail-800 bg-green-400"></span>
+                                                        </span>
+                                                    }
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-omail-900 dark:text-omail-100">@user.FullName</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm text-omail-600 dark:text-omail-300">@user.Email</div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm text-omail-600 dark:text-omail-300">@(string.IsNullOrEmpty(user.Position) ? "-" : user.Position)</div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full @(user.IsActive ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400" : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400")">
+                                                @(user.IsActive ? "Active" : "Inactive")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Emails Card -->
+        <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-5 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Recent Emails</h3>
+                <a href="/admin/emails" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm font-medium">View all</a>
+            </div>
+            <div class="p-6">
+                @if (recentEmails == null || !recentEmails.Any())
+                {
+                    <div class="flex justify-center items-center py-8">
+                        <div class="text-center">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/msoeawqm.json"
+                                trigger="loop"
+                                delay="2000"
+                                colors="primary:#121331,secondary:#818cf8"
+                                class="w-12 h-12 mx-auto">
+                            </lord-icon>
+                            <p class="mt-2 text-omail-500 dark:text-omail-400">No emails found</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="space-y-4">
+                        @foreach (var email in recentEmails)
+                        {
+                            <div class="flex items-start p-3 hover:bg-omail-50 dark:hover:bg-omail-700/30 rounded-lg transition-colors duration-150">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
+                                        @(email.Sender?.Initials ?? "??")
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-omail-900 dark:text-omail-100 truncate">
+                                            @email.Sender?.FullName
+                                        </p>
+                                        <p class="ml-2 flex-shrink-0 text-xs text-omail-500 dark:text-omail-400">
+                                            @FormatDate(email.SentAt ?? email.CreatedAt)
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-omail-800 dark:text-omail-200 font-medium truncate">
+                                            @email.Subject
+                                        </p>
+                                        <div class="flex items-center mt-1">
+                                            <span class="px-2 py-0.5 text-xs rounded-full @GetStatusBadgeClass(email.Status)">
+                                                @email.Status.ToString()
+                                            </span>
+                                            @if (email.Recipients.Count > 0)
+                                            {
+                                                <span class="ml-2 text-xs text-omail-500 dark:text-omail-400">
+                                                    @email.Recipients.Count recipient@(email.Recipients.Count > 1 ? "s" : "")
+                                                </span>
+                                            }
+                                            @if (email.Attachments.Count > 0)
+                                            {
+                                                <span class="ml-2 flex items-center text-xs text-omail-500 dark:text-omail-400">
+                                                    <lord-icon
+                                                        src="https://cdn.lordicon.com/xhbsnkyp.json"
+                                                        trigger="hover"
+                                                        colors="primary:#818cf8"
+                                                        class="w-4 h-4 mr-1">
+                                                    </lord-icon>
+                                                    @email.Attachments.Count
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Organization Structure Card -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-5 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Organization Structure</h3>
+            <a href="/admin/organizations" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 text-sm font-medium">Manage Structure</a>
+        </div>
+        <div class="p-6">
+            @if (departments == null || !departments.Any())
+            {
+                <div class="flex justify-center items-center py-8">
+                    <div class="text-center">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/msoeawqm.json"
+                            trigger="loop"
+                            delay="2000"
+                            colors="primary:#121331,secondary:#818cf8"
+                            class="w-12 h-12 mx-auto">
+                        </lord-icon>
+                        <p class="mt-2 text-omail-500 dark:text-omail-400">No organization structure found</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach (var department in departments)
+                    {
+                        <div class="border border-omail-200 dark:border-omail-700 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300">
+                            <div class="bg-omail-50 dark:bg-omail-700/50 px-4 py-3 border-b border-omail-200 dark:border-omail-700">
+                                <div class="flex items-center text-omail-700 dark:text-omail-300">
+                                    <span>@department.Name</span>
+                                    <span class="mx-2">•</span>
+                                    <span>@department.Sections.Count sections</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    @foreach (var section1 in department.Sections)
+                                    {
+                                        <li class="flex items-center justify-between">
+                                            <span class="text-omail-700 dark:text-omail-300">@section1.Name</span>
+                                            <span class="text-sm text-omail-500 dark:text-omail-400">@section1.Employees.Count user@(section1.Employees.Count != 1 ? "s" : "")</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private int usersCount = 0;
+    private int emailsCount = 0;
+    private int pendingApprovalsCount = 0;
+    private int organizationsCount = 0;
+    private List<Employee> recentUsers;
+    private List<EmailMessage> recentEmails;
+    private List<Department> departments;
+    private System.Timers.Timer refreshTimer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+        
+        // Setup a refresh timer (every 60 seconds)
+        refreshTimer = new System.Timers.Timer(60000);
+        refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(LoadDashboardData);
+        refreshTimer.Start();
+    }
+    
+    public void Dispose()
+    {
+        refreshTimer?.Stop();
+        refreshTimer?.Dispose();
+    }
+    
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            // Count users
+            usersCount = await AuthService.GetTotalUserCountAsync();
+            
+            // Get recent users
+            recentUsers = await AuthService.GetRecentUsersAsync(5);
+            
+            // Count emails
+            emailsCount = await EmailService.GetTotalEmailCountAsync();
+            
+            // Get recent emails
+            recentEmails = await EmailService.GetRecentEmailsAsync(5);
+            
+            // Count pending approvals
+            pendingApprovalsCount = await ApprovalService.GetTotalPendingApprovalsCountAsync();
+            
+            // Count organizations
+            organizationsCount = await AuthService.GetTotalOrganizationsCountAsync();
+            
+            // Get department structure
+            departments = await AuthService.GetDepartmentsWithSectionsAsync();
+            
+            // Update UI
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading dashboard data: {ex.Message}");
+        }
+    }
+    
+    private string FormatDate(DateTime date)
+    {
+        var today = DateTime.Today;
+        var dateOnly = date.Date;
+        
+        if (dateOnly == today)
+            return date.ToString("h:mm tt");
+        
+        if (dateOnly == today.AddDays(-1))
+            return "Yesterday";
+        
+        return date.ToString("MMM d");
+    }
+    
+    private string GetStatusBadgeClass(EmailStatus status)
+    {
+        return status switch
+        {
+            EmailStatus.Draft => "bg-omail-100 text-omail-800 dark:bg-omail-700/50 dark:text-omail-300",
+            EmailStatus.PendingApproval => "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400",
+            EmailStatus.Approved => "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400",
+            EmailStatus.Rejected => "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400",
+            EmailStatus.Sent => "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400",
+            EmailStatus.Received => "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-400",
+            _ => "bg-omail-100 text-omail-800 dark:bg-omail-700/50 dark:text-omail-300"
+        };
+    }
+}

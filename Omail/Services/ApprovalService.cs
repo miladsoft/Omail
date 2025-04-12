@@ -95,5 +95,12 @@ namespace Omail.Services
             await _context.SaveChangesAsync();
             return approval;
         }
+
+        public async Task<int> GetTotalPendingApprovalsCountAsync()
+        {
+            return await _context.EmailApprovals
+                .Where(a => a.Status == ApprovalStatus.Pending)
+                .CountAsync();
+        }
     }
 }

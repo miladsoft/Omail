@@ -9,11 +9,13 @@ namespace Omail.Services
         private readonly AppDbContext _context;
         private readonly AuthService _authService;
         private readonly ServiceFactory _serviceFactory;
+        private readonly ILogger<EmailService> _logger;
 
         public EmailService(
             AppDbContext context, 
             AuthService authService,
-            ServiceFactory serviceFactory)
+            ServiceFactory serviceFactory,
+            ILogger<EmailService> logger)
         {
             _context = context;
             _authService = authService;
@@ -108,32 +110,23 @@ namespace Omail.Services
 
         public async Task<EmailMessage> GetEmailByIdAsync(int id)
         {
-            var currentUser = await _authService.GetCurrentUserAsync();
-            if (currentUser == null)
-                return null;
-
-            var email = await _context.Emails
-                .Include(e => e.Sender)
-                .Include(e => e.Recipients)
-                .ThenInclude(r => r.Recipient)
-                .Include(e => e.Attachments)
-                .Include(e => e.Approvals)
-                .ThenInclude(a => a.Approver)
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            if (email == null)
-                return null;
-
-            // Mark as read if current user is a recipient
-            var recipient = email.Recipients.FirstOrDefault(r => r.RecipientId == currentUser.Id);
-            if (recipient != null && !recipient.IsRead)
+            try
             {
-                recipient.IsRead = true;
-                recipient.ReadAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+                return await _context.Emails
+                    .Include(e => e.Sender)
+                    .Include(e => e.Recipients)
+                        .ThenInclude(r => r.Recipient)
+                    .Include(e => e.Attachments)
+                    .Include(e => e.Approvals)
+                        .ThenInclude(a => a.Approver)
+                    .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             }
-
-            return email;
+            catch (Exception ex)
+            {
+                // Check if logger is null before using it to avoid NullReferenceException
+                _logger?.LogError(ex, "Error retrieving email with ID {EmailId}", id);
+                throw;
+            }
         }
 
         public async Task<EmailMessage> SaveDraftAsync(EmailMessage email, List<int> recipientIds, List<int> ccIds = null, List<int> bccIds = null)
@@ -321,6 +314,22 @@ namespace Omail.Services
 
             _context.Emails.Remove(email);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetTotalEmailCountAsync()
+        {
+            return await _context.Emails.CountAsync();
+        }
+
+        public async Task<List<EmailMessage>> GetRecentEmailsAsync(int count = 5)
+        {
+            return await _context.Emails
+                .Include(e => e.Sender)
+                .Include(e => e.Recipients)
+                    .ThenInclude(r => r.Recipient)
+                .OrderByDescending(e => e.CreatedAt)
+                .Take(count)
+                .ToListAsync();
         }
 
         private async Task AddRecipientsAsync(int emailId, List<int> recipientIds, RecipientType type)

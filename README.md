@@ -12,6 +12,10 @@ A modern, responsive email UI framework built with Blazor and Tailwind CSS.
 - 📬 Complete email workflow (inbox, compose, sent, drafts, trash)
 - 🎨 Customizable UI components
 - 🌐 Progressive Web App capabilities
+- 👨‍💼 Comprehensive Admin Dashboard
+- 👥 User management with permissions
+- 🏢 Organization and department management
+- 📊 Advanced analytics and statistics
 
 ## Getting Started
 
