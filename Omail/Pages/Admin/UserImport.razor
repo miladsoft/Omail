@@ -252,7 +252,7 @@
     private List<string> importErrors = new List<string>();
     private List<ImportedUserViewModel> importedUsers = new List<ImportedUserViewModel>();
     
-    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    private void OnFileSelected(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
         selectedFileName = e.File.Name;

@@ -62,7 +62,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </button>
-                            <InputFile id="profilePictureUpload" OnChange="UploadProfilePicture" hidden @ref="fileInputReference" accept="image/*" />
+                            <InputFile id="profilePictureUpload" OnChange="UploadProfilePicture" hidden />
                         </div>
                     </div>
                     
@@ -241,7 +241,6 @@
     private bool showChangePasswordDialog = false;
     private ProfileModel profileModel = new ProfileModel();
     private PasswordChangeModel passwordModel = new PasswordChangeModel();
-    private ElementReference fileInputReference;
     
     protected override async Task OnInitializedAsync()
     {

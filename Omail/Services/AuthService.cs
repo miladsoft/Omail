@@ -17,6 +17,9 @@ namespace Omail.Services
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILogger<AuthService> _logger;
 
+        // Add property to expose context for extension methods
+        internal AppDbContext Context => _context;
+
         public AuthService(
             AppDbContext context,
             ProtectedSessionStorage sessionStorage,

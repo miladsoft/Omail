@@ -403,16 +403,16 @@
         {
             if (currentEmployee == null)
             {
-                currentEmployee = await AuthService.GetCurrentEmployeeAsync();
+                currentEmployee = await AuthService.GetCurrentUserAsync();
             }
 
             if (currentSection.Id == 0)
             {
-                await AuthService.CreateSectionAsync(currentSection, currentEmployee.Id);
+                await AuthService.CreateSectionAsync(currentSection);
             }
             else
             {
-                await AuthService.UpdateSectionAsync(currentSection, currentEmployee.Id);
+                await AuthService.UpdateSectionAsync(currentSection);
             }
             await LoadOrganizationStructure();
         }
@@ -428,16 +428,16 @@
         {
             if (currentEmployee == null)
             {
-                currentEmployee = await AuthService.GetCurrentEmployeeAsync();
+                currentEmployee = await AuthService.GetCurrentUserAsync();
             }
 
             if (currentDepartment.Id == 0)
             {
-                await AuthService.CreateDepartmentAsync(currentDepartment, currentEmployee.Id);
+                await AuthService.CreateDepartmentAsync(currentDepartment);
             }
             else
             {
-                await AuthService.UpdateDepartmentAsync(currentDepartment, currentEmployee.Id);
+                await AuthService.UpdateDepartmentAsync(currentDepartment);
             }
             await LoadOrganizationStructure();
         }
@@ -453,16 +453,18 @@
         {
             if (currentEmployee == null)
             {
-                currentEmployee = await AuthService.GetCurrentEmployeeAsync();
+                currentEmployee = await AuthService.GetCurrentUserAsync();
             }
 
             if (currentOrganization.Id == 0)
             {
-                await AuthService.AddOrganizationAsync(currentOrganization, currentEmployee.Id);
+                // Create a new organization
+                await AuthService.UpdateOrganizationAsync(currentOrganization);
             }
             else
             {
-                await AuthService.UpdateOrganizationAsync(currentOrganization, currentEmployee.Id);
+                // Update existing organization
+                await AuthService.UpdateOrganizationAsync(currentOrganization);
             }
             await LoadOrganizationStructure();
         }

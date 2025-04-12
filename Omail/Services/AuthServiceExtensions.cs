@@ -10,29 +10,25 @@ namespace Omail.Services
     {
         public static async Task<Section> GetSectionByIdAsync(this AuthService authService, int id)
         {
-            using var context = authService.CreateDbContext();
-            return await context.Sections
+            return await authService.Context.Sections
                 .Include(s => s.Department)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public static async Task<List<Employee>> GetEmployeesBySectionAsync(this AuthService authService, int sectionId)
         {
-            using var context = authService.CreateDbContext();
-            return await context.Employees
+            return await authService.Context.Employees
                 .Where(e => e.SectionId == sectionId)
                 .ToListAsync();
         }
 
         public static async Task<bool> UpdateProfileAsync(this AuthService authService, int userId, object profileData)
         {
-            using var context = authService.CreateDbContext();
-            var user = await context.Employees.FindAsync(userId);
+            var user = await authService.Context.Employees.FindAsync(userId);
             
             if (user == null)
                 return false;
 
-            // Use reflection to copy properties from profileData to user
             var properties = profileData.GetType().GetProperties();
             foreach (var prop in properties)
             {
@@ -44,40 +40,44 @@ namespace Omail.Services
                 }
             }
 
-            await context.SaveChangesAsync();
+            await authService.Context.SaveChangesAsync();
             return true;
         }
 
         public static async Task<bool> ChangePasswordAsync(this AuthService authService, int userId, string currentPassword, string newPassword)
         {
-            using var context = authService.CreateDbContext();
-            var user = await context.Employees.FindAsync(userId);
+            var user = await authService.Context.Employees.FindAsync(userId);
             
             if (user == null)
                 return false;
 
-            // Verify current password
             var currentHashedPassword = HashPassword(currentPassword);
             if (user.PasswordHash != currentHashedPassword)
                 return false;
 
-            // Update to new password
             user.PasswordHash = HashPassword(newPassword);
-            await context.SaveChangesAsync();
+            await authService.Context.SaveChangesAsync();
             return true;
         }
 
         public static async Task<bool> UpdateProfilePictureAsync(this AuthService authService, int userId, string imageData)
         {
-            using var context = authService.CreateDbContext();
-            var user = await context.Employees.FindAsync(userId);
+            var user = await authService.Context.Employees.FindAsync(userId);
             
             if (user == null)
                 return false;
 
             user.ProfilePicture = imageData;
-            await context.SaveChangesAsync();
+            await authService.Context.SaveChangesAsync();
             return true;
+        }
+
+        public static async Task<List<Section>> GetSectionsByDepartmentAsync(this AuthService authService, int departmentId)
+        {
+            return await authService.Context.Sections
+                .Where(s => s.DepartmentId == departmentId)
+                .OrderBy(s => s.Name)
+                .ToListAsync();
         }
 
         private static string HashPassword(string password)

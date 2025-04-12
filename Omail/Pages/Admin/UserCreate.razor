@@ -103,7 +103,7 @@
                         <InputSelect 
                             id="section" 
                             @bind-Value="userModel.SectionId"
-                            class="mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 @(sections.Count == 0 ? "bg-omail-100 dark:bg-omail-800/50 cursor-not-allowed" : "")">
+                            class="@GetSectionSelectClass()">
                             <option value="0">-- Select Section --</option>
                             @foreach (var sec in sections)
                             {
@@ -284,9 +284,22 @@
                 userModel.SectionId = sections.First().Id;
             }
 
-            // Update the method call to match the expected parameters
-            var currentUser = await AuthService.GetCurrentUserAsync();
-            await AuthService.CreateUserAsync(userModel, userModel.Password, currentUser.Id);
+            // Convert from UserCreateModel to the expected UserModel type
+            var serviceUserModel = new AuthService.UserModel
+            {
+                FirstName = userModel.FirstName,
+                LastName = userModel.LastName,
+                Email = userModel.Email,
+                PhoneNumber = userModel.PhoneNumber,
+                Position = userModel.Position,
+                Password = userModel.Password,
+                SectionId = userModel.SectionId,
+                IsManager = userModel.IsManager,
+                IsActive = userModel.IsActive,
+                HireDate = userModel.HireDate
+            };
+
+            await AuthService.CreateUserAsync(serviceUserModel);
 
             await JSRuntime.InvokeVoidAsync("alert", "User created successfully!");
             NavigationManager.NavigateTo("/admin/users");
@@ -300,6 +313,11 @@
         {
             isProcessing = false;
         }
+    }
+
+    private string GetSectionSelectClass()
+    {
+        return sections.Count == 0 ? "mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-omail-100 dark:bg-omail-800/50 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 cursor-not-allowed" : "mt-1 block w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50";
     }
     
     public class UserCreateModel
