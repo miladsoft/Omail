@@ -9,12 +9,11 @@
 <div class="space-y-4">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-omail-800 dark:text-white flex items-center">
-            <lord-icon
-                src="https://cdn.lordicon.com/iltqorsz.json"
-                trigger="loop"
-                delay="1000"
-                colors="primary:#121331,secondary:#818cf8"
-                class="w-8 h-8 mr-2">
+            <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
+                       trigger="loop"
+                       delay="1000"
+                       colors="primary:#121331,secondary:#818cf8"
+                       class="w-8 h-8 mr-2">
             </lord-icon>
             Sent
             <span class="ml-2 bg-omail-500 text-white text-xs px-2 py-0.5 rounded-full">@(emails?.Count ?? 0)</span>
@@ -23,20 +22,18 @@
             <div class="relative">
                 <input type="text" placeholder="Search sent emails..."
                        @bind-value="searchQuery" @bind-value:event="oninput"
-                       class="pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/50 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 w-48 md:w-64 transition-all duration-300"/>
-                <lord-icon
-                    src="https://cdn.lordicon.com/msoeawqm.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="absolute left-3 top-2.5 w-5 h-5">
+                       class="pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/50 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 w-48 md:w-64 transition-all duration-300" />
+                <lord-icon src="https://cdn.lordicon.com/msoeawqm.json"
+                           trigger="hover"
+                           colors="primary:#121331,secondary:#818cf8"
+                           class="absolute left-3 top-2.5 w-5 h-5">
                 </lord-icon>
             </div>
             <button @onclick="@(() => NavigationManager.NavigateTo("/compose"))" class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
-                <lord-icon
-                    src="https://cdn.lordicon.com/wloilxuq.json"
-                    trigger="hover"
-                    colors="primary:#ffffff"
-                    class="w-5 h-5">
+                <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
+                           trigger="hover"
+                           colors="primary:#ffffff"
+                           class="w-5 h-5">
                 </lord-icon>
                 <span>Compose</span>
             </button>
@@ -44,28 +41,28 @@
     </div>
 
     <div class="grid grid-cols-12 gap-4">
-        <SidebarComponent ActivePage="sent" />
+        <div class="col-span-12 md:col-span-3 space-y-2">
 
+            <SidebarComponent ActivePage="sent" />
+        </div>
         <!-- Email list -->
         <div class="col-span-12 md:col-span-9">
             <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
                 <div class="border-b border-omail-200 dark:border-omail-700 p-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500"/>
+                        <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500" />
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="RefreshSent">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/nxooksci.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/nxooksci.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="MoveSelectedToTrash" disabled="@(!selectedEmails.Any())">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/gsqxdxog.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                     </div>
@@ -77,19 +74,17 @@
                             </span>
                         }
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="PreviousPage" disabled="@(currentPage == 0)">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/iifryyua.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/iifryyua.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="NextPage" disabled="@((currentPage + 1) * pageSize >= (filteredEmails?.Count ?? 0))">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/jxwksgwv.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/jxwksgwv.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                     </div>
@@ -106,12 +101,11 @@
                 else if (filteredEmails.Count == 0)
                 {
                     <div class="py-12 flex flex-col items-center justify-center text-center">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/msoeawqm.json"
-                            trigger="loop"
-                            delay="2000"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-16 h-16 mb-4">
+                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json"
+                                   trigger="loop"
+                                   delay="2000"
+                                   colors="primary:#121331,secondary:#818cf8"
+                                   class="w-16 h-16 mb-4">
                         </lord-icon>
                         <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">No sent emails found</h3>
                         <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
@@ -128,10 +122,10 @@
                             var primaryRecipient = email.Recipients.FirstOrDefault(r => r.Type == RecipientType.To)?.Recipient;
                             var recipientCount = email.Recipients.Count(r => r.Type == RecipientType.To);
                             var additionalCount = recipientCount > 1 ? recipientCount - 1 : 0;
-                            
+
                             <a href="@($"email-detail/{email.Id}")" class="block hover:bg-omail-50 dark:hover:bg-omail-700/50 transition-colors duration-150">
                                 <div class="flex items-center px-4 py-3">
-                                    <input type="checkbox" checked="@selectedEmails.Contains(email.Id)" @onclick="() => ToggleEmailSelection(email.Id)" @onclick:stopPropagation="true" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3"/>
+                                    <input type="checkbox" checked="@selectedEmails.Contains(email.Id)" @onclick="() => ToggleEmailSelection(email.Id)" @onclick:stopPropagation="true" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3" />
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-center justify-between">
                                             <p class="text-sm font-medium text-omail-900 dark:text-omail-100 truncate">
@@ -157,11 +151,10 @@
                                     <div class="ml-3 flex-shrink-0 flex items-center">
                                         @if (email.Attachments.Any())
                                         {
-                                            <lord-icon
-                                                src="https://cdn.lordicon.com/xhbsnkyp.json"
-                                                trigger="hover"
-                                                colors="primary:#818cf8"
-                                                class="w-5 h-5">
+                                            <lord-icon src="https://cdn.lordicon.com/xhbsnkyp.json"
+                                                       trigger="hover"
+                                                       colors="primary:#818cf8"
+                                                       class="w-5 h-5">
                                             </lord-icon>
                                         }
                                     </div>
@@ -189,7 +182,7 @@
     protected override async Task OnInitializedAsync()
     {
         await RefreshSent();
-        
+
         // Setup a refresh timer (every 60 seconds)
         refreshTimer = new System.Timers.Timer(60000);
         refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(RefreshSent);
@@ -225,11 +218,11 @@
         else
         {
             var query = searchQuery.ToLower();
-            filteredEmails = emails?.Where(e => 
-                e.Subject?.ToLower().Contains(query) == true || 
-                e.Body?.ToLower().Contains(query) == true || 
-                e.Recipients.Any(r => 
-                    r.Recipient?.FullName?.ToLower().Contains(query) == true || 
+            filteredEmails = emails?.Where(e =>
+                e.Subject?.ToLower().Contains(query) == true ||
+                e.Body?.ToLower().Contains(query) == true ||
+                e.Recipients.Any(r =>
+                    r.Recipient?.FullName?.ToLower().Contains(query) == true ||
                     r.Recipient?.Email?.ToLower().Contains(query) == true
                 )
             ).ToList() ?? new List<EmailMessage>();
@@ -239,7 +232,7 @@
         currentPage = 0;
     }
 
-    private IEnumerable<EmailMessage> pagedEmails => 
+    private IEnumerable<EmailMessage> pagedEmails =>
         filteredEmails
             .Skip(currentPage * pageSize)
             .Take(pageSize);
@@ -292,7 +285,7 @@
             return;
 
         isLoading = true;
-        
+
         try
         {
             foreach (var emailId in selectedEmails.ToList())
@@ -300,7 +293,7 @@
                 await EmailService.MoveToTrashAsync(emailId);
                 selectedEmails.Remove(emailId);
             }
-            
+
             await RefreshSent();
         }
         catch (Exception ex)
@@ -318,19 +311,19 @@
     {
         var today = DateTime.Today;
         var dateOnly = date.Date;
-        
+
         if (dateOnly == today)
             return date.ToString("h:mm tt");
-        
+
         if (dateOnly == today.AddDays(-1))
             return "Yesterday";
-        
+
         if (date > today.AddDays(-7))
             return date.ToString("ddd"); // Day name
-        
+
         if (date.Year == today.Year)
             return date.ToString("MMM d"); // Month Day
-        
+
         return date.ToString("MMM d, yyyy"); // Month Day, Year
     }
 

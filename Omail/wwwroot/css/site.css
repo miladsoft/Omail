@@ -1,0 +1,26 @@
+/* Fix for email interface elements */
+
+/* Better sidebar styling */
+.sidebar-container {
+    flex-shrink: 0;
+}
+
+/* Ensure main content properly fills the space */
+.main-content {
+    flex: 1;
+    width: 100%;
+}
+
+/* Fix email list container heights */
+.email-list-container {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+}
+
+/* Make sure the layout doesn't break on small screens */
+@media (max-width: 767px) {
+    .sidebar-container {
+        position: fixed;
+        z-index: 40;
+    }
+}

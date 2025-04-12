@@ -222,14 +222,14 @@
     </header>
 
     <div class="flex-1 flex">
-        <!-- Sidebar Navigation -->
-        <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 transition-all duration-300">
+        <!-- Sidebar Navigation - Primary App Navigation -->
+        <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 overflow-y-auto fixed md:sticky top-16 h-[calc(100vh-64px)] transition-all duration-300 sidebar-container">
             <NavMenu />
         </nav>
 
         <!-- Main Content Area -->
-        <main class="flex-1 p-4 overflow-hidden">
-            <div class="container mx-auto transition-all">
+        <main class="flex-1 p-4 overflow-auto main-content">
+            <div class="container mx-auto transition-all max-w-7xl">
                 @Body
             </div>
         </main>

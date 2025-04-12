@@ -2,48 +2,37 @@
 @inject AuthService AuthService
 @inject ApprovalService ApprovalService
 @implements IDisposable
-@using Omail.Components
 
-<!-- Email folders sidebar -->
-<div class="col-span-12 md:col-span-3 space-y-2">
+<!-- Email complementary sidebar -->
+
     <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
-        <div class="p-4">
-            <NavLink href="inbox" class="@GetLinkClass("inbox")">
-                <IconFallback IconType="inbox" CssClass="w-5 h-5 mr-3" />
-                <span>Inbox</span>
-                @if (inboxCount > 0)
-                {
-                    <span class="ml-auto bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">@inboxCount</span>
-                }
-            </NavLink>
-            <NavLink href="sent" class="@GetLinkClass("sent")">
-                <IconFallback IconType="sent" CssClass="w-5 h-5 mr-3" />
-                <span>Sent</span>
-            </NavLink>
-            <NavLink href="drafts" class="@GetLinkClass("drafts")">
-                <IconFallback IconType="drafts" CssClass="w-5 h-5 mr-3" />
-                <span>Drafts</span>
-                @if (draftsCount > 0)
-                {
-                    <span class="ml-auto bg-omail-500 text-white text-xs px-2 py-0.5 rounded-full">@draftsCount</span>
-                }
-            </NavLink>
-            @if (isManager && pendingApprovalsCount > 0)
+        <!-- Current folder info and stats -->
+        <div class="p-4 border-b border-omail-100 dark:border-omail-700">
+            <h3 class="text-lg font-medium text-omail-800 dark:text-white">@GetPageTitle(ActivePage)</h3>
+            <p class="text-sm text-omail-500 dark:text-omail-400 mt-1">@GetPageDescription(ActivePage)</p>
+            
+            @if (ActivePage == "inbox" && inboxCount > 0)
             {
-                <NavLink href="approvals" class="@GetLinkClass("approvals")">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Approvals</span>
-                    <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">@pendingApprovalsCount</span>
-                </NavLink>
+                <div class="mt-3 bg-omail-50 dark:bg-omail-700/30 p-2 rounded-md">
+                    <span class="text-sm text-omail-600 dark:text-omail-300">@inboxCount unread emails</span>
+                </div>
             }
-            <NavLink href="trash" class="@GetLinkClass("trash")">
-                <IconFallback IconType="trash" CssClass="w-5 h-5 mr-3" />
-                <span>Trash</span>
-            </NavLink>
+            else if (ActivePage == "drafts" && draftsCount > 0)
+            {
+                <div class="mt-3 bg-omail-50 dark:bg-omail-700/30 p-2 rounded-md">
+                    <span class="text-sm text-omail-600 dark:text-omail-300">@draftsCount saved drafts</span>
+                </div>
+            }
+            else if (ActivePage == "approvals" && pendingApprovalsCount > 0 && isManager)
+            {
+                <div class="mt-3 bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded-md">
+                    <span class="text-sm text-yellow-800 dark:text-yellow-300">@pendingApprovalsCount pending approvals</span>
+                </div>
+            }
         </div>
-        <div class="border-t border-omail-100 dark:border-omail-700 p-4">
+
+        <!-- Labels section - keep this -->
+        <div class="p-4">
             <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Labels</h3>
             <div class="space-y-1">
                 <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
@@ -64,7 +53,34 @@
                 </a>
             </div>
         </div>
+
+        <!-- Filters section - new addition -->
+        <div class="border-t border-omail-100 dark:border-omail-700 p-4">
+            <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Filters</h3>
+            <div class="space-y-1">
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <svg class="w-4 h-4 mr-2 text-omail-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Read</span>
+                </a>
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <svg class="w-4 h-4 mr-2 text-omail-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16" />
+                    </svg>
+                    <span>Unread</span>
+                </a>
+                <a href="#" class="flex items-center px-3 py-1 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md">
+                    <svg class="w-4 h-4 mr-2 text-omail-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span>Has Attachments</span>
+                </a>
+            </div>
+        </div>
     </div>
+
+    <!-- Storage info - keep this -->
     <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-4">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-medium text-omail-700 dark:text-omail-300">Storage</h3>
@@ -75,7 +91,7 @@
         </div>
         <p class="text-xs text-omail-500 dark:text-omail-400 mt-1">7.5 GB of 10 GB used</p>
     </div>
-</div>
+ 
 
 @code {
     [Parameter]
@@ -147,16 +163,30 @@
         }
     }
     
-    private string GetLinkClass(string page)
+    private string GetPageTitle(string page)
     {
-        var baseClass = "flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-lg mb-1";
-        
-        if (page == ActivePage)
+        return page.ToLowerInvariant() switch
         {
-            return baseClass + " bg-omail-100/50 dark:bg-omail-600/40 font-medium border-l-4 border-omail-600 dark:border-omail-100";
-        }
-        
-        return baseClass;
+            "inbox" => "Inbox",
+            "sent" => "Sent Items",
+            "drafts" => "Drafts",
+            "trash" => "Deleted Items",
+            "approvals" => "Pending Approvals",
+            _ => "Emails"
+        };
+    }
+    
+    private string GetPageDescription(string page)
+    {
+        return page.ToLowerInvariant() switch
+        {
+            "inbox" => "Received messages",
+            "sent" => "Messages you've sent",
+            "drafts" => "Messages in progress",
+            "trash" => "Deleted messages",
+            "approvals" => "Messages awaiting your approval",
+            _ => "Email messages"
+        };
     }
     
     public void Dispose()

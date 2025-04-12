@@ -9,12 +9,11 @@
 <div class="space-y-4">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-omail-800 dark:text-white flex items-center">
-            <lord-icon
-                src="https://cdn.lordicon.com/gsqxdxog.json"
-                trigger="loop"
-                delay="1000"
-                colors="primary:#121331,secondary:#818cf8"
-                class="w-8 h-8 mr-2">
+            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                       trigger="loop"
+                       delay="1000"
+                       colors="primary:#121331,secondary:#818cf8"
+                       class="w-8 h-8 mr-2">
             </lord-icon>
             Trash
             <span class="ml-2 bg-omail-600 text-white text-xs px-2 py-0.5 rounded-full">@(emails?.Count ?? 0)</span>
@@ -23,22 +22,20 @@
             <div class="relative">
                 <input type="text" placeholder="Search deleted emails..."
                        @bind-value="searchQuery" @bind-value:event="oninput"
-                       class="pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/50 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 w-48 md:w-64 transition-all duration-300"/>
-                <lord-icon
-                    src="https://cdn.lordicon.com/msoeawqm.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="absolute left-3 top-2.5 w-5 h-5">
+                       class="pl-10 pr-4 py-2 border border-omail-200 dark:border-omail-700 rounded-lg bg-white dark:bg-omail-800/50 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 w-48 md:w-64 transition-all duration-300" />
+                <lord-icon src="https://cdn.lordicon.com/msoeawqm.json"
+                           trigger="hover"
+                           colors="primary:#121331,secondary:#818cf8"
+                           class="absolute left-3 top-2.5 w-5 h-5">
                 </lord-icon>
             </div>
             <button class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
                     @onclick="EmptyTrashConfirmation"
                     disabled="@(!emails?.Any() ?? true)">
-                <lord-icon
-                    src="https://cdn.lordicon.com/nrzuGLoB.json"
-                    trigger="hover"
-                    colors="primary:#ffffff"
-                    class="w-5 h-5">
+                <lord-icon src="https://cdn.lordicon.com/nrzuGLoB.json"
+                           trigger="hover"
+                           colors="primary:#ffffff"
+                           class="w-5 h-5">
                 </lord-icon>
                 <span>Empty Trash</span>
             </button>
@@ -46,40 +43,39 @@
     </div>
 
     <div class="grid grid-cols-12 gap-4">
-        <SidebarComponent ActivePage="trash" />
+        <div class="col-span-12 md:col-span-3 space-y-2">
 
+            <SidebarComponent ActivePage="trash" />
+        </div>
         <!-- Email list -->
         <div class="col-span-12 md:col-span-9">
             <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
                 <div class="border-b border-omail-200 dark:border-omail-700 p-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500"/>
+                        <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500" />
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="RefreshTrash">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/nxooksci.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/nxooksci.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
-                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" 
-                                @onclick="RestoreSelectedEmails" 
+                        <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md"
+                                @onclick="RestoreSelectedEmails"
                                 disabled="@(!selectedEmails.Any())">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/diyqmgmt.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/diyqmgmt.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md"
                                 @onclick="PermanentlyDeleteSelectedConfirmation"
                                 disabled="@(!selectedEmails.Any())">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/nrzuGLoB.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/nrzuGLoB.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                     </div>
@@ -91,19 +87,17 @@
                             </span>
                         }
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="PreviousPage" disabled="@(currentPage == 0)">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/iifryyua.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/iifryyua.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="NextPage" disabled="@((currentPage + 1) * pageSize >= (filteredEmails?.Count ?? 0))">
-                            <lord-icon
-                                src="https://cdn.lordicon.com/jxwksgwv.json"
-                                trigger="hover"
-                                colors="primary:#121331,secondary:#818cf8"
-                                class="w-5 h-5">
+                            <lord-icon src="https://cdn.lordicon.com/jxwksgwv.json"
+                                       trigger="hover"
+                                       colors="primary:#121331,secondary:#818cf8"
+                                       class="w-5 h-5">
                             </lord-icon>
                         </button>
                     </div>
@@ -120,12 +114,11 @@
                 else if (filteredEmails.Count == 0)
                 {
                     <div class="py-12 flex flex-col items-center justify-center text-center">
-                        <lord-icon
-                            src="https://cdn.lordicon.com/gsqxdxog.json"
-                            trigger="loop"
-                            delay="2000"
-                            colors="primary:#121331,secondary:#818cf8"
-                            class="w-16 h-16 mb-4">
+                        <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                                   trigger="loop"
+                                   delay="2000"
+                                   colors="primary:#121331,secondary:#818cf8"
+                                   class="w-16 h-16 mb-4">
                         </lord-icon>
                         <h3 class="text-lg font-medium text-omail-900 dark:text-omail-100 mb-1">Trash is Empty</h3>
                         <p class="text-sm text-omail-500 dark:text-omail-400 max-w-sm">
@@ -140,13 +133,13 @@
                         @foreach (var email in pagedEmails)
                         {
                             var isSentEmail = email.SenderId == currentUserId;
-                            var primaryPerson = isSentEmail 
-                                ? email.Recipients.FirstOrDefault(r => r.Type == RecipientType.To)?.Recipient
-                                : email.Sender;
-                            
+                            var primaryPerson = isSentEmail
+                            ? email.Recipients.FirstOrDefault(r => r.Type == RecipientType.To)?.Recipient
+                            : email.Sender;
+
                             <div class="block hover:bg-omail-50 dark:hover:bg-omail-700/50 transition-colors duration-150">
                                 <div class="flex items-center px-4 py-3">
-                                    <input type="checkbox" checked="@selectedEmails.Contains(email.Id)" @onclick="() => ToggleEmailSelection(email.Id)" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3"/>
+                                    <input type="checkbox" checked="@selectedEmails.Contains(email.Id)" @onclick="() => ToggleEmailSelection(email.Id)" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500 mr-3" />
                                     <div class="flex-shrink-0 mr-3">
                                         <div class="w-10 h-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium">
                                             @(primaryPerson?.Initials ?? "??")
@@ -180,22 +173,20 @@
                                     <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
                                         <button class="text-omail-400 hover:text-omail-600 dark:text-omail-500 dark:hover:text-omail-300"
                                                 @onclick="() => RestoreEmail(email.Id)">
-                                            <lord-icon
-                                                src="https://cdn.lordicon.com/diyqmgmt.json"
-                                                trigger="hover"
-                                                colors="primary:#121331,secondary:#818cf8"
-                                                class="w-5 h-5">
+                                            <lord-icon src="https://cdn.lordicon.com/diyqmgmt.json"
+                                                       trigger="hover"
+                                                       colors="primary:#121331,secondary:#818cf8"
+                                                       class="w-5 h-5">
                                             </lord-icon>
                                         </button>
                                         @if (email.SenderId == currentUserId)
                                         {
                                             <button class="text-omail-400 hover:text-omail-600 dark:text-omail-500 dark:hover:text-omail-300"
                                                     @onclick="() => DeleteEmailPermanentlyConfirmation(email.Id)">
-                                                <lord-icon
-                                                    src="https://cdn.lordicon.com/nrzuGLoB.json"
-                                                    trigger="hover"
-                                                    colors="primary:#121331,secondary:#818cf8"
-                                                    class="w-5 h-5">
+                                                <lord-icon src="https://cdn.lordicon.com/nrzuGLoB.json"
+                                                           trigger="hover"
+                                                           colors="primary:#121331,secondary:#818cf8"
+                                                           class="w-5 h-5">
                                                 </lord-icon>
                                             </button>
                                         }
@@ -239,7 +230,7 @@
     private int pageSize = 10;
     private int currentUserId;
     private System.Timers.Timer refreshTimer;
-    
+
     // Confirmation dialog properties
     private bool showConfirmation = false;
     private string confirmationTitle;
@@ -258,7 +249,7 @@
         }
 
         await RefreshTrash();
-        
+
         // Setup a refresh timer (every 60 seconds)
         refreshTimer = new System.Timers.Timer(60000);
         refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(RefreshTrash);
@@ -294,13 +285,13 @@
         else
         {
             var query = searchQuery.ToLower();
-            filteredEmails = emails?.Where(e => 
-                e.Subject?.ToLower().Contains(query) == true || 
-                e.Body?.ToLower().Contains(query) == true || 
+            filteredEmails = emails?.Where(e =>
+                e.Subject?.ToLower().Contains(query) == true ||
+                e.Body?.ToLower().Contains(query) == true ||
                 e.Sender?.FullName?.ToLower().Contains(query) == true ||
                 e.Sender?.Email?.ToLower().Contains(query) == true ||
-                e.Recipients.Any(r => 
-                    r.Recipient?.FullName?.ToLower().Contains(query) == true || 
+                e.Recipients.Any(r =>
+                    r.Recipient?.FullName?.ToLower().Contains(query) == true ||
                     r.Recipient?.Email?.ToLower().Contains(query) == true
                 )
             ).ToList() ?? new List<EmailMessage>();
@@ -310,7 +301,7 @@
         currentPage = 0;
     }
 
-    private IEnumerable<EmailMessage> pagedEmails => 
+    private IEnumerable<EmailMessage> pagedEmails =>
         filteredEmails
             .Skip(currentPage * pageSize)
             .Take(pageSize);
@@ -376,14 +367,14 @@
             return;
 
         isLoading = true;
-        
+
         try
         {
             foreach (var emailId in selectedEmails.ToList())
             {
                 await EmailService.RestoreFromTrashAsync(emailId);
             }
-            
+
             selectedEmails.Clear();
             await RefreshTrash();
         }
@@ -402,7 +393,8 @@
         confirmationTitle = "Delete Permanently";
         confirmationMessage = "Are you sure you want to permanently delete this email? This action cannot be undone.";
         confirmationButtonText = "Delete Permanently";
-        confirmationAction = async () => {
+        confirmationAction = async () =>
+        {
             await DeleteEmailPermanently(emailId);
             CancelConfirmation();
         };
@@ -428,11 +420,12 @@
     {
         if (!selectedEmails.Any())
             return;
-            
+
         confirmationTitle = "Delete Selected Emails";
         confirmationMessage = $"Are you sure you want to permanently delete {selectedEmails.Count} selected emails? This action cannot be undone.";
         confirmationButtonText = "Delete All";
-        confirmationAction = async () => {
+        confirmationAction = async () =>
+        {
             await PermanentlyDeleteSelected();
             CancelConfirmation();
         };
@@ -445,18 +438,21 @@
             return;
 
         isLoading = true;
-        
+
         try
         {
             foreach (var emailId in selectedEmails.ToList())
             {
-                try {
+                try
+                {
                     await EmailService.PermanentlyDeleteAsync(emailId);
-                } catch (UnauthorizedAccessException) {
+                }
+                catch (UnauthorizedAccessException)
+                {
                     // Skip emails user doesn't have permission to permanently delete
                 }
             }
-            
+
             selectedEmails.Clear();
             await RefreshTrash();
         }
@@ -474,11 +470,12 @@
     {
         if (!emails?.Any() ?? true)
             return;
-            
+
         confirmationTitle = "Empty Trash";
         confirmationMessage = "Are you sure you want to permanently delete all emails in the trash? This action cannot be undone.";
         confirmationButtonText = "Empty Trash";
-        confirmationAction = async () => {
+        confirmationAction = async () =>
+        {
             await EmptyTrash();
             CancelConfirmation();
         };
@@ -491,14 +488,14 @@
             return;
 
         isLoading = true;
-        
+
         try
         {
             foreach (var email in emails.Where(e => e.SenderId == currentUserId).ToList())
             {
                 await EmailService.PermanentlyDeleteAsync(email.Id);
             }
-            
+
             selectedEmails.Clear();
             await RefreshTrash();
         }
@@ -530,19 +527,19 @@
     {
         var today = DateTime.Today;
         var dateOnly = date.Date;
-        
+
         if (dateOnly == today)
             return date.ToString("h:mm tt");
-        
+
         if (dateOnly == today.AddDays(-1))
             return "Yesterday";
-        
+
         if (date > today.AddDays(-7))
             return date.ToString("ddd"); // Day name
-        
+
         if (date.Year == today.Year)
             return date.ToString("MMM d"); // Month Day
-        
+
         return date.ToString("MMM d, yyyy"); // Month Day, Year
     }
 
