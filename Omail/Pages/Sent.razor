@@ -9,12 +9,9 @@
 <div class="space-y-4">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-omail-800 dark:text-white flex items-center">
-            <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
-                       trigger="loop"
-                       delay="1000"
-                       colors="primary:#121331,secondary:#818cf8"
-                       class="w-8 h-8 mr-2">
-            </lord-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
             Sent
             <span class="ml-2 bg-omail-500 text-white text-xs px-2 py-0.5 rounded-full">@(emails?.Count ?? 0)</span>
         </h1>
@@ -52,18 +49,14 @@
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" @bind="selectAll" @onclick="ToggleSelectAll" class="rounded border-omail-300 text-omail-600 focus:ring-omail-500" />
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="RefreshSent">
-                            <lord-icon src="https://cdn.lordicon.com/nxooksci.json"
-                                       trigger="hover"
-                                       colors="primary:#121331,secondary:#818cf8"
-                                       class="w-5 h-5">
-                            </lord-icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
                         </button>
                         <button class="p-1 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-md" @onclick="MoveSelectedToTrash" disabled="@(!selectedEmails.Any())">
-                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
-                                       trigger="hover"
-                                       colors="primary:#121331,secondary:#818cf8"
-                                       class="w-5 h-5">
-                            </lord-icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                         </button>
                     </div>
                     <div class="flex items-center space-x-2">
