@@ -1,54 +1,173 @@
 @page "/"
-@using Microsoft.AspNetCore.Components.Web
 @namespace Omail.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Components.Web
+@{
+    Layout = null;
+}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Omail UI</title>
     <base href="~/" />
     <link href="css/style.min.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <link rel="icon" type="image/png" href="favicon.png"/>
-    <title>Omail</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
     
-    <style>
-        /* Hide blazor error UI by default */
-        #blazor-error-ui {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-top: 1px solid #ddd;
-            padding: 1rem;
-            z-index: 9999;
-        }
-        
-        html.dark {
-            color-scheme: dark;
-        }
-    </style>
+    <!-- Meta tags -->
+    <meta name="description" content="Modern email UI built with Blazor and Tailwind CSS">
+    <meta name="theme-color" content="#6555db">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://omail.app/">
+    <meta property="og:title" content="Omail UI">
+    <meta property="og:description" content="Modern email UI built with Blazor and Tailwind CSS">
+    <meta property="og:image" content="https://omail.app/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://omail.app/">
+    <meta property="twitter:title" content="Omail UI">
+    <meta property="twitter:description" content="Modern email UI built with Blazor and Tailwind CSS">
+    <meta property="twitter:image" content="https://omail.app/twitter-image.jpg">
+    
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
-<body class="bg-omail-50 dark:bg-gradient-to-br dark:from-omail-900 dark:to-omail-800 min-h-screen">
+<body class="bg-omail-50 min-h-screen">
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
-    <div id="blazor-error-ui">
-        <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
-        </environment>
-        <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
-        </environment>
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+    <div id="blazor-error-ui" class="fixed bottom-0 w-full bg-red-100 dark:bg-red-900/70 border-t border-red-300 dark:border-red-800 z-50 px-4 py-3 hidden">
+        <div class="flex items-center justify-between container mx-auto">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span class="text-red-800 dark:text-red-200">
+                    <environment include="Staging,Production">
+                        An error has occurred. This application may no longer respond until reloaded.
+                    </environment>
+                    <environment include="Development">
+                        An unhandled exception has occurred. See browser dev tools for details.
+                    </environment>
+                </span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="" class="reload px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                    Reload
+                </a>
+                <a class="dismiss px-3 py-1 bg-transparent border border-red-500 text-red-500 rounded hover:bg-red-500/10 transition-colors cursor-pointer">
+                    Dismiss
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-loading" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
+            <div class="text-omail-600 font-medium mt-4">Loading Omail...</div>
+        </div>
     </div>
 
     <script src="_framework/blazor.server.js"></script>
-    <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
-    <script src="js/app.js"></script>
+    
+    <!-- Add Heroicons as a fallback for icons -->
+    <script src="https://unpkg.com/@@heroicons/store@0.1.5/dist/icon-store.js"></script>
+    
+    <!-- Add error handling for lord-icon elements -->
+    <script>
+        // Simple script without interop
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading spinner when Blazor is fully loaded
+            Blazor.addEventListener('afterStarted', function() {
+                const loadingEl = document.getElementById('app-loading');
+                if (loadingEl) {
+                    loadingEl.style.display = 'none';
+                }
+                
+                // Replace lord-icon elements with SVG fallbacks if they fail to load
+                setTimeout(replaceLordIconsWithFallbacks, 2000);
+            });
+            
+            // Make the dismiss button work for blazor error UI
+            const dismissButton = document.querySelector('#blazor-error-ui .dismiss');
+            if (dismissButton) {
+                dismissButton.addEventListener('click', function() {
+                    document.getElementById('blazor-error-ui').style.display = 'none';
+                });
+            }
+        });
+        
+        function replaceLordIconsWithFallbacks() {
+            const lordIcons = document.querySelectorAll('lord-icon');
+            
+            lordIcons.forEach(icon => {
+                // Check if lord-icon is properly initialized
+                if (!icon.shadowRoot || icon.classList.contains('icon-error')) {
+                    const iconType = getIconTypeFromSrc(icon.getAttribute('src'));
+                    const iconColor = icon.getAttribute('colors')?.includes('primary:#') ? 
+                        icon.getAttribute('colors').split('primary:')[1].split(',')[0] : 'currentColor';
+                    
+                    // Create fallback SVG icon
+                    const fallbackIcon = createFallbackSVG(iconType, iconColor, icon.className);
+                    
+                    // Replace the lord-icon with the fallback
+                    icon.parentNode.replaceChild(fallbackIcon, icon);
+                }
+            });
+        }
+        
+        function getIconTypeFromSrc(src) {
+            // Extract the icon name from the src URL
+            if (!src) return 'mail';
+            
+            const parts = src.split('/');
+            const fileName = parts[parts.length - 1].replace('.json', '');
+            
+            // Map common lord-icon names to Heroicon equivalents
+            const iconMap = {
+                'tkaubbni': 'inbox',
+                'wloilxuq': 'pencil-square',
+                'iltqorsz': 'paper-airplane',
+                'puvaffet': 'document',
+                'gsqxdxog': 'trash',
+                'hwuyodym': 'cog',
+                'fihkmkwt': 'briefcase',
+                'msoeawqm': 'search',
+                'nxooksci': 'refresh',
+                'jxwksgwv': 'chevron-right',
+                'iifryyua': 'chevron-left',
+                'hjeefwhm': 'check-circle',
+                'yeallgsa': 'credit-card',
+                'eszyyflr': 'user-circle'
+            };
+            
+            return iconMap[fileName] || 'document-text';
+        }
+        
+        function createFallbackSVG(iconType, color, className) {
+            // Create a span element to hold the icon
+            const span = document.createElement('span');
+            span.className = className || 'w-5 h-5';
+            span.style.display = 'inline-flex';
+            
+            // Use Heroicons if available
+            if (window.iconStore && window.iconStore.outline && window.iconStore.outline[iconType]) {
+                const svgString = window.iconStore.outline[iconType];
+                span.innerHTML = svgString.replace(/stroke="currentColor"/g, `stroke="${color}"`);
+            } else {
+                // Fallback to a simple SVG if Heroicons isn't available
+                span.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="${color}" class="w-full h-full">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>`;
+            }
+            
+            return span;
+        }
+    </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 @inject Omail.Services.ThemeService ThemeService
 @inject NavigationManager Navigation
 @using Omail.Components
+@implements IDisposable
 
 <div class="min-h-screen bg-omail-50 dark:bg-gradient-to-br dark:from-omail-900 dark:to-omail-800 flex flex-col transition-colors duration-500">
     <!-- Header -->
@@ -22,6 +23,43 @@
                 
                 <!-- Desktop Navigation -->
                 <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="relative px-3 py-2 group">
+                                <button class="flex items-center focus:outline-none" id="user-menu-button">
+                                    <span class="sr-only">Open user menu</span>
+                                    <div class="avatar flex-shrink-0">@context.User.Identity?.Name?.Substring(0, 2)</div>
+                                    <div class="ml-3 hidden md:block text-left">
+                                        <div class="text-sm font-medium text-omail-800 dark:text-white">@context.User.Identity?.Name</div>
+                                        <div class="text-xs text-omail-500 dark:text-omail-400">@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+                                    </div>
+                                    <svg class="ml-2 h-5 w-5 text-omail-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <!-- Dropdown menu -->
+                                <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-omail-800 ring-1 ring-black ring-opacity-5 divide-y divide-omail-100 dark:divide-omail-700 hidden group-hover:block" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                    <div class="py-1" role="none">
+                                        <a href="settings" class="group flex items-center px-4 py-2 text-sm text-omail-700 dark:text-omail-200 hover:bg-omail-100 dark:hover:bg-omail-700/50" role="menuitem" tabindex="-1">
+                                            <svg class="mr-3 h-5 w-5 text-omail-500 group-hover:text-omail-600 dark:text-omail-400 dark:group-hover:text-omail-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                            </svg>
+                                            Settings
+                                        </a>
+                                    </div>
+                                    <div class="py-1" role="none">
+                                        <a href="logout" class="group flex items-center px-4 py-2 text-sm text-omail-700 dark:text-omail-200 hover:bg-omail-100 dark:hover:bg-omail-700/50" role="menuitem" tabindex="-1">
+                                            <svg class="mr-3 h-5 w-5 text-omail-500 group-hover:text-omail-600 dark:text-omail-400 dark:group-hover:text-omail-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 2a1 1 0 10-2 0v6.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a.997.997 0 001.414 0l3-3a1 1 0 00-1.414-1.414L14 11.586V5z" clip-rule="evenodd" />
+                                            </svg>
+                                            Sign Out
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
+                    
                     <div class="relative px-3 py-2">
                         <ThemeToggle></ThemeToggle>
                     </div>
@@ -50,12 +88,26 @@
         </div>
         
         <!-- Mobile menu -->
-        <div class="sm:hidden @(isMobileMenuOpen ? "block" : "hidden") bg-white dark:bg-omail-800 shadow-lg dark:shadow-omail-600/20 transition-colors duration-500">
-            <div class="px-2 pt-2 pb-3 space-y-1">
+        <div class="sm:hidden @(isMobileMenuOpen ? "block animate-fade-in" : "hidden") bg-white dark:bg-omail-800 shadow-lg dark:shadow-omail-600/20 transition-all duration-500">
+            <div class="px-2 pt-2 pb-3 space-y-1 custom-scrollbar max-h-[70vh] overflow-y-auto">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="flex items-center px-4 py-2 mb-2 border-b border-omail-100 dark:border-omail-700">
+                            <div class="avatar">
+                                @context.User.Identity?.Name?.Substring(0, 2)
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-omail-800 dark:text-white">@context.User.Identity?.Name</div>
+                                <div class="text-xs text-omail-500 dark:text-omail-400">@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+                
                 <!-- Email mobile links -->
                 <NavLink href="inbox" Match="NavLinkMatch.All" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
                     <span class="flex items-center">
                         <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
                                   trigger="hover"
@@ -66,8 +118,8 @@
                     </span>
                 </NavLink>
                 <NavLink href="compose" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
                     <span class="flex items-center">
                         <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
                                   trigger="hover"
@@ -78,8 +130,8 @@
                     </span>
                 </NavLink>
                 <NavLink href="sent" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
                     <span class="flex items-center">
                         <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
                                   trigger="hover"
@@ -89,55 +141,89 @@
                         Sent
                     </span>
                 </NavLink>
+                <NavLink href="drafts" 
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
+                    <span class="flex items-center">
+                        <lord-icon src="https://cdn.lordicon.com/puvaffet.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Drafts
+                    </span>
+                </NavLink>
+                <NavLink href="trash" 
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
+                    <span class="flex items-center">
+                        <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Trash
+                    </span>
+                </NavLink>
                 
-                <!-- Existing mobile links -->
-                <NavLink href="" Match="NavLinkMatch.All" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                <!-- Site navigation -->
+                <div class="py-1 my-2 border-t border-omail-100 dark:border-omail-700"></div>
+                
+                <NavLink href="settings" 
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
                     <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        Home
+                        <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Settings
                     </span>
                 </NavLink>
-                <NavLink href="counter" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
+                <NavLink href="portfolio" 
+                    class="nav-link"
+                    ActiveClass="nav-link-active">
                     <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Counter
+                        <lord-icon src="https://cdn.lordicon.com/fihkmkwt.json"
+                                  trigger="hover"
+                                  colors="primary:#121331,secondary:#818cf8"
+                                  class="w-5 h-5 mr-2">
+                        </lord-icon>
+                        Portfolio
                     </span>
                 </NavLink>
-                <NavLink href="weather" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                        </svg>
-                        Weather
-                    </span>
-                </NavLink>
-                <NavLink href="tailwind-demo" 
-                    class="block px-3 py-2 rounded-md text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-600/20 transition-all duration-300"
-                    ActiveClass="bg-omail-100/50 dark:bg-omail-600/40 text-omail-600 dark:text-white font-medium border-l-4 border-omail-600 dark:border-omail-100">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.171 2.171a2 2 0 010 2.828l-8.486 8.486a2 2 0 01-2.828 0l-2.171-2.171a2 2 0 010-2.828L7.343 11"></path>
-                        </svg>
-                        Tailwind Demo
-                    </span>
-                </NavLink>
+                
+                <!-- Auth links -->
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink href="logout" class="nav-link text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Sign Out
+                            </span>
+                        </NavLink>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink href="login" class="nav-link">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                </svg>
+                                Login
+                            </span>
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </div>
     </header>
 
     <div class="flex-1 flex">
         <!-- Sidebar Navigation -->
-        <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 transition-all">
+        <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 transition-all duration-300">
             <NavMenu />
         </nav>
 
@@ -179,5 +265,10 @@
     private void ToggleMobileMenu()
     {
         isMobileMenuOpen = !isMobileMenuOpen;
+    }
+
+    public void Dispose()
+    {
+        // Cleanup resources if needed
     }
 }

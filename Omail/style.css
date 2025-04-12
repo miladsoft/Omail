@@ -14,7 +14,7 @@
     }
     
     body {
-        @apply bg-omail-50 dark:bg-omail-dark text-omail-dark dark:text-omail-light transition-colors duration-300;
+        @apply bg-omail-50 dark:bg-omail-dark text-omail-800 dark:text-omail-50 transition-colors duration-300;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
     
@@ -25,33 +25,83 @@
 
 @layer components {
     .btn-primary {
-        @apply bg-omail-primary hover:bg-omail-primary/80 text-white py-2 px-4 rounded shadow transition-colors duration-300;
+        @apply inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 shadow transition-colors;
     }
     
+    .btn-secondary {
+        @apply inline-flex items-center justify-center px-5 py-2 border border-omail-300 dark:border-omail-700 text-base font-medium rounded-md text-omail-700 dark:text-omail-200 bg-white dark:bg-omail-800 hover:bg-omail-50 dark:hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 shadow-sm transition-colors;
+    }
+
     .card {
-        @apply bg-white dark:bg-omail-dark/30 rounded-lg p-6 shadow-md transition-colors duration-300;
+        @apply bg-white dark:bg-omail-800/50 rounded-xl shadow overflow-hidden transition-colors;
     }
-    
-    .navbar {
-        @apply bg-white dark:bg-omail-dark border-b border-omail-200 dark:border-omail-primary/20 transition-colors duration-300;
+
+    .form-input {
+        @apply w-full px-3 py-2 border border-omail-300 dark:border-omail-700 rounded-md shadow-sm focus:outline-none focus:ring-omail-500 focus:border-omail-500 dark:bg-omail-900/60 dark:text-white;
     }
-    
-    .input {
-        @apply w-full px-3 py-2 border border-omail-300 dark:border-omail-700 rounded-md shadow-sm 
-               focus:outline-none focus:ring-2 focus:ring-omail-primary focus:border-omail-primary
-               bg-white dark:bg-omail-900 text-omail-900 dark:text-omail-100 transition-colors duration-300;
+
+    .form-label {
+        @apply block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1;
     }
-    
+
+    .nav-link {
+        @apply flex items-center px-3 py-2 text-omail-700 dark:text-omail-100 hover:bg-omail-100/50 dark:hover:bg-omail-700/30 rounded-md transition-colors;
+    }
+
+    .nav-link-active {
+        @apply bg-omail-100/50 dark:bg-omail-700/40 text-omail-800 dark:text-white font-medium border-l-4 border-omail-600;
+    }
+
+    .avatar {
+        @apply h-10 w-10 rounded-full bg-omail-200 dark:bg-omail-700 flex items-center justify-center text-omail-700 dark:text-omail-200 font-medium;
+    }
+
     .badge {
         @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
     }
-    
+
     .badge-primary {
-        @apply bg-omail-primary/20 text-omail-primary dark:bg-omail-primary/30 dark:text-omail-light;
+        @apply bg-omail-100 dark:bg-omail-700 text-omail-800 dark:text-omail-100;
     }
-    
-    .badge-gray {
-        @apply bg-omail-200 text-omail-800 dark:bg-omail-700 dark:text-omail-200;
+
+    .badge-success {
+        @apply bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300;
+    }
+
+    .badge-danger {
+        @apply bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300;
+    }
+
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-omail-100 dark:bg-omail-800 rounded;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-omail-300 dark:bg-omail-700 rounded hover:bg-omail-400 dark:hover:bg-omail-600 transition-colors;
+    }
+
+    /* Animations */
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 }
 

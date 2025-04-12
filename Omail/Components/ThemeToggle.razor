@@ -16,8 +16,8 @@
 </button>
 
 @code {
-    private async Task ToggleTheme()
+    private void ToggleTheme()
     {
-        await ThemeService.ToggleThemeAsync();
+        ThemeService.ToggleTheme();
     }
 }

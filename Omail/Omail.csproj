@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
@@ -38,7 +39,7 @@
     <Message Condition="'$(NodeJSInstalled)'=='0'" Importance="high" Text="Installing npm dependencies..." />
     <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Message Condition="'$(NodeJSInstalled)'=='0'" Importance="high" Text="Running npm build..." />
-    <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Condition="'$(NodeJSInstalled)'=='0'" Command="npm run build:css" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Warning Condition="'$(NodeJSInstalled)'!='0'" Text="Node.js is not installed, skipping npm commands." />
   </Target>
 

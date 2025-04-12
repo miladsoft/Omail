@@ -1,11 +1,11 @@
 {
-  "name": "Omail",
+  "name": "Omail UI",
   "short_name": "Omail",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#086c81",
+  "background_color": "#6555db",
+  "theme_color": "#6555db",
   "prefer_related_applications": false,
   "icons": [
     {

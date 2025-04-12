@@ -1,14 +1,21 @@
 {
-  "name": "omail-client",
-  "private": true,
+  "name": "omail",
   "version": "1.0.0",
+  "description": "Omail UI - A modern email UI built with Blazor and Tailwind CSS",
   "scripts": {
-    "build": "tailwindcss -i style.css -o wwwroot/css/style.min.css --minify",
-    "dev": "tailwindcss -i style.css -o wwwroot/css/style.min.css --watch"
+    "build:css": "tailwindcss -i ./style.css -o ./wwwroot/css/style.min.css --minify",
+    "watch:css": "tailwindcss -i ./style.css -o ./wwwroot/css/style.min.css --watch",
+    "dev": "npm run watch:css"
   },
   "keywords": [],
   "devDependencies": {
-    "tailwindcss": "^3.3.3"
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.9",
+    "autoprefixer": "^10.4.14",
+    "cssnano": "^6.0.1",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2"
   },
   "dependencies": {}
 }

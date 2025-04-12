@@ -2,18 +2,14 @@
 @inject AuthService AuthService
 @inject ApprovalService ApprovalService
 @implements IDisposable
+@using Omail.Components
 
 <!-- Email folders sidebar -->
 <div class="col-span-12 md:col-span-3 space-y-2">
     <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
         <div class="p-4">
             <NavLink href="inbox" class="@GetLinkClass("inbox")">
-                <lord-icon
-                    src="https://cdn.lordicon.com/tkaubbni.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5 mr-3">
-                </lord-icon>
+                <IconFallback IconType="inbox" CssClass="w-5 h-5 mr-3" />
                 <span>Inbox</span>
                 @if (inboxCount > 0)
                 {
@@ -21,21 +17,11 @@
                 }
             </NavLink>
             <NavLink href="sent" class="@GetLinkClass("sent")">
-                <lord-icon
-                    src="https://cdn.lordicon.com/iltqorsz.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5 mr-3">
-                </lord-icon>
+                <IconFallback IconType="sent" CssClass="w-5 h-5 mr-3" />
                 <span>Sent</span>
             </NavLink>
             <NavLink href="drafts" class="@GetLinkClass("drafts")">
-                <lord-icon
-                    src="https://cdn.lordicon.com/puvaffet.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5 mr-3">
-                </lord-icon>
+                <IconFallback IconType="drafts" CssClass="w-5 h-5 mr-3" />
                 <span>Drafts</span>
                 @if (draftsCount > 0)
                 {
@@ -45,23 +31,15 @@
             @if (isManager && pendingApprovalsCount > 0)
             {
                 <NavLink href="approvals" class="@GetLinkClass("approvals")">
-                    <lord-icon
-                        src="https://cdn.lordicon.com/hjeefwhm.json"
-                        trigger="hover"
-                        colors="primary:#121331,secondary:#818cf8"
-                        class="w-5 h-5 mr-3">
-                    </lord-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     <span>Approvals</span>
                     <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">@pendingApprovalsCount</span>
                 </NavLink>
             }
             <NavLink href="trash" class="@GetLinkClass("trash")">
-                <lord-icon
-                    src="https://cdn.lordicon.com/gsqxdxog.json"
-                    trigger="hover"
-                    colors="primary:#121331,secondary:#818cf8"
-                    class="w-5 h-5 mr-3">
-                </lord-icon>
+                <IconFallback IconType="trash" CssClass="w-5 h-5 mr-3" />
                 <span>Trash</span>
             </NavLink>
         </div>

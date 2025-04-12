@@ -1,57 +1,74 @@
-﻿@using Omail.Layout
+﻿@using Omail.Authentication
+@using Omail.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
 @using Omail.Services
+
+@inject NavigationManager NavigationManager
 @inject ThemeService ThemeService
-@implements IAsyncDisposable
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated != true)
+                    {
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        <div class="container mx-auto p-4">
+                            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 text-center">
+                                <div class="text-red-500 mb-4">
+                                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-xl font-bold text-omail-800 dark:text-white mb-2">Access Denied</h2>
+                                <p class="text-omail-600 dark:text-omail-300">You do not have permission to access this resource.</p>
+                            </div>
+                        </div>
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="container mx-auto p-4">
+                        <div class="flex justify-center items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-omail-600"></div>
+                            <span class="ml-3 text-omail-600 dark:text-omail-300">Authorizing...</span>
+                        </div>
+                    </div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found - Omail</PageTitle>
+            <LayoutView Layout="@typeof(Layout.MainLayout)">
+                <div class="container mx-auto p-4 text-center">
+                    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 max-w-lg mx-auto">
+                        <svg class="w-24 h-24 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <h1 class="text-2xl font-bold text-omail-800 dark:text-white mt-4 mb-2">Page Not Found</h1>
+                        <p class="text-omail-600 dark:text-omail-300 mb-6">The page you are looking for does not exist or has been moved.</p>
+                        <a href="/" class="inline-block px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700 transition-colors">Go to Home</a>
+                    </div>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
 
 <ThemeProvider>
-    <CascadingAuthenticationState>
-        <Router AppAssembly="@typeof(App).Assembly">
-            <Found Context="routeData">
-                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Omail.Shared.MainLayout)">
-                    <NotAuthorized>
-                        @if (context.User.Identity?.IsAuthenticated != true)
-                        {
-                            <RedirectToLogin />
-                        }
-                        else
-                        {
-                            <p class="p-4 text-center">
-                                You are not authorized to access this resource.
-                            </p>
-                        }
-                    </NotAuthorized>
-                    <Authorizing>
-                        <div class="flex justify-center items-center h-screen">
-                            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-omail-600"></div>
-                        </div>
-                    </Authorizing>
-                </AuthorizeRouteView>
-                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-            </Found>
-            <NotFound>
-                <PageTitle>Not found</PageTitle>
-                <LayoutView Layout="@typeof(Omail.Shared.MainLayout)">
-                    <div class="py-12 flex flex-col items-center justify-center text-center">
-                        <h1 class="text-2xl font-bold text-omail-700 dark:text-omail-200">404 - Page Not Found</h1>
-                        <p class="mt-4 text-omail-600 dark:text-omail-400">The page you're looking for doesn't exist.</p>
-                        <a href="/" class="mt-4 bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg">
-                            Return Home
-                        </a>
-                    </div>
-                </LayoutView>
-            </NotFound>
-        </Router>
-    </CascadingAuthenticationState>
+    <ThemeSwitch />
 </ThemeProvider>
 
 @code {
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await ThemeService.InitializeAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        // Optional cleanup if needed
+        // Initialize theme without JavaScript
+        ThemeService.InitializeTheme();
+        base.OnInitialized();
     }
 }

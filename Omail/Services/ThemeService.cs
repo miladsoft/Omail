@@ -1,46 +1,48 @@
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-
 namespace Omail.Services
 {
     public class ThemeService
     {
-        private bool _isDarkMode;
-        private readonly ProtectedLocalStorage _localStorage;
-        
-        public bool IsDarkMode => _isDarkMode;
-        
+        private bool _isDarkMode = false;
+
         public event Action OnThemeChange;
-        
-        public ThemeService(ProtectedLocalStorage localStorage)
+
+        public bool IsDarkMode => _isDarkMode;
+
+        public ThemeService()
         {
-            _localStorage = localStorage;
+            // Default to light mode - no JavaScript needed
         }
-        
-        public async Task InitializeAsync()
+
+        // This method doesn't use JavaScript and can be called anytime
+        public void InitializeTheme()
         {
-            try
-            {
-                var result = await _localStorage.GetAsync<bool>("darkMode");
-                _isDarkMode = result.Success ? result.Value : false;
-                
-                // No JavaScript interop here
-            }
-            catch
-            {
-                _isDarkMode = false;
-            }
+            // Set a default theme (light mode)
+            _isDarkMode = false;
         }
-        
-        public async Task ToggleThemeAsync()
+
+        public void ToggleTheme()
         {
             _isDarkMode = !_isDarkMode;
-            await _localStorage.SetAsync("darkMode", _isDarkMode);
-            
-            // No JavaScript interop here
+            NotifyThemeChanged();
+        }
+
+        public void SetTheme(bool darkMode)
+        {
+            if (_isDarkMode != darkMode)
+            {
+                _isDarkMode = darkMode;
+                NotifyThemeChanged();
+            }
+        }
+
+        public string GetThemeClass()
+        {
+            return _isDarkMode ? "dark" : "";
+        }
+
+        private void NotifyThemeChanged()
+        {
             OnThemeChange?.Invoke();
         }
-        
-        // Expose CSS class for theme
-        public string GetThemeClass() => _isDarkMode ? "dark" : "";
     }
 }
