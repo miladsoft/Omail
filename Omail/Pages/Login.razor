@@ -39,12 +39,19 @@
             <div class="rounded-md -space-y-px">
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email address</label>
-                    <InputText id="email" @bind-Value="loginModel.Email" class="appearance-none relative block w-full px-3 py-2 border border-omail-300 dark:border-omail-700 placeholder-omail-500 text-omail-900 dark:text-white dark:bg-omail-900/60 rounded focus:outline-none focus:ring-omail-500 focus:border-omail-500 focus:z-10 sm:text-sm" placeholder="Email address" />
+                    <InputText id="email" 
+                               @bind-Value="loginModel.Email" 
+                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-900/60 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                               placeholder="Email address" />
                     <ValidationMessage For="@(() => loginModel.Email)" class="text-red-500 text-xs mt-1" />
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Password</label>
-                    <InputText id="password" type="password" @bind-Value="loginModel.Password" class="appearance-none relative block w-full px-3 py-2 border border-omail-300 dark:border-omail-700 placeholder-omail-500 text-omail-900 dark:text-white dark:bg-omail-900/60 rounded focus:outline-none focus:ring-omail-500 focus:border-omail-500 focus:z-10 sm:text-sm" placeholder="Password" />
+                    <InputText id="password" 
+                               type="password" 
+                               @bind-Value="loginModel.Password" 
+                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-900/60 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                               placeholder="Password" />
                     <ValidationMessage For="@(() => loginModel.Password)" class="text-red-500 text-xs mt-1" />
                 </div>
             </div>

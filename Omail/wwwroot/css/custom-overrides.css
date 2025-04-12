@@ -1,0 +1,11 @@
+/* Global focus outline removal */
+*:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    outline-offset: 0 !important;
+}
+
+/* Additional accessibility support - optional hover styles */
+input:hover, button:hover, a:hover, select:hover, textarea:hover {
+    opacity: 0.9;
+}

@@ -5,7 +5,7 @@ namespace Omail.Data.Models
 {
     public class Employee
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  // Make sure this matches what's referenced in EmailMessage
         
         [Required]
         [MaxLength(100)]

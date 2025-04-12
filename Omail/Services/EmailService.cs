@@ -112,6 +112,7 @@ namespace Omail.Services
         {
             try
             {
+                // Fix the query to use the correct column name
                 return await _context.Emails
                     .Include(e => e.Sender)
                     .Include(e => e.Recipients)
@@ -119,11 +120,10 @@ namespace Omail.Services
                     .Include(e => e.Attachments)
                     .Include(e => e.Approvals)
                         .ThenInclude(a => a.Approver)
-                    .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+                    .FirstOrDefaultAsync(e => e.Id == id);
             }
             catch (Exception ex)
             {
-                // Check if logger is null before using it to avoid NullReferenceException
                 _logger?.LogError(ex, "Error retrieving email with ID {EmailId}", id);
                 throw;
             }

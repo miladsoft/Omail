@@ -48,42 +48,96 @@
             <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md">
                 <div class="p-6">
                     <EditForm Model="userModel" OnValidSubmit="HandleValidSubmit" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="department" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Department</label>
-                                <select id="department" @bind="selectedDepartmentId" @bind:event="onchange" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
-                                    <option value="0">-- Select Department --</option>
-                                    @foreach (var department in departments)
-                                    {
-                                        <option value="@department.Id">@department.Name</option>
-                                    }
-                                </select>
-                                @if (selectedDepartmentId == 0)
-                                {
-                                    <div class="text-red-500 text-xs mt-1">Department is required</div>
-                                }
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">First Name</label>
+                                    <InputText @bind-Value="userModel.FirstName" 
+                                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                               placeholder="First Name" />
+                                    <ValidationMessage For="@(() => userModel.FirstName)" class="text-red-500 text-xs mt-1" />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Last Name</label>
+                                    <InputText @bind-Value="userModel.LastName" 
+                                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                               placeholder="Last Name" />
+                                    <ValidationMessage For="@(() => userModel.LastName)" class="text-red-500 text-xs mt-1" />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email</label>
+                                    <InputText @bind-Value="userModel.Email" 
+                                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                               placeholder="Email Address" />
+                                    <ValidationMessage For="@(() => userModel.Email)" class="text-red-500 text-xs mt-1" />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Position</label>
+                                    <InputText @bind-Value="userModel.Position" 
+                                               class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                               placeholder="Job Position" />
+                                </div>
                             </div>
                             
-                            <!-- Section -->
-                            <div>
-                                <label for="section" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Section</label>
-                                <select id="section" @bind="userModel.SectionId" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" disabled="@(selectedDepartmentId == 0)">
-                                    <option value="0">-- Select Section --</option>
-                                    @foreach (var section1 in sections.Where(s => s.DepartmentId == selectedDepartmentId))
-                                    {
-                                        <option value="@section1.Id">@section1.Name</option>
-                                    }
-                                </select>
-                                @if (userModel.SectionId == 0)
-                                {
-                                    <div class="text-red-500 text-xs mt-1">Section is required</div>
-                                }
-                            </div>
+                            @if (IsNewUser || changePassword)
+                            {
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Password</label>
+                                        <InputText type="password" @bind-Value="userModel.Password" 
+                                                   class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                                   placeholder="Password" />
+                                        <ValidationMessage For="@(() => userModel.Password)" class="text-red-500 text-xs mt-1" />
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Confirm Password</label>
+                                        <InputText type="password" @bind-Value="userModel.ConfirmPassword" 
+                                                   class="w-full px-3 py-2 rounded-lg border border-omail-300 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                                   placeholder="Confirm Password" />
+                                        <ValidationMessage For="@(() => userModel.ConfirmPassword)" class="text-red-500 text-xs mt-1" />
+                                    </div>
+                                </div>
+                            }
                             
-                            <!-- Hire Date -->
-                            <div>
-                                <label for="hireDate" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Hire Date</label>
-                                <InputDate id="hireDate" @bind-Value="userModel.HireDate" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="department" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Department</label>
+                                    <select id="department" @bind="selectedDepartmentId" @bind:event="onchange" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300">
+                                        <option value="0">-- Select Department --</option>
+                                        @foreach (var department in departments)
+                                        {
+                                            <option value="@department.Id">@department.Name</option>
+                                        }
+                                    </select>
+                                    @if (selectedDepartmentId == 0)
+                                    {
+                                        <div class="text-red-500 text-xs mt-1">Department is required</div>
+                                    }
+                                </div>
+                                
+                                <div>
+                                    <label for="section" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Section</label>
+                                    <select id="section" @bind="userModel.SectionId" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" disabled="@(selectedDepartmentId == 0)">
+                                        <option value="0">-- Select Section --</option>
+                                        @foreach (var section1 in sections.Where(s => s.DepartmentId == selectedDepartmentId))
+                                        {
+                                            <option value="@section1.Id">@section1.Name</option>
+                                        }
+                                    </select>
+                                    @if (userModel.SectionId == 0)
+                                    {
+                                        <div class="text-red-500 text-xs mt-1">Section is required</div>
+                                    }
+                                </div>
+                                
+                                <div>
+                                    <label for="hireDate" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Hire Date</label>
+                                    <InputDate id="hireDate" @bind-Value="userModel.HireDate" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-2 focus:ring-omail-500 dark:focus:ring-omail-400 transition-all duration-300" />
+                                </div>
                             </div>
                         </div>
                     </EditForm>

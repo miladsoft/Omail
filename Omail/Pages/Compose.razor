@@ -157,13 +157,18 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Subject:</label>
-                    <InputText @bind-Value="emailModel.Subject" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-omail-500 focus:border-omail-500" placeholder="Enter subject" />
+                    <InputText @bind-Value="emailModel.Subject" 
+                               class="w-full px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                               placeholder="Enter subject" />
                     <ValidationMessage For="@(() => emailModel.Subject)" class="text-red-500 text-xs mt-1" />
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Message:</label>
-                    <InputTextArea @bind-Value="emailModel.Body" class="w-full rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white focus:ring-omail-500 focus:border-omail-500" rows="10" placeholder="Write your message here..." />
+                    <InputTextArea @bind-Value="emailModel.Body" 
+                                   class="w-full px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/30 text-omail-800 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500" 
+                                   rows="10" 
+                                   placeholder="Write your message here..." />
                     <ValidationMessage For="@(() => emailModel.Body)" class="text-red-500 text-xs mt-1" />
                 </div>
                 
