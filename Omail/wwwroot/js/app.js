@@ -8,9 +8,12 @@ window.appFunctions = {
         if (input) {
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
             input.setAttribute('type', type);
+            // Optionally toggle icon if needed
+            // const icon = input.nextElementSibling?.querySelector('svg'); // Adjust selector if needed
+            // if (icon) { ... toggle icon appearance ... }
         }
     },
-    
+
     // Save text to a file and download it
     saveAsFile: function(filename, content) {
         const blob = new Blob([content], { type: 'text/plain' });
@@ -20,8 +23,9 @@ window.appFunctions = {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href); // Clean up blob URL
     },
-    
+
     // Set theme preference
     setThemePreference: function(isDark) {
         if (isDark) {
@@ -29,41 +33,94 @@ window.appFunctions = {
         } else {
             document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        // Store preference only if it's not set to follow system
+        // The ThemeService in Blazor should decide whether to store 'light', 'dark', or remove the item for 'system'
+        // localStorage.setItem('theme', isDark ? 'dark' : 'light'); // Let Blazor service handle storage logic
     },
-    
+
     // Check browser-level preference for dark mode
     prefersDarkMode: function() {
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+
+    // Apply Accent Color using CSS Variables
+    applyAccentColor: function(colorName) {
+        const root = document.documentElement;
+        // Map color names to HSL values or specific hex codes
+        // Example using Tailwind's default palette structure (adjust as needed)
+        // This requires defining these CSS variables in your main CSS file.
+        let color500 = '';
+        let color600 = '';
+        let color400 = ''; // For rings/focus in dark mode
+
+        // Define your color mappings here. Ensure these match your Tailwind config or CSS.
+        const colorMap = {
+            omail: { 500: '63, 98, 184', 600: '49, 46, 129', 400: '99, 102, 241' }, // Example: Indigo
+            blue: { 500: '59, 130, 246', 600: '37, 99, 235', 400: '96, 165, 250' },
+            indigo: { 500: '99, 102, 241', 600: '79, 70, 229', 400: '129, 140, 248' },
+            purple: { 500: '139, 92, 246', 600: '124, 58, 237', 400: '167, 139, 250' },
+            pink: { 500: '236, 72, 153', 600: '219, 39, 119', 400: '244, 114, 182' },
+            red: { 500: '239, 68, 68', 600: '220, 38, 38', 400: '248, 113, 113' },
+            orange: { 500: '249, 115, 22', 600: '234, 88, 12', 400: '251, 146, 60' },
+            amber: { 500: '245, 158, 11', 600: '217, 119, 6', 400: '252, 182, 3' },
+            yellow: { 500: '234, 179, 8', 600: '202, 138, 4', 400: '250, 204, 21' },
+            green: { 500: '34, 197, 94', 600: '22, 163, 74', 400: '74, 222, 128' },
+        };
+
+        const selectedColor = colorMap[colorName] || colorMap['omail']; // Fallback to default
+
+        root.style.setProperty('--color-accent-500-hsl', selectedColor[500]);
+        root.style.setProperty('--color-accent-600-hsl', selectedColor[600]);
+        root.style.setProperty('--color-accent-400-hsl', selectedColor[400]);
+
+        console.log(`Applied accent color: ${colorName}`);
+    },
+
+    // Placeholder for applying other layout settings
+    applyLayoutSettings: function(density, fontFamily, fontSize, sidebarPosition) {
+        console.log("Applying layout settings:", { density, fontFamily, fontSize, sidebarPosition });
+        // Add/remove classes on body or html element based on settings
+        // Example: document.body.classList.add(`density-${density}`);
+        // Example: document.documentElement.style.setProperty('--font-family-base', fontFamily);
     }
 };
 
 // Initialize theme on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Check for stored theme preference or use system default
+function initializeTheme() {
     const storedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (storedTheme === 'dark' || (storedTheme === null && systemPrefersDark)) {
         document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
     }
-    
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (localStorage.getItem('theme') === null) {
-            if (e.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+}
+
+// Run theme initialization
+initializeTheme();
+
+// Listen for system theme changes and update if theme is set to 'system' (null in localStorage)
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (localStorage.getItem('theme') === null) { // Only react if following system preference
+        if (e.matches) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    });
+    }
 });
 
-// Helper function to toggle password visibility
-function togglePasswordVisibility(elementId) {
-    window.appFunctions.togglePasswordVisibility(elementId);
-}
+// Initialize accent color on load
+document.addEventListener('DOMContentLoaded', () => {
+    const storedAccentColor = localStorage.getItem('accentColor');
+    if (storedAccentColor) {
+        window.appFunctions.applyAccentColor(storedAccentColor);
+    } else {
+         window.appFunctions.applyAccentColor('omail'); // Apply default
+    }
+    // Initialize other appearance settings if needed
+});
 
 // Store commonly used icons to avoid network requests for lord-icon
 window.iconStore = {

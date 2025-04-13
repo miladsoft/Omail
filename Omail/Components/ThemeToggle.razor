@@ -1,46 +1,49 @@
-@inject IJSRuntime JSRuntime
 @inject ThemeService ThemeService
+@implements IDisposable
 
-<div class="tooltip-container">
-    <button @onclick="ToggleTheme" class="relative p-1.5 rounded-lg text-omail-600 dark:text-omail-400 hover:bg-omail-100 dark:hover:bg-omail-800/80 transition-colors" aria-label="Toggle Dark Mode">
-        <div class="@(isDarkMode ? "opacity-0 rotate-90" : "opacity-100 rotate-0") transition-all absolute inset-0 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-        </div>
-        <div class="@(!isDarkMode ? "opacity-0 -rotate-90" : "opacity-100 rotate-0") transition-all absolute inset-0 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-        </div>
-    </button>
-    <div class="tooltip -bottom-8 left-1/2 transform -translate-x-1/2">
-        Switch to @(isDarkMode ? "light" : "dark") mode
-    </div>
-</div>
+<button @onclick="ToggleTheme"
+        class="p-2 rounded-full text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700 focus:outline-none transition-colors duration-200"
+        aria-label="Toggle theme">
+    @if (isDarkMode)
+    {
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+    }
+    else
+    {
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+    }
+</button>
 
 @code {
-    private bool isDarkMode = false;
+    private bool isDarkMode;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         isDarkMode = ThemeService.IsDarkMode;
-        ThemeService.OnThemeChange += OnThemeChange;
-    }
-
-    private void OnThemeChange(object sender, ThemeChangedEventArgs e)
-    {
-        isDarkMode = e.IsDarkMode;
-        StateHasChanged();
+        ThemeService.OnThemeChange += HandleThemeChange;
     }
 
     private async Task ToggleTheme()
     {
-        await ThemeService.ToggleDarkMode();
+        // Ensure we are not following the system theme when toggling manually
+        await ThemeService.SetSystemTheme(false);
+        // Toggle the dark mode state
+        await ThemeService.SetDarkMode(!isDarkMode);
+        // The HandleThemeChange event will update the local isDarkMode state and trigger UI refresh.
+    }
+
+    private void HandleThemeChange(object sender, ThemeChangedEventArgs e)
+    {
+        isDarkMode = e.IsDarkMode;
+        InvokeAsync(StateHasChanged); // Ensure UI updates on the correct thread
     }
 
     public void Dispose()
     {
-        ThemeService.OnThemeChange -= OnThemeChange;
+        ThemeService.OnThemeChange -= HandleThemeChange;
     }
 }
