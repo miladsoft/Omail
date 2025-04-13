@@ -1,7 +1,47 @@
 @inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
 
-<div id="theme-switcher" class="hidden"></div>
+<div class="tooltip-container">
+    <button @onclick="ToggleTheme" class="relative p-1.5 rounded-lg text-omail-600 dark:text-omail-400 hover:bg-omail-100 dark:hover:bg-omail-800/80 transition-colors" aria-label="Toggle Dark Mode">
+        <div class="@(isDarkMode ? "opacity-0 rotate-90" : "opacity-100 rotate-0") transition-all absolute inset-0 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        </div>
+        <div class="@(!isDarkMode ? "opacity-0 -rotate-90" : "opacity-100 rotate-0") transition-all absolute inset-0 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </div>
+    </button>
+    <div class="tooltip -bottom-8 left-1/2 transform -translate-x-1/2">
+        Switch to @(isDarkMode ? "light" : "dark") mode
+    </div>
+</div>
 
 @code {
-    // No JavaScript interop needed
+    private bool isDarkMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isDarkMode = ThemeService.IsDarkMode;
+        ThemeService.OnThemeChange += OnThemeChange;
+    }
+
+    private void OnThemeChange(object sender, ThemeChangedEventArgs e)
+    {
+        isDarkMode = e.IsDarkMode;
+        StateHasChanged();
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.ToggleDarkMode();
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChange -= OnThemeChange;
+    }
 }

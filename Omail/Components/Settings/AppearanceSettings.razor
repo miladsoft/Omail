@@ -8,43 +8,41 @@
         <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Theme Preferences</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Light Theme -->
+            <!-- Light Theme Card -->
             <div @onclick="() => SetTheme(ThemeMode.Light)" class="@GetThemeCardClasses(ThemeMode.Light)">
-                <div class="w-full h-32 bg-omail-50 rounded-t-lg border-b border-omail-200 overflow-hidden">
-                    <div class="h-6 bg-white border-b border-omail-200 flex items-center px-3">
-                        <div class="w-2 h-2 bg-omail-300 rounded-full mr-1.5"></div>
-                        <div class="w-2 h-2 bg-omail-300 rounded-full mr-1.5"></div>
-                        <div class="w-2 h-2 bg-omail-300 rounded-full"></div>
+                <div class="w-full h-32 bg-omail-50 dark:bg-omail-800/10 rounded-t-lg border-b border-omail-200 dark:border-omail-700 overflow-hidden">
+                    <div class="h-6 bg-white dark:bg-omail-800 border-b border-omail-200 dark:border-omail-700 flex items-center px-3">
+                        <div class="w-2 h-2 bg-omail-300 dark:bg-omail-600 rounded-full mr-1.5"></div>
+                        <div class="w-2 h-2 bg-omail-300 dark:bg-omail-600 rounded-full mr-1.5"></div>
+                        <div class="w-2 h-2 bg-omail-300 dark:bg-omail-600 rounded-full"></div>
                     </div>
                     <div class="flex h-full p-2">
-                        <div class="w-1/4 bg-white border-r border-omail-200 h-full"></div>
-                        <div class="w-3/4 bg-white h-full p-2">
-                            <div class="h-2 bg-omail-100 rounded w-3/4 mb-1"></div>
-                            <div class="h-2 bg-omail-100 rounded w-1/2 mb-1"></div>
-                            <div class="h-2 bg-omail-100 rounded w-5/6"></div>
+                        <div class="w-1/4 bg-white dark:bg-omail-800 border-r border-omail-200 dark:border-omail-700 h-full"></div>
+                        <div class="w-3/4 bg-white dark:bg-omail-800 h-full p-2">
+                            <div class="h-2 bg-omail-100 dark:bg-omail-700 rounded w-3/4 mb-1"></div>
+                            <div class="h-2 bg-omail-100 dark:bg-omail-700 rounded w-1/2 mb-1"></div>
+                            <div class="h-2 bg-omail-100 dark:bg-omail-700 rounded w-5/6"></div>
                         </div>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-4 bg-white dark:bg-omail-800/50 rounded-b-lg">
                     <div class="flex justify-between items-center">
-                        <span class="font-medium">Light</span>
+                        <span class="font-medium text-omail-900 dark:text-white">Light</span>
                         @if (currentTheme == ThemeMode.Light)
                         {
-                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
+                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center text-xs font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 Active
                             </span>
                         }
                     </div>
                     <p class="text-omail-500 dark:text-omail-400 text-sm mt-1">
-                        Light appearance with white background
+                        Light appearance with white background.
                     </p>
                 </div>
             </div>
 
-            <!-- Dark Theme -->
+            <!-- Dark Theme Card -->
             <div @onclick="() => SetTheme(ThemeMode.Dark)" class="@GetThemeCardClasses(ThemeMode.Dark)">
                 <div class="w-full h-32 bg-omail-900 rounded-t-lg border-b border-omail-700 overflow-hidden">
                     <div class="h-6 bg-omail-800 border-b border-omail-700 flex items-center px-3">
@@ -61,66 +59,64 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-4 bg-white dark:bg-omail-800/50 rounded-b-lg">
                     <div class="flex justify-between items-center">
-                        <span class="font-medium">Dark</span>
+                        <span class="font-medium text-omail-900 dark:text-white">Dark</span>
                         @if (currentTheme == ThemeMode.Dark)
                         {
-                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
+                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center text-xs font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 Active
                             </span>
                         }
                     </div>
                     <p class="text-omail-500 dark:text-omail-400 text-sm mt-1">
-                        Dark appearance with reduced brightness
+                        Dark appearance with reduced brightness.
                     </p>
                 </div>
             </div>
 
-            <!-- System Theme -->
+            <!-- System Theme Card -->
             <div @onclick="() => SetTheme(ThemeMode.System)" class="@GetThemeCardClasses(ThemeMode.System)">
-                <div class="w-full h-32 bg-gradient-to-r from-omail-50 to-omail-900 rounded-t-lg overflow-hidden">
+                 <div class="w-full h-32 bg-gradient-to-r from-omail-50 to-omail-900 dark:from-omail-800/10 dark:to-omail-900 rounded-t-lg overflow-hidden border-b border-omail-200 dark:border-omail-700">
                     <div class="h-full flex">
+                        <!-- Light part representation -->
                         <div class="w-1/2 flex flex-col">
-                            <div class="h-6 bg-white border-b border-omail-200 flex items-center px-3">
-                                <div class="w-2 h-2 bg-omail-300 rounded-full mr-1.5"></div>
-                                <div class="w-2 h-2 bg-omail-300 rounded-full"></div>
+                            <div class="h-6 bg-white dark:bg-omail-800 border-b border-omail-200 dark:border-omail-700 flex items-center px-3">
+                                <div class="w-2 h-2 bg-omail-300 dark:bg-omail-600 rounded-full mr-1.5"></div>
+                                <div class="w-2 h-2 bg-omail-300 dark:bg-omail-600 rounded-full"></div>
                             </div>
-                            <div class="flex-1 p-2">
-                                <div class="h-2 bg-omail-100 rounded w-3/4 mb-1"></div>
-                                <div class="h-2 bg-omail-100 rounded w-1/2"></div>
+                            <div class="flex-1 p-2 bg-omail-50 dark:bg-omail-800/10">
+                                <div class="h-2 bg-omail-100 dark:bg-omail-700 rounded w-3/4 mb-1"></div>
+                                <div class="h-2 bg-omail-100 dark:bg-omail-700 rounded w-1/2"></div>
                             </div>
                         </div>
+                        <!-- Dark part representation -->
                         <div class="w-1/2 flex flex-col">
                             <div class="h-6 bg-omail-800 border-b border-omail-700 flex items-center px-3">
                                 <div class="w-2 h-2 bg-omail-600 rounded-full mr-1.5"></div>
                                 <div class="w-2 h-2 bg-omail-600 rounded-full"></div>
                             </div>
-                            <div class="flex-1 p-2">
+                            <div class="flex-1 p-2 bg-omail-900">
                                 <div class="h-2 bg-omail-700 rounded w-3/4 mb-1"></div>
                                 <div class="h-2 bg-omail-700 rounded w-1/2"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-4 bg-white dark:bg-omail-800/50 rounded-b-lg">
                     <div class="flex justify-between items-center">
-                        <span class="font-medium">System</span>
+                        <span class="font-medium text-omail-900 dark:text-white">System</span>
                         @if (currentTheme == ThemeMode.System)
                         {
-                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
+                            <span class="text-omail-600 dark:text-omail-400 inline-flex items-center text-xs font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 Active
                             </span>
                         }
                     </div>
                     <p class="text-omail-500 dark:text-omail-400 text-sm mt-1">
-                        Follows your system's appearance
+                        Follows your operating system's appearance.
                     </p>
                 </div>
             </div>
@@ -132,10 +128,10 @@
         <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Layout Density</h2>
         
         <div class="space-y-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-omail-800/50 shadow-sm">
                 <div>
                     <h3 class="text-sm font-medium text-omail-800 dark:text-white">Compact View</h3>
-                    <p class="text-sm text-omail-500 dark:text-omail-400">Show more content with reduced spacing</p>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Show more content with reduced spacing.</p>
                 </div>
                 <div class="relative inline-block w-12 align-middle select-none">
                     <input type="checkbox" name="toggle" id="compact-view" class="toggle-checkbox" />
@@ -143,10 +139,10 @@
                 </div>
             </div>
             
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-omail-800/50 shadow-sm">
                 <div>
                     <h3 class="text-sm font-medium text-omail-800 dark:text-white">Split View</h3>
-                    <p class="text-sm text-omail-500 dark:text-omail-400">Show email list and content side by side</p>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Show email list and content side by side.</p>
                 </div>
                 <div class="relative inline-block w-12 align-middle select-none">
                     <input type="checkbox" name="toggle" id="split-view" class="toggle-checkbox" checked />
@@ -160,12 +156,16 @@
     <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
         <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Accent Color</h2>
         
-        <div class="grid grid-cols-5 md:grid-cols-10 gap-2">
+        <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
             @foreach (var color in accentColors)
             {
                 <div @onclick="() => SetAccentColor(color.Value)" 
-                     class="@GetColorClasses(color.Value) h-10 rounded-lg border cursor-pointer transition-all duration-200"
+                     class="@GetColorClasses(color.Value) h-10 rounded-full border cursor-pointer transition-all duration-200 flex items-center justify-center"
                      title="@color.Name">
+                     @if (color.Value == currentAccentColor)
+                     {
+                         <svg class="w-5 h-5 text-white dark:text-black" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                     }
                 </div>
             }
         </div>
@@ -175,10 +175,10 @@
 @code {
     private enum ThemeMode { Light, Dark, System }
     private ThemeMode currentTheme = ThemeMode.System;
-    private string currentAccentColor = "omail";
+    private string currentAccentColor = "omail"; // Default accent color
     private List<ColorOption> accentColors = new List<ColorOption>
     {
-        new ColorOption { Name = "Omail", Value = "omail" },
+        new ColorOption { Name = "Omail", Value = "omail" }, // Assuming 'omail' corresponds to a color like indigo or blue
         new ColorOption { Name = "Blue", Value = "blue" },
         new ColorOption { Name = "Indigo", Value = "indigo" },
         new ColorOption { Name = "Purple", Value = "purple" },
@@ -190,61 +190,62 @@
         new ColorOption { Name = "Green", Value = "green" }
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Subscribe to theme changes
-        ThemeService.OnThemeChange += OnThemeChange;
-        GetCurrentTheme();
+        ThemeService.OnThemeChange += HandleThemeChange;
+        // Load current theme settings potentially from local storage or user preferences
+        await GetCurrentThemeAsync();
+        // Load current accent color
+        // currentAccentColor = await LoadAccentColorPreference(); 
     }
 
-    private void OnThemeChange(object sender, ThemeChangedEventArgs e)
+    private async Task GetCurrentThemeAsync()
     {
-        if (e.IsDarkMode)
-        {
-            currentTheme = ThemeMode.Dark;
-        }
-        else
-        {
-            currentTheme = ThemeMode.Light;
-        }
-        StateHasChanged();
-    }
+        // Simulate loading theme preference
+        await Task.Yield(); // Ensure async context
+        var isSystem = ThemeService.IsSystemTheme; // Assuming these properties reflect stored preferences
+        var isDark = ThemeService.IsDarkMode;
 
-    private void GetCurrentTheme()
-    {
-        var isDarkMode = ThemeService.IsDarkMode;
-        var isSystemTheme = ThemeService.IsSystemTheme;
-
-        if (isSystemTheme)
+        if (isSystem)
         {
             currentTheme = ThemeMode.System;
-        }
-        else if (isDarkMode)
-        {
-            currentTheme = ThemeMode.Dark;
+            // Optionally, determine actual system theme if needed for initial render
         }
         else
         {
-            currentTheme = ThemeMode.Light;
+            currentTheme = isDark ? ThemeMode.Dark : ThemeMode.Light;
         }
+    }
+
+    private void HandleThemeChange(object sender, ThemeChangedEventArgs e)
+    {
+        // This handler might be redundant if GetCurrentThemeAsync covers the initial state
+        // and SetTheme handles updates. Ensure it doesn't cause conflicts.
+        // It's useful if the ThemeService can change independently (e.g., system theme change detection).
+        InvokeAsync(async () => 
+        {
+            await GetCurrentThemeAsync(); // Re-evaluate based on ThemeService state
+            StateHasChanged();
+        });
     }
 
     private string GetThemeCardClasses(ThemeMode theme)
     {
-        string baseClasses = "border rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ";
+        string baseClasses = "border dark:border-omail-700 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md";
+        bool isActive = theme == currentTheme;
+        
+        // Use ring utility for active state indication
+        string activeClasses = isActive ? "ring-2 ring-offset-2 ring-offset-white dark:ring-offset-omail-900 ring-omail-500 dark:ring-omail-400" : "border-omail-200 dark:border-omail-700";
+        // Subtle scale effect on hover/active
+        string hoverScale = isActive ? "transform scale-[1.02]" : "hover:scale-[1.01]"; 
 
-        if (theme == currentTheme)
-        {
-            return baseClasses + "ring-2 ring-omail-500 border-transparent transform scale-[1.02]";
-        }
-        else
-        {
-            return baseClasses + "hover:border-omail-300 dark:border-omail-700 dark:hover:border-omail-500 hover:shadow";
-        }
+        return $"{baseClasses} {activeClasses} {hoverScale}";
     }
 
     private async Task SetTheme(ThemeMode theme)
     {
+        if (currentTheme == theme) return; // Avoid unnecessary updates
+
         currentTheme = theme;
 
         switch (theme)
@@ -258,41 +259,59 @@
                 await ThemeService.SetSystemTheme(false);
                 break;
             case ThemeMode.System:
-                await ThemeService.SetSystemTheme(true);
+                await ThemeService.SetSystemTheme(true); 
+                // ThemeService should handle detecting system preference and applying dark/light mode
                 break;
         }
+        // StateHasChanged() might be called implicitly by ThemeService event or needed here
+        StateHasChanged(); 
     }
 
     private string GetColorClasses(string color)
     {
-        string baseClasses = $"bg-{color}-500 dark:bg-{color}-700 ";
+        // Ensure color names match Tailwind color palette names (e.g., 'blue', 'red')
+        // Handle the custom 'omail' color specifically if it's not a standard Tailwind color.
+        string colorValue = color == "omail" ? "indigo" : color; // Example: Map 'omail' to 'indigo'
+
+        string baseBg = $"bg-{colorValue}-500 dark:bg-{colorValue}-600"; // Adjusted dark variant
+        string hoverBg = $"hover:bg-{colorValue}-600 dark:hover:bg-{colorValue}-500";
+        string baseClasses = $"border rounded-full cursor-pointer transition-all duration-200 {baseBg} {hoverBg}";
 
         if (color == currentAccentColor)
         {
-            return baseClasses + $"ring-2 ring-{color}-500 dark:ring-{color}-400 border-transparent transform scale-105";
+            // Use ring and subtle scale for active color
+            return $"{baseClasses} ring-2 ring-offset-2 ring-offset-white dark:ring-offset-omail-900 ring-{colorValue}-500 dark:ring-{colorValue}-400 transform scale-110 border-transparent";
         }
         else
         {
-            return baseClasses + "border-omail-200 dark:border-omail-700 hover:shadow-md";
+            // Standard border for inactive colors
+            return $"{baseClasses} border-omail-300 dark:border-omail-600";
         }
     }
 
     private async Task SetAccentColor(string color)
     {
+        if (currentAccentColor == color) return;
+
         currentAccentColor = color;
-        // In a real application, you would call a service to update the accent color theme
-        await JSRuntime.InvokeVoidAsync("console.log", $"Setting accent color to: {color}");
+        // Persist the selected accent color (e.g., in local storage or user profile)
+        // await SaveAccentColorPreference(color); 
+        
+        // Apply the accent color change visually (this might involve JS interop or CSS variable updates)
+        await JSRuntime.InvokeVoidAsync("console.log", $"Accent color set to: {color}"); 
+        
+        // Potentially trigger a UI update if needed, e.g., if other components depend on this state.
+        StateHasChanged();
     }
 
     public void Dispose()
     {
-        // Unsubscribe from events
-        ThemeService.OnThemeChange -= OnThemeChange;
+        ThemeService.OnThemeChange -= HandleThemeChange;
     }
 
     private class ColorOption
     {
         public string Name { get; set; }
-        public string Value { get; set; }
+        public string Value { get; set; } // Should correspond to Tailwind color names or custom CSS variables
     }
 }

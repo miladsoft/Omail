@@ -148,7 +148,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label for="default-font" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Default Font</label>
-                <select id="default-font" class="input-field">
+                <select id="default-font" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50">
                     <option value="arial">Arial</option>
                     <option value="calibri">Calibri</option>
                     <option value="georgia">Georgia</option>
@@ -159,7 +159,7 @@
             
             <div>
                 <label for="font-size" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Font Size</label>
-                <select id="font-size" class="input-field">
+                <select id="font-size" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50">
                     <option value="small">Small</option>
                     <option value="medium" selected>Medium</option>
                     <option value="large">Large</option>
@@ -205,7 +205,7 @@
                             </svg>
                         </button>
                     </div>
-                    <textarea id="signature" rows="4" class="w-full bg-white dark:bg-omail-800 p-3 focus:outline-none border-0 focus:ring-0" placeholder="Enter your email signature here...">John Smith
+                    <textarea id="signature" rows="4" class="mt-1 w-full rounded-md border-0 py-2 px-3 bg-white dark:bg-omail-800 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" placeholder="Enter your email signature here...">John Smith
 Marketing Director
 Omail Inc.
 john@example.com | (555) 123-4567</textarea>
@@ -239,22 +239,22 @@ john@example.com | (555) 123-4567</textarea>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="start-date" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Start Date</label>
-                            <input type="date" id="start-date" class="input-field" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <input type="date" id="start-date" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         </div>
                         <div>
                             <label for="end-date" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">End Date</label>
-                            <input type="date" id="end-date" class="input-field" value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                            <input type="date" id="end-date" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
                         </div>
                     </div>
                     
                     <div>
                         <label for="subject" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Subject</label>
-                        <input type="text" id="subject" class="input-field" value="Out of Office - Automatic Reply" />
+                        <input type="text" id="subject" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50" value="Out of Office - Automatic Reply" />
                     </div>
                     
                     <div>
                         <label for="message" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Message</label>
-                        <textarea id="message" rows="4" class="input-field">Thank you for your email. I am out of the office until [End Date] and will have limited access to email. If this matter is urgent, please contact [Alternate Contact] at [Contact Information].
+                        <textarea id="message" rows="4" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50">Thank you for your email. I am out of the office until [End Date] and will have limited access to email. If this matter is urgent, please contact [Alternate Contact] at [Contact Information].
 
 Best regards,
 [Your Name]</textarea>
@@ -267,7 +267,7 @@ Best regards,
         <div class="bg-white dark:bg-omail-800/50 rounded-lg shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
                 <h3 class="text-sm font-medium text-omail-800 dark:text-white">Email Filters</h3>
-                <button @onclick="AddNewFilter" class="btn-outline-sm flex items-center">
+                <button @onclick="AddNewFilter" class="inline-flex items-center px-3 py-1.5 border border-omail-300 dark:border-omail-600 text-xs font-medium rounded-md text-omail-700 dark:text-omail-200 bg-white dark:bg-omail-800 hover:bg-omail-50 dark:hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>

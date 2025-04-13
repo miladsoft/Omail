@@ -21,8 +21,8 @@
                         Current Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="current-password" @bind="currentPassword" class="input-field pr-10" />
-                        <button  type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-omail-500">
+                        <input type="password" id="current-password" @bind="currentPassword" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 pr-10" />
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-omail-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -36,7 +36,7 @@
                         New Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="new-password" @bind="newPassword" class="input-field pr-10" />
+                        <input type="password" id="new-password" @bind="newPassword" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 pr-10" />
                         <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-omail-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -69,7 +69,7 @@
                         Confirm New Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="confirm-password" @bind="confirmPassword" class="input-field pr-10" />
+                        <input type="password" id="confirm-password" @bind="confirmPassword" class="mt-1 w-full rounded-md border border-omail-300 dark:border-omail-700 py-2 px-3 bg-white dark:bg-omail-800/30 text-omail-900 dark:text-white shadow-sm focus:border-omail-500 focus:ring focus:ring-omail-500 focus:ring-opacity-50 pr-10" />
                         <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-omail-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -80,7 +80,7 @@
                 </div>
                 
                 <div class="pt-2 flex justify-end">
-                    <button @onclick="ChangePassword" class="btn-primary">
+                    <button @onclick="ChangePassword" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 transition-colors">
                         Change Password
                     </button>
                 </div>
@@ -132,10 +132,10 @@
                     </div>
                     
                     <div class="flex justify-between">
-                        <button @onclick="RegenerateCodes" class="btn-outline">
+                        <button @onclick="RegenerateCodes" class="inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-600 text-sm font-medium rounded-md text-omail-700 dark:text-omail-200 bg-white dark:bg-omail-800 hover:bg-omail-50 dark:hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 transition-colors">
                             Regenerate Codes
                         </button>
-                        <button @onclick="DownloadRecoveryCodes" class="btn-outline">
+                        <button @onclick="DownloadRecoveryCodes" class="inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-600 text-sm font-medium rounded-md text-omail-700 dark:text-omail-200 bg-white dark:bg-omail-800 hover:bg-omail-50 dark:hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
@@ -153,7 +153,7 @@
                         Two-factor authentication adds an extra layer of security to your account by requiring more than just a password to log in.
                     </p>
                     
-                    <button @onclick="SetupTwoFactor" class="btn-primary">
+                    <button @onclick="SetupTwoFactor" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 transition-colors">
                         Set Up Two-Factor Authentication
                     </button>
                 </div>
@@ -236,7 +236,7 @@
             </div>
             
             <div class="px-4 py-3 bg-omail-50 dark:bg-omail-700/50 border-t border-omail-100 dark:border-omail-700 flex justify-end">
-                <button @onclick="SignOutAllDevices" class="btn-danger-outline text-sm">
+                <button @onclick="SignOutAllDevices" class="inline-flex items-center px-4 py-2 border border-red-300 dark:border-red-600 text-sm font-medium rounded-md text-red-700 dark:text-red-300 bg-white dark:bg-omail-800 hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
                     Sign Out All Devices
                 </button>
             </div>
