@@ -1,75 +1,131 @@
 @page "/settings"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+@inject ThemeService ThemeService
+@using Omail.Components.Settings
 
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-omail-800 dark:text-white">Settings</h1>
-        <button class="bg-omail-600 hover:bg-omail-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
-            <lord-icon
-                src="https://cdn.lordicon.com/hwuyodym.json"
-                trigger="hover"
-                colors="primary:#ffffff"
-                class="w-5 h-5">
-            </lord-icon>
-            <span>Save Changes</span>
-        </button>
+<PageTitle>Settings - Omail</PageTitle>
+
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-omail-800 dark:text-white">Settings</h1>
+                <p class="text-omail-500 dark:text-omail-300 mt-1">Manage your account preferences and email settings</p>
+            </div>
+            <button @onclick="SaveSettings" class="btn-primary flex items-center space-x-2 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Save Changes</span>
+            </button>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-omail-900 dark:text-white mb-4">Profile Settings</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-200 mb-1">Name</label>
-                        <input type="text" 
-                               class="w-full px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/50 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-200 mb-1">Email</label>
-                        <input type="email" 
-                               class="w-full px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/50 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-omail-700 dark:text-omail-200 mb-1">Bio</label>
-                        <textarea rows="4" 
-                                  class="w-full px-3 py-2 rounded-lg border border-omail-200 dark:border-omail-700 bg-white dark:bg-omail-800/50 text-omail-900 dark:text-white placeholder-omail-500 dark:placeholder-omail-400 focus:outline-none focus:ring-2 focus:ring-omail-500 focus:border-omail-500"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-omail-900 dark:text-white mb-4">Security Settings</h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-omail-900 dark:text-white font-medium">Two-Factor Authentication</h3>
-                            <p class="text-sm text-omail-500 dark:text-omail-300">Add an extra layer of security</p>
-                        </div>
-                        <div class="relative">
-                            <input type="checkbox" class="sr-only peer">
-                            <div class="w-11 h-6 bg-omail-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-omail-300 dark:peer-focus:ring-omail-800 rounded-full peer dark:bg-omail-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-omail-600"></div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Settings Navigation -->
+    <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-sm overflow-hidden">
+        <div class="border-b border-omail-100 dark:border-omail-700">
+            <div class="flex overflow-x-auto custom-scrollbar">
+                <nav class="flex-nowrap whitespace-nowrap" aria-label="Settings tabs">
+                    @foreach (var tab in settingTabs)
+                    {
+                        <button @onclick="() => SelectTab(tab.Id)" 
+                                class="@GetTabClasses(tab.Id) relative px-6 py-4 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="@tab.IconClass mr-2"></span>
+                                @tab.Name
+                            </span>
+                            @if (tab.Id == activeTab)
+                            {
+                                <span class="absolute inset-x-0 bottom-0 h-0.5 bg-omail-600 dark:bg-omail-400"></span>
+                            }
+                        </button>
+                    }
+                </nav>
             </div>
         </div>
 
-        <div class="lg:col-span-1">
-            <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-omail-900 dark:text-white mb-4">Notifications</h2>
-                <div class="space-y-4">
-                    @foreach (var item in new[] { "Email Notifications", "Push Notifications", "Weekly Updates" })
-                    {
-                        <div class="flex items-center justify-between">
-                            <span class="text-omail-900 dark:text-white">@item</span>
-                            <div class="relative">
-                                <input type="checkbox" class="sr-only peer">
-                                <div class="w-11 h-6 bg-omail-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-omail-300 dark:peer-focus:ring-omail-800 rounded-full peer dark:bg-omail-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-omail-600"></div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
+        <!-- Tab Content -->
+        <div class="p-6">
+            @switch (activeTab)
+            {
+                case "profile":
+                    <div class="animate-fadeIn">
+                        <AccountSettings />
+                    </div>
+                    break;
+                case "appearance":
+                    <div class="animate-fadeIn">
+                        <AppearanceSettings />
+                    </div>
+                    break;
+                case "notifications":
+                    <div class="animate-fadeIn">
+                        <NotificationSettings />
+                    </div>
+                    break;
+                case "security":
+                    <div class="animate-fadeIn">
+                        <SecuritySettings />
+                    </div>
+                    break;
+                case "email":
+                    <div class="animate-fadeIn">
+                        <EmailSettings />
+                    </div>
+                    break;
+                default:
+                    <div class="animate-fadeIn">
+                        <AccountSettings />
+                    </div>
+                    break;
+            }
         </div>
     </div>
 </div>
+
+@code {
+    private string activeTab = "profile";
+    private List<SettingsTab> settingTabs = new List<SettingsTab>
+    {
+        new SettingsTab { Id = "profile", Name = "Profile", IconClass = "ri-user-3-line" },
+        new SettingsTab { Id = "appearance", Name = "Appearance", IconClass = "ri-palette-line" },
+        new SettingsTab { Id = "notifications", Name = "Notifications", IconClass = "ri-notification-3-line" },
+        new SettingsTab { Id = "security", Name = "Security", IconClass = "ri-shield-check-line" },
+        new SettingsTab { Id = "email", Name = "Email Settings", IconClass = "ri-mail-settings-line" }
+    };
+
+    private void SelectTab(string tabId)
+    {
+        activeTab = tabId;
+    }
+
+    private string GetTabClasses(string tabId) 
+    {
+        string baseClasses = "inline-flex items-center border-b-2 ";
+        if (tabId == activeTab)
+        {
+            return baseClasses + "text-omail-600 dark:text-omail-300 border-omail-500";
+        }
+        else 
+        {
+            return baseClasses + "text-omail-500 dark:text-omail-400 hover:text-omail-700 dark:hover:text-white border-transparent";
+        }
+    }
+
+    private async Task SaveSettings()
+    {
+        // Save settings implementation
+        await Task.Delay(500); // Simulate API call
+        ToastService.ShowSuccess("Settings saved successfully!");
+    }
+
+    private class SettingsTab
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string IconClass { get; set; }
+    }
+}

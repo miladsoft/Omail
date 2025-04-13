@@ -73,7 +73,9 @@
 </div>
 
 @code {
-    [Parameter] public UserModel User { get; set; }
+    [Parameter]
+    [EditorRequired] // Add EditorRequired attribute to enforce providing this parameter
+    public required UserModel User { get; set; }
     [Parameter] public EventCallback<UserModel> OnDeleteClick { get; set; }
     
     private void ViewUser()

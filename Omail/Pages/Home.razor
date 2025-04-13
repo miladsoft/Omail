@@ -1,67 +1,526 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject EmailService EmailService
+@using System.Security.Claims
 
-<PageTitle>Home - Omail UI</PageTitle>
+<PageTitle>Omail - Modern Email Platform</PageTitle>
 
-<div class="card dark:bg-omail-dark/30 bg-white shadow-md rounded-lg overflow-hidden transition-colors duration-300">
-    <div class="p-6">
-        <div class="flex items-center mb-4">
-            <div class="bg-gradient-to-r from-omail-primary to-omail-primary/70 rounded-full p-3 mr-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-omail-primary dark:text-omail-light transition-colors duration-300">Welcome to OmailUI</h1>
-        </div>
-        
-        <p class="text-lg text-omail-600 dark:text-omail-light/80 mb-8 transition-colors duration-300">
-            A modern, responsive UI framework for Blazor applications with dark mode support.
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-omail-primary dark:text-omail-light mb-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                    </svg>
+<div class="space-y-8">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-omail-600 to-omail-800 dark:from-omail-800 dark:to-omail-900 rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight">
+                        Welcome to <span class="text-omail-100">Omail</span>
+                    </h1>
+                    <p class="text-xl text-omail-100/90 leading-relaxed">
+                        A modern, secure email platform designed for professionals. 
+                        Streamline your communications and boost productivity with our powerful tools.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-4">
+                        <button @onclick="GoToInbox" class="px-6 py-3 bg-white text-omail-700 hover:text-omail-800 font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Go to Inbox
+                        </button>
+                        <button @onclick="ComposeNew" class="px-6 py-3 bg-omail-900/30 backdrop-blur-sm text-white border border-omail-100/30 hover:bg-omail-900/50 font-medium rounded-lg hover:shadow-lg transition-all duration-300 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Compose New Email
+                        </button>
+                    </div>
                 </div>
-                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Smart Design</h3>
-                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
-                    Thoughtfully designed components that work together seamlessly.
-                </p>
-            </div>
-            
-            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-omail-primary dark:text-omail-light mb-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
-                    </svg>
+                <div class="hidden lg:flex justify-end">
+                    <div class="relative">
+                        <div class="absolute -top-8 -left-8 w-64 h-64 bg-omail-400/20 rounded-full filter blur-3xl"></div>
+                        <div class="absolute -bottom-8 -right-8 w-64 h-64 bg-omail-200/20 rounded-full filter blur-3xl"></div>
+                        <img src="images/email-illustration.svg" alt="Omail Dashboard" class="relative z-10 max-w-md" />
+                    </div>
                 </div>
-                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Fully Responsive</h3>
-                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
-                    Looks great on any device, from phones to desktops.
-                </p>
             </div>
-            
-            <div class="bg-omail-light/10 dark:bg-omail-primary/20 p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-omail-primary dark:text-omail-light mb-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold text-omail-dark dark:text-omail-light text-lg mb-2 transition-colors duration-300">Customizable</h3>
-                <p class="text-omail-600 dark:text-omail-light/80 transition-colors duration-300">
-                    Easily adapt the framework to match your brand identity.
-                </p>
-            </div>
-        </div>
-        
-        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a href="tailwind-demo" class="btn-primary w-full sm:w-auto text-center">
-                View Components
-            </a>
-            <a href="counter" class="px-4 py-2 border border-omail-primary text-omail-primary hover:bg-omail-primary hover:text-white rounded shadow transition-colors w-full sm:w-auto text-center">
-                Try Demos
-            </a>
         </div>
     </div>
+
+    <!-- Stats Section for Authenticated Users -->
+    <AuthorizeView>
+        <Authorized Context="statsAuth">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Unread Messages</p>
+                            <p class="text-3xl font-bold text-omail-800 dark:text-white mt-1">@unreadCount</p>
+                        </div>
+                        <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button @onclick="GoToInbox" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 flex items-center">
+                            View all
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Sent Today</p>
+                            <p class="text-3xl font-bold text-omail-800 dark:text-white mt-1">@sentTodayCount</p>
+                        </div>
+                        <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button @onclick="GoToSent" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 flex items-center">
+                            View sent emails
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Drafts</p>
+                            <p class="text-3xl font-bold text-omail-800 dark:text-white mt-1">@draftCount</p>
+                        </div>
+                        <div class="bg-amber-100 dark:bg-amber-900/30 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button @onclick="GoToDrafts" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-omail-200 flex items-center">
+                            View drafts
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-omail-500 dark:text-omail-400">Storage Used</p>
+                            <p class="text-3xl font-bold text-omail-800 dark:text-white mt-1">@storageUsed</p>
+                        </div>
+                        <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="w-full bg-gray-200 dark:bg-omail-700 rounded-full h-2.5">
+                            <div class="bg-purple-600 h-2.5 rounded-full" style="width: @storagePercentage%"></div>
+                        </div>
+                        <span class="text-xs text-right block mt-1 text-omail-500 dark:text-omail-400">@storagePercentage% of 15GB used</span>
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Recent Emails Section for Authorized Users -->
+    <AuthorizeView>
+        <Authorized Context="emailsAuth">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Emails -->
+                <div class="lg:col-span-2 bg-white dark:bg-omail-800/50 rounded-xl shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-omail-800 dark:text-white">Recent Emails</h3>
+                        <a href="/inbox" class="text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white text-sm flex items-center">
+                            View all
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="divide-y divide-omail-100 dark:divide-omail-700">
+                        @if (!isLoading && recentEmails.Any())
+                        {
+                            @foreach (var email in recentEmails)
+                            {
+                                <div class="p-5 hover:bg-omail-50 dark:hover:bg-omail-700/30">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 rounded-full bg-@GetRandomColor()-100 dark:bg-@GetRandomColor()-900/40 flex items-center justify-center text-@GetRandomColor()-700 dark:text-@GetRandomColor()-300 font-medium">
+                                                @email.SenderInitials
+                                            </div>
+                                        </div>
+                                        <div class="ml-3 flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <p class="text-sm font-medium text-omail-900 dark:text-white truncate">
+                                                    @email.SenderName
+                                                </p>
+                                                <p class="ml-2 flex-shrink-0 text-xs text-omail-500 dark:text-omail-400">
+                                                    @FormatDate(email.Date)
+                                                </p>
+                                            </div>
+                                            <a href="/email/@email.Id" class="block mt-1">
+                                                <p class="text-sm text-omail-800 dark:text-omail-200 font-medium truncate">@email.Subject</p>
+                                                <p class="text-sm text-omail-500 dark:text-omail-400 truncate mt-1">@email.Preview</p>
+                                            </a>
+                                            @if (email.HasAttachment)
+                                            {
+                                                <div class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-omail-100 text-omail-800 dark:bg-omail-700 dark:text-omail-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                    </svg>
+                                                    Attachment
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="flex flex-col items-center justify-center py-12">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-omail-300 dark:text-omail-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <h3 class="mt-4 text-lg font-medium text-omail-800 dark:text-white">No emails yet</h3>
+                                <p class="mt-2 text-omail-500 dark:text-omail-400">Your recent emails will appear here</p>
+                                <button @onclick="ComposeNew" class="mt-4 px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
+                                    Compose New Email
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white dark:bg-omail-800/50 rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-omail-800 dark:text-white mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button @onclick="ComposeNew" class="w-full flex items-center justify-between p-4 bg-omail-50 dark:bg-omail-700/50 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-lg text-omail-800 dark:text-white transition-colors duration-300">
+                            <div class="flex items-center">
+                                <div class="bg-omail-600 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </div>
+                                <span class="ml-3 font-medium">Compose New</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        
+                        <button @onclick="GoToSettings" class="w-full flex items-center justify-between p-4 bg-omail-50 dark:bg-omail-700/50 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-lg text-omail-800 dark:text-white transition-colors duration-300">
+                            <div class="flex items-center">
+                                <div class="bg-blue-600 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-3 font-medium">Settings</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        <AuthorizeView Roles="Manager">
+                            <Authorized Context="adminAuth">
+                                <button @onclick="GoToAdmin" class="w-full flex items-center justify-between p-4 bg-omail-50 dark:bg-omail-700/50 hover:bg-omail-100 dark:hover:bg-omail-700 rounded-lg text-omail-800 dark:text-white transition-colors duration-300">
+                                    <div class="flex items-center">
+                                        <div class="bg-purple-600 text-white rounded-full p-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <span class="ml-3 font-medium">Admin Dashboard</span>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-omail-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </Authorized>
+                        </AuthorizeView>
+                    </div>
+
+                    <div class="mt-8 border-t border-omail-100 dark:border-omail-700 pt-4">
+                        <h4 class="text-sm font-medium text-omail-800 dark:text-white mb-4">Email Categories</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                    <span class="text-omail-600 dark:text-omail-300">Work</span>
+                                </div>
+                                <span class="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400 px-2 py-1 rounded-full text-xs">@workEmails</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                    <span class="text-omail-600 dark:text-omail-300">Personal</span>
+                                </div>
+                                <span class="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400 px-2 py-1 rounded-full text-xs">@personalEmails</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+                                    <span class="text-omail-600 dark:text-omail-300">Social</span>
+                                </div>
+                                <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400 px-2 py-1 rounded-full text-xs">@socialEmails</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                                    <span class="text-omail-600 dark:text-omail-300">Marketing</span>
+                                </div>
+                                <span class="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400 px-2 py-1 rounded-full text-xs">@marketingEmails</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Features Section - For all users -->
+    <div class="py-6">
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold text-omail-800 dark:text-white mb-4">Why Choose Omail</h2>
+            <p class="text-omail-600 dark:text-omail-300">Experience the next level of email with powerful features designed to improve your workflow.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                <div class="rounded-full bg-omail-100 dark:bg-omail-700/50 p-3 w-14 h-14 mb-5 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-omail-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white mb-2">Advanced Security</h3>
+                <p class="text-omail-600 dark:text-omail-300">End-to-end encryption and multi-factor authentication keep your communications secure.</p>
+            </div>
+
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                <div class="rounded-full bg-omail-100 dark:bg-omail-700/50 p-3 w-14 h-14 mb-5 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-omail-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white mb-2">Team Collaboration</h3>
+                <p class="text-omail-600 dark:text-omail-300">Seamless collaboration with teammates through shared inboxes and message threads.</p>
+            </div>
+
+            <div class="bg-white dark:bg-omail-800/50 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                <div class="rounded-full bg-omail-100 dark:bg-omail-700/50 p-3 w-14 h-14 mb-5 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-omail-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-omail-800 dark:text-white mb-2">Smart Organization</h3>
+                <p class="text-omail-600 dark:text-omail-300">AI-powered categorization and priority inbox help you focus on what's important.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- For Unauthorized Users: CTA Section -->
+    <AuthorizeView>
+        <NotAuthorized Context="loginCta">
+            <div class="bg-gradient-to-br from-omail-700 to-omail-900 rounded-2xl p-8 shadow-xl">
+                <div class="md:flex items-center justify-between">
+                    <div class="md:w-2/3">
+                        <h2 class="text-2xl font-bold text-white mb-4">Get Started with Omail Today</h2>
+                        <p class="text-omail-100/80 mb-6">Join thousands of professionals who trust Omail for secure, efficient email communication.</p>
+                        <div class="flex flex-wrap gap-4">
+                            <button @onclick="GoToLogin" class="px-6 py-3 bg-white text-omail-700 hover:text-omail-800 font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                </svg>
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hidden md:block md:w-1/3 text-center">
+                        <img src="images/email-secure.svg" alt="Secure Email" class="w-48 mx-auto" />
+                    </div>
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>
+
+@code {
+    private bool isLoading = true;
+    private List<EmailPreview> recentEmails = new List<EmailPreview>();
+    private int unreadCount = 0;
+    private int sentTodayCount = 0;
+    private int draftCount = 0;
+    private string storageUsed = "2.1 GB";
+    private int storagePercentage = 14;
+    private int workEmails = 16;
+    private int personalEmails = 24;
+    private int socialEmails = 8;
+    private int marketingEmails = 12;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            await LoadEmailData();
+        }
+
+        isLoading = false;
+    }
+
+    private async Task LoadEmailData()
+    {
+        try
+        {
+            // In a real application, you would load data from services
+            // For this demo, we'll use dummy data
+            await Task.Delay(300); // Simulate API call
+
+            // Populate with example data
+            recentEmails = new List<EmailPreview>
+            {
+                new EmailPreview
+                {
+                    Id = 1,
+                    SenderName = "Alex Johnson",
+                    SenderInitials = "AJ",
+                    Subject = "Weekly Project Update - Q3 Goals",
+                    Preview = "Hi team, I wanted to share our progress on the Q3 goals. We've made significant progress with...",
+                    Date = DateTime.Now.AddHours(-2),
+                    HasAttachment = true
+                },
+                new EmailPreview
+                {
+                    Id = 2,
+                    SenderName = "Marketing Team",
+                    SenderInitials = "MT",
+                    Subject = "New Campaign Assets Ready for Review",
+                    Preview = "Please find attached the new campaign assets for your review. We need feedback by Thursday...",
+                    Date = DateTime.Now.AddHours(-5),
+                    HasAttachment = true
+                },
+                new EmailPreview
+                {
+                    Id = 3,
+                    SenderName = "Sarah Miller",
+                    SenderInitials = "SM",
+                    Subject = "Meeting Rescheduled - Important",
+                    Preview = "Due to some conflicts, tomorrow's board meeting has been rescheduled to Friday at 2pm...",
+                    Date = DateTime.Now.AddHours(-8),
+                    HasAttachment = false
+                },
+                new EmailPreview
+                {
+                    Id = 4,
+                    SenderName = "IT Support",
+                    SenderInitials = "IT",
+                    Subject = "System Maintenance Notification",
+                    Preview = "This is a reminder that we'll be performing scheduled maintenance on the servers this Sunday...",
+                    Date = DateTime.Now.AddDays(-1),
+                    HasAttachment = false
+                }
+            };
+
+            unreadCount = 7;
+            sentTodayCount = 12;
+            draftCount = 3;
+            storageUsed = "2.1 GB";
+            storagePercentage = 14;
+        }
+        catch (Exception)
+        {
+            // Handle exception appropriately
+        }
+    }
+
+    private void GoToInbox()
+    {
+        NavigationManager.NavigateTo("/inbox");
+    }
+
+    private void GoToSent()
+    {
+        NavigationManager.NavigateTo("/sent");
+    }
+
+    private void GoToDrafts()
+    {
+        NavigationManager.NavigateTo("/drafts");
+    }
+
+    private void ComposeNew()
+    {
+        NavigationManager.NavigateTo("/compose");
+    }
+
+    private void GoToSettings()
+    {
+        NavigationManager.NavigateTo("/settings");
+    }
+
+    private void GoToAdmin()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        var now = DateTime.Now;
+        var timeDiff = now - date;
+
+        if (timeDiff.TotalMinutes < 1)
+            return "Just now";
+        if (timeDiff.TotalMinutes < 60)
+            return $"{Math.Floor(timeDiff.TotalMinutes)}m ago";
+        if (timeDiff.TotalHours < 24)
+            return $"{Math.Floor(timeDiff.TotalHours)}h ago";
+        if (date.Date == now.Date.AddDays(-1))
+            return "Yesterday";
+
+        return date.ToString("MMM d");
+    }
+
+    private string GetRandomColor()
+    {
+        var colors = new[] { "blue", "green", "purple", "amber", "indigo", "teal", "orange" };
+        return colors[new Random().Next(colors.Length)];
+    }
+
+    private class EmailPreview
+    {
+        public int Id { get; set; }
+        public string SenderName { get; set; }
+        public string SenderInitials { get; set; }
+        public string Subject { get; set; }
+        public string Preview { get; set; }
+        public DateTime Date { get; set; }
+        public bool HasAttachment { get; set; }
+    }
+}

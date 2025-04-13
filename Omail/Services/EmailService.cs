@@ -9,7 +9,7 @@ namespace Omail.Services
         private readonly AppDbContext _context;
         private readonly AuthService _authService;
         private readonly ServiceFactory _serviceFactory;
-        private readonly ILogger<EmailService> _logger;
+        private ILogger<EmailService> _logger;
 
         public EmailService(
             AppDbContext context, 
@@ -20,6 +20,7 @@ namespace Omail.Services
             _context = context;
             _authService = authService;
             _serviceFactory = serviceFactory;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<List<EmailMessage>> GetInboxAsync(int? limit = null)

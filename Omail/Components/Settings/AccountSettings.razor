@@ -1,0 +1,207 @@
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+
+<div class="space-y-8">
+    <!-- Profile Information -->
+    <div>
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Profile Information</h2>
+        
+        <div class="bg-white dark:bg-omail-800/50 rounded-lg shadow-sm overflow-hidden">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-omail-600 text-white h-16 w-16 rounded-full flex items-center justify-center text-xl font-semibold">
+                            JS
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center">
+                            <h3 class="text-lg font-medium text-omail-800 dark:text-white">John Smith</h3>
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400">
+                                Verified
+                            </span>
+                        </div>
+                        <p class="text-omail-500 dark:text-omail-400 mt-1">john.smith@example.com</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="full-name" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                            Full Name
+                        </label>
+                        <input type="text" name="full-name" id="full-name" class="mt-1 input-field" value="John Smith">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                            Email Address
+                        </label>
+                        <input type="email" name="email" id="email" class="mt-1 input-field" value="john.smith@example.com" disabled>
+                        <p class="mt-1 text-xs text-omail-500 dark:text-omail-400">
+                            To change your email address, please contact support.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                            Phone Number
+                        </label>
+                        <input type="tel" name="phone" id="phone" class="mt-1 input-field" value="+1 (555) 123-4567">
+                    </div>
+                    
+                    <div>
+                        <label for="job-title" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                            Job Title
+                        </label>
+                        <input type="text" name="job-title" id="job-title" class="mt-1 input-field" value="Marketing Director">
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label for="timezone" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                        Timezone
+                    </label>
+                    <select id="timezone" name="timezone" class="mt-1 input-field">
+                        <option value="UTC-08:00" selected>(UTC-08:00) Pacific Time (US & Canada)</option>
+                        <option value="UTC-07:00">(UTC-07:00) Mountain Time (US & Canada)</option>
+                        <option value="UTC-06:00">(UTC-06:00) Central Time (US & Canada)</option>
+                        <option value="UTC-05:00">(UTC-05:00) Eastern Time (US & Canada)</option>
+                        <option value="UTC+00:00">(UTC+00:00) London, Edinburgh</option>
+                        <option value="UTC+01:00">(UTC+01:00) Berlin, Paris, Rome</option>
+                        <option value="UTC+02:00">(UTC+02:00) Athens, Istanbul</option>
+                        <option value="UTC+03:00">(UTC+03:00) Moscow, Dubai</option>
+                        <option value="UTC+05:30">(UTC+05:30) Mumbai, New Delhi</option>
+                        <option value="UTC+08:00">(UTC+08:00) Beijing, Hong Kong</option>
+                        <option value="UTC+09:00">(UTC+09:00) Tokyo, Seoul</option>
+                        <option value="UTC+10:00">(UTC+10:00) Sydney, Melbourne</option>
+                    </select>
+                </div>
+                
+                <div class="mt-6">
+                    <label for="bio" class="block text-sm font-medium text-omail-700 dark:text-omail-300">
+                        Bio
+                    </label>
+                    <textarea id="bio" name="bio" rows="4" class="mt-1 input-field">Marketing Director at Omail Inc. with 10+ years of experience in digital marketing and brand strategy.</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connected Accounts -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Connected Accounts</h2>
+        
+        <div class="bg-white dark:bg-omail-800/50 rounded-lg shadow-sm overflow-hidden">
+            <ul class="divide-y divide-omail-100 dark:divide-omail-700">
+                <li class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 p-2 rounded-lg">
+                                <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-omail-800 dark:text-white">Twitter</p>
+                                <p class="text-xs text-omail-500 dark:text-omail-400">Connected as @@johnsmith</p>
+                            </div>
+                        </div>
+                        <button @onclick="DisconnectAccount" class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                            Disconnect
+                        </button>
+                    </div>
+                </li>
+                
+                <li class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-blue-700 p-2 rounded-lg">
+                                <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-omail-800 dark:text-white">Facebook</p>
+                                <p class="text-xs text-omail-500 dark:text-omail-400">Connected as John Smith</p>
+                            </div>
+                        </div>
+                        <button @onclick="DisconnectAccount" class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                            Disconnect
+                        </button>
+                    </div>
+                </li>
+                
+                <li class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-gray-800 p-2 rounded-lg">
+                                <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-omail-800 dark:text-white">GitHub</p>
+                                <p class="text-xs text-omail-500 dark:text-omail-400">Not connected</p>
+                            </div>
+                        </div>
+                        <button @onclick="ConnectAccount" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                            Connect
+                        </button>
+                    </div>
+                </li>
+                
+                <li class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 p-2 rounded-lg">
+                                <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.23 0H1.77C.8 0 0 .77 0 1.72v20.56C0 23.23.8 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.2 0 22.23 0zM7.27 20.1H3.65V9.24h3.62V20.1zM5.47 7.76h-.03c-1.22 0-2-.83-2-1.87 0-1.06.8-1.87 2.05-1.87 1.24 0 2 .8 2.02 1.87 0 1.04-.78 1.87-2.05 1.87zM20.34 20.1h-3.63v-5.8c0-1.45-.52-2.45-1.83-2.45-1 0-1.6.67-1.87 1.32-.1.23-.11.55-.11.88v6.05H9.28s.05-9.82 0-10.84h3.63v1.54a3.6 3.6 0 0 1 3.26-1.8c2.39 0 4.18 1.56 4.18 4.89v6.21z" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-omail-800 dark:text-white">LinkedIn</p>
+                                <p class="text-xs text-omail-500 dark:text-omail-400">Not connected</p>
+                            </div>
+                        </div>
+                        <button @onclick="ConnectAccount" class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                            Connect
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Delete Account -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-5 border border-red-200 dark:border-red-800">
+            <h3 class="text-lg font-medium text-red-800 dark:text-red-400">Delete Account</h3>
+            <p class="mt-2 text-sm text-red-700 dark:text-red-300">
+                Once your account is deleted, all of your data will be permanently removed. This action cannot be undone.
+            </p>
+            <div class="mt-4">
+                <button @onclick="ShowDeleteConfirmation" class="px-4 py-2 bg-white dark:bg-omail-800 border border-red-300 dark:border-red-700 rounded-md text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30">
+                    Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void DisconnectAccount()
+    {
+        ToastService.ShowSuccess("Account disconnected successfully.");
+    }
+    
+    private void ConnectAccount()
+    {
+        ToastService.ShowInfo("Redirecting to authentication page...");
+    }
+    
+    private void ShowDeleteConfirmation()
+    {
+        ToastService.ShowWarning("Account deletion feature is currently disabled.");
+    }
+}

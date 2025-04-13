@@ -1,0 +1,394 @@
+@inject IToastService ToastService
+
+<div class="space-y-8">
+    <!-- Email Display Settings -->
+    <div>
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Email Display</h2>
+        
+        <div class="space-y-5">
+            <!-- Display Density -->
+            <div>
+                <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Display Density</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div @onclick="() => SetDisplayDensity(1)" class="@GetDensityCardClasses(1)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 p-2 rounded-lg mb-2 flex flex-col border border-omail-100 dark:border-omail-700">
+                            <div class="h-3 w-1/2 bg-omail-200 dark:bg-omail-700 rounded mb-3"></div>
+                            <div class="h-2 w-3/4 bg-omail-200 dark:bg-omail-700 rounded mb-2"></div>
+                            <div class="h-2 w-5/6 bg-omail-200 dark:bg-omail-700 rounded mb-2"></div>
+                            <div class="h-2 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Comfortable</div>
+                    </div>
+                    
+                    <div @onclick="() => SetDisplayDensity(2)" class="@GetDensityCardClasses(2)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 p-2 rounded-lg mb-2 flex flex-col border border-omail-100 dark:border-omail-700">
+                            <div class="h-3 w-1/2 bg-omail-200 dark:bg-omail-700 rounded mb-2"></div>
+                            <div class="h-2 w-3/4 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                            <div class="h-2 w-5/6 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                            <div class="h-2 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Default</div>
+                    </div>
+                    
+                    <div @onclick="() => SetDisplayDensity(3)" class="@GetDensityCardClasses(3)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 p-2 rounded-lg mb-2 flex flex-col border border-omail-100 dark:border-omail-700">
+                            <div class="h-2 w-1/2 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                            <div class="h-1.5 w-3/4 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                            <div class="h-1.5 w-5/6 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                            <div class="h-1.5 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Compact</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reading Pane -->
+            <div>
+                <label class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-2">Reading Pane</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div @onclick="() => SetReadingPane(1)" class="@GetReadingPaneCardClasses(1)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 h-16 p-2 rounded-lg mb-2 border border-omail-100 dark:border-omail-700 flex">
+                            <div class="w-full flex flex-col">
+                                <div class="h-2 w-1/3 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-1/2 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Hidden</div>
+                    </div>
+                    
+                    <div @onclick="() => SetReadingPane(2)" class="@GetReadingPaneCardClasses(2)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 h-16 p-2 rounded-lg mb-2 border border-omail-100 dark:border-omail-700 flex">
+                            <div class="w-1/3 border-r border-omail-300 dark:border-omail-600 pr-1">
+                                <div class="h-1.5 w-full bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                            </div>
+                            <div class="w-2/3 pl-1">
+                                <div class="h-1.5 w-1/3 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-5/6 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Right</div>
+                    </div>
+                    
+                    <div @onclick="() => SetReadingPane(3)" class="@GetReadingPaneCardClasses(3)">
+                        <div class="bg-omail-50 dark:bg-omail-800/30 h-16 p-2 rounded-lg mb-2 border border-omail-100 dark:border-omail-700 flex flex-col">
+                            <div class="h-1/2 border-b border-omail-300 dark:border-omail-600 pb-1">
+                                <div class="h-1.5 w-1/3 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-1/2 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                            </div>
+                            <div class="h-1/2 pt-1">
+                                <div class="h-1.5 w-1/3 bg-omail-200 dark:bg-omail-700 rounded mb-1"></div>
+                                <div class="h-1.5 w-2/3 bg-omail-200 dark:bg-omail-700 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-omail-800 dark:text-white">Bottom</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Other Display Settings -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-omail-800 dark:text-white">Show Sender Images</h3>
+                            <p class="text-sm text-omail-500 dark:text-omail-400">Display profile images next to emails</p>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" name="sender-images" id="sender-images" class="toggle-checkbox" checked />
+                            <label for="sender-images" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-omail-800 dark:text-white">Enable Conversation View</h3>
+                            <p class="text-sm text-omail-500 dark:text-omail-400">Group related messages together</p>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" name="conversation-view" id="conversation-view" class="toggle-checkbox" checked />
+                            <label for="conversation-view" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-omail-800 dark:text-white">Auto-Collapse Quoted Text</h3>
+                            <p class="text-sm text-omail-500 dark:text-omail-400">Hide repeated text in email replies</p>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" name="collapse-quoted" id="collapse-quoted" class="toggle-checkbox" checked />
+                            <label for="collapse-quoted" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-omail-800 dark:text-white">Show Email Snippets</h3>
+                            <p class="text-sm text-omail-500 dark:text-omail-400">Preview of email content in the list</p>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" name="show-snippets" id="show-snippets" class="toggle-checkbox" checked />
+                            <label for="show-snippets" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Composition Settings -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Composition Settings</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="default-font" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Default Font</label>
+                <select id="default-font" class="input-field">
+                    <option value="arial">Arial</option>
+                    <option value="calibri">Calibri</option>
+                    <option value="georgia">Georgia</option>
+                    <option value="times">Times New Roman</option>
+                    <option value="verdana">Verdana</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="font-size" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Font Size</label>
+                <select id="font-size" class="input-field">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Always Request Read Receipt</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Get notified when recipients open your emails</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="read-receipt" id="read-receipt" class="toggle-checkbox" />
+                    <label for="read-receipt" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Auto-Save Drafts</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Automatically save drafts while composing</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="auto-save-draft" id="auto-save-draft" class="toggle-checkbox" checked />
+                    <label for="auto-save-draft" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <label for="signature" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Email Signature</label>
+                <div class="mt-1 border border-omail-300 dark:border-omail-600 rounded-md overflow-hidden">
+                    <!-- This would be a rich text editor in a real app -->
+                    <div class="bg-white dark:bg-omail-800 p-2 flex gap-2 border-b border-omail-300 dark:border-omail-600">
+                        <button class="p-1 rounded hover:bg-omail-100 dark:hover:bg-omail-700">B</button>
+                        <button class="p-1 rounded hover:bg-omail-100 dark:hover:bg-omail-700"><i>I</i></button>
+                        <button class="p-1 rounded hover:bg-omail-100 dark:hover:bg-omail-700"><u>U</u></button>
+                        <span class="border-r border-omail-300 dark:border-omail-600"></span>
+                        <button class="p-1 rounded hover:bg-omail-100 dark:hover:bg-omail-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    <textarea id="signature" rows="4" class="w-full bg-white dark:bg-omail-800 p-3 focus:outline-none border-0 focus:ring-0" placeholder="Enter your email signature here...">John Smith
+Marketing Director
+Omail Inc.
+john@example.com | (555) 123-4567</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Auto-replies -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Filters and Auto-replies</h2>
+        
+        <!-- Vacation Responder -->
+        <div class="bg-white dark:bg-omail-800/50 rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="p-5 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Vacation Responder</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400 mt-1">
+                        Automatically reply to emails when you're away
+                    </p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="vacation" id="vacation" class="toggle-checkbox" @onchange="ToggleVacationResponder" />
+                    <label for="vacation" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            @if (vacationResponderEnabled)
+            {
+                <div class="p-5 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="start-date" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Start Date</label>
+                            <input type="date" id="start-date" class="input-field" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div>
+                            <label for="end-date" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">End Date</label>
+                            <input type="date" id="end-date" class="input-field" value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Subject</label>
+                        <input type="text" id="subject" class="input-field" value="Out of Office - Automatic Reply" />
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-omail-700 dark:text-omail-300 mb-1">Message</label>
+                        <textarea id="message" rows="4" class="input-field">Thank you for your email. I am out of the office until [End Date] and will have limited access to email. If this matter is urgent, please contact [Alternate Contact] at [Contact Information].
+
+Best regards,
+[Your Name]</textarea>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <!-- Email Filters -->
+        <div class="bg-white dark:bg-omail-800/50 rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-omail-100 dark:border-omail-700 flex justify-between items-center">
+                <h3 class="text-sm font-medium text-omail-800 dark:text-white">Email Filters</h3>
+                <button @onclick="AddNewFilter" class="btn-outline-sm flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Filter
+                </button>
+            </div>
+            
+            <div class="divide-y divide-omail-100 dark:divide-omail-700">
+                <!-- Filter 1 -->
+                <div class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            <h4 class="text-sm font-medium text-omail-800 dark:text-white">Newsletters</h4>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="p-1 text-omail-600 dark:text-omail-400 hover:text-omail-900 dark:hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                            <button class="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-omail-500 dark:text-omail-400">
+                        From contains: newsletter, subscribe, updates
+                    </div>
+                    <div class="mt-1 text-xs text-omail-500 dark:text-omail-400">
+                        Action: Apply label "Newsletters"
+                    </div>
+                </div>
+                
+                <!-- Filter 2 -->
+                <div class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                            <h4 class="text-sm font-medium text-omail-800 dark:text-white">Important Clients</h4>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="p-1 text-omail-600 dark:text-omail-400 hover:text-omail-900 dark:hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                            <button class="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-omail-500 dark:text-omail-400">
+                        From: client@bigcompany.com, john@importantclient.com
+                    </div>
+                    <div class="mt-1 text-xs text-omail-500 dark:text-omail-400">
+                        Action: Star email and apply label "VIP"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int displayDensity = 2; // 1: Comfortable, 2: Default, 3: Compact
+    private int readingPane = 2; // 1: Hidden, 2: Right, 3: Bottom
+    private bool vacationResponderEnabled = false;
+    private bool filterModalOpen = false;
+    
+    private void SetDisplayDensity(int density)
+    {
+        displayDensity = density;
+        ToastService.ShowInfo("Display density updated");
+    }
+    
+    private string GetDensityCardClasses(int density)
+    {
+        string baseClasses = "cursor-pointer rounded-lg p-2 transition-all duration-200 ";
+        
+        if (density == displayDensity)
+        {
+            return baseClasses + "bg-omail-100 dark:bg-omail-700/50 ring-2 ring-omail-500 dark:ring-omail-400";
+        }
+        else
+        {
+            return baseClasses + "hover:bg-omail-50 dark:hover:bg-omail-800";
+        }
+    }
+    
+    private void SetReadingPane(int pane)
+    {
+        readingPane = pane;
+        ToastService.ShowInfo("Reading pane setting updated");
+    }
+    
+    private string GetReadingPaneCardClasses(int pane)
+    {
+        string baseClasses = "cursor-pointer rounded-lg p-2 transition-all duration-200 ";
+        
+        if (pane == readingPane)
+        {
+            return baseClasses + "bg-omail-100 dark:bg-omail-700/50 ring-2 ring-omail-500 dark:ring-omail-400";
+        }
+        else
+        {
+            return baseClasses + "hover:bg-omail-50 dark:hover:bg-omail-800";
+        }
+    }
+    
+    private void ToggleVacationResponder(ChangeEventArgs e)
+    {
+        vacationResponderEnabled = (bool)e.Value;
+    }
+    
+    private void AddNewFilter()
+    {
+        ToastService.ShowInfo("Filter creation dialog would open here");
+    }
+}

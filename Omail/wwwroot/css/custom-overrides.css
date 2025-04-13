@@ -9,3 +9,157 @@
 input:hover, button:hover, a:hover, select:hover, textarea:hover {
     opacity: 0.9;
 }
+
+/* Toggle Switch */
+.toggle-checkbox {
+    @apply absolute opacity-0 w-0 h-0;
+}
+
+.toggle-label {
+    @apply block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-omail-600 cursor-pointer;
+    position: relative;
+}
+
+.toggle-label:before {
+    @apply absolute block bg-white dark:bg-white rounded-full;
+    content: '';
+    width: 1.25rem;
+    height: 1.25rem;
+    top: 0.125rem;
+    left: 0.125rem;
+    transition: transform 0.3s ease;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+    @apply bg-omail-600 dark:bg-omail-400;
+}
+
+.toggle-checkbox:checked + .toggle-label:before {
+    transform: translateX(1.25rem);
+}
+
+/* Input Field */
+.input-field {
+    @apply block w-full px-3 py-2 border border-omail-300 dark:border-omail-600 rounded-md
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 dark:focus:ring-omail-400 
+    focus:border-omail-500 dark:focus:border-omail-400 sm:text-sm
+    bg-white dark:bg-omail-800 text-omail-900 dark:text-white;
+    transition: all 0.2s;
+}
+
+.input-field:disabled {
+    @apply bg-omail-100 dark:bg-omail-700/50 cursor-not-allowed;
+}
+
+/* Button Styles */
+.btn-primary {
+    @apply inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-omail-600 hover:bg-omail-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 dark:focus:ring-offset-omail-800;
+}
+
+.btn-danger {
+    @apply inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-omail-800;
+}
+
+.btn-outline {
+    @apply inline-flex items-center px-4 py-2 border border-omail-300 dark:border-omail-600 shadow-sm text-sm font-medium rounded-md 
+    text-omail-700 dark:text-omail-300 bg-white dark:bg-omail-800/50 hover:bg-omail-50 dark:hover:bg-omail-700/50 
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 dark:focus:ring-offset-omail-800;
+}
+
+.btn-danger-outline {
+    @apply inline-flex items-center px-4 py-2 border border-red-300 dark:border-red-800 shadow-sm text-sm font-medium rounded-md 
+    text-red-700 dark:text-red-400 bg-white dark:bg-omail-800/50 hover:bg-red-50 dark:hover:bg-red-900/20
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-omail-800;
+}
+
+.btn-outline-sm {
+    @apply inline-flex items-center px-3 py-1.5 border border-omail-300 dark:border-omail-600 text-xs font-medium rounded-md 
+    text-omail-700 dark:text-omail-300 bg-white dark:bg-omail-800/50 hover:bg-omail-50 dark:hover:bg-omail-700/50 
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-omail-500 dark:focus:ring-offset-omail-800;
+}
+
+/* Avatar */
+.avatar {
+    @apply h-8 w-8 rounded-full flex items-center justify-center bg-omail-600 dark:bg-omail-700 text-white font-semibold text-sm shadow-sm;
+}
+
+/* Navigation links */
+.nav-link {
+    @apply flex items-center px-4 py-2 text-omail-700 dark:text-omail-300 hover:bg-omail-100 dark:hover:bg-omail-700/50 rounded-lg transition-all duration-200;
+}
+
+.nav-link-active {
+    @apply bg-omail-100/50 dark:bg-omail-700/70 font-medium border-l-4 border-omail-600 dark:border-omail-400;
+}
+
+/* Animations */
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-fade-out {
+    animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.omail.400') theme('colors.omail.100');
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-omail-100 dark:bg-omail-800/80 rounded-lg;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-omail-400 dark:bg-omail-600 rounded-lg hover:bg-omail-500 dark:hover:bg-omail-500;
+}
+
+/* Tooltip */
+.tooltip {
+    @apply invisible absolute px-2 py-1 text-xs text-white bg-omail-800 dark:bg-black rounded-md whitespace-nowrap transition-all duration-200 opacity-0 -translate-y-1;
+    z-index: 50;
+}
+
+.tooltip-container:hover .tooltip {
+    @apply visible opacity-100 translate-y-0;
+}
+
+.shadow-omail {
+    box-shadow: 0 4px 14px -2px rgba(101, 85, 219, 0.25);
+}
+
+.dark .shadow-omail {
+    box-shadow: 0 4px 14px -2px rgba(101, 85, 219, 0.4);
+}

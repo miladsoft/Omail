@@ -1,0 +1,207 @@
+@inject IJSRuntime JSRuntime
+
+<div class="space-y-8">
+    <!-- Email Notifications -->
+    <div>
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Email Notifications</h2>
+        
+        <div class="bg-omail-50 dark:bg-omail-800/30 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 pt-1">
+                    <svg class="h-5 w-5 text-omail-500 dark:text-omail-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <p class="ml-3 text-sm text-omail-600 dark:text-omail-300">
+                    These notification settings control how and when you receive alerts about new emails and events.
+                </p>
+            </div>
+        </div>
+
+        <div class="space-y-5">
+            <!-- New Email Notification -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">New Email Notifications</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Receive notifications when new emails arrive</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="new-email" id="new-email" class="toggle-checkbox" checked />
+                    <label for="new-email" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <!-- Important Email Notification -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Important Emails Only</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Only notify for emails marked as important</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="important-only" id="important-only" class="toggle-checkbox" />
+                    <label for="important-only" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <!-- Sound Notification -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Notification Sounds</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Play a sound when new emails arrive</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="notification-sound" id="notification-sound" class="toggle-checkbox" checked />
+                    <label for="notification-sound" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <!-- Desktop Notification -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Desktop Notifications</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Show notifications on your desktop</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="desktop-notifications" id="desktop-notifications" class="toggle-checkbox" checked @onchange="RequestDesktopPermission" />
+                    <label for="desktop-notifications" class="toggle-label"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Do Not Disturb -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Do Not Disturb</h2>
+        
+        <div class="space-y-5">
+            <!-- Do Not Disturb Mode -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Do Not Disturb</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Mute all notifications temporarily</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="dnd" id="dnd" class="toggle-checkbox" />
+                    <label for="dnd" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <!-- Notification Schedule -->
+            <div class="mt-5 space-y-3">
+                <h3 class="text-sm font-medium text-omail-800 dark:text-white">Notification Schedule</h3>
+                <p class="text-sm text-omail-500 dark:text-omail-400">Set times when notifications are active</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                    <div>
+                        <label for="start-time" class="block text-xs font-medium text-omail-700 dark:text-omail-300 mb-1">Start Time</label>
+                        <input type="time" id="start-time" class="input-field" value="09:00" />
+                    </div>
+                    <div>
+                        <label for="end-time" class="block text-xs font-medium text-omail-700 dark:text-omail-300 mb-1">End Time</label>
+                        <input type="time" id="end-time" class="input-field" value="17:00" />
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="block text-xs font-medium text-omail-700 dark:text-omail-300 mb-2">Active Days</label>
+                    <div class="grid grid-cols-7 gap-1.5">
+                        @foreach (var day in Enum.GetValues<DayOfWeek>())
+                        {
+                            string dayName = day.ToString().Substring(0, 1);
+                            bool isWeekday = day != DayOfWeek.Saturday && day != DayOfWeek.Sunday;
+                            string dayClass = isWeekday ? 
+                                "bg-omail-100 text-omail-800 dark:bg-omail-700 dark:text-omail-100" : 
+                                "bg-white text-omail-400 dark:bg-omail-800 dark:text-omail-500 border border-omail-200 dark:border-omail-700";
+                            
+                            <div class="flex items-center justify-center h-8 rounded-md cursor-pointer @dayClass">
+                                @dayName
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Notifications -->
+    <div class="pt-6 border-t border-omail-100 dark:border-omail-700">
+        <h2 class="text-lg font-medium text-omail-900 dark:text-white mb-4">Mobile Notifications</h2>
+        
+        <div class="space-y-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Push Notifications</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Send notifications to your mobile device</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="push-notification" id="push-notification" class="toggle-checkbox" checked />
+                    <label for="push-notification" class="toggle-label"></label>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-omail-800 dark:text-white">Email Preview</h3>
+                    <p class="text-sm text-omail-500 dark:text-omail-400">Show email content in the notification</p>
+                </div>
+                <div class="relative inline-block w-12 align-middle select-none">
+                    <input type="checkbox" name="email-preview" id="email-preview" class="toggle-checkbox" checked />
+                    <label for="email-preview" class="toggle-label"></label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Connected Devices -->
+        <div class="mt-6 bg-white dark:bg-omail-800/50 rounded-lg shadow-sm">
+            <div class="px-4 py-3 border-b border-omail-100 dark:border-omail-700">
+                <h3 class="font-medium text-omail-800 dark:text-white">Connected Devices</h3>
+            </div>
+            <div class="divide-y divide-omail-100 dark:divide-omail-700">
+                <div class="px-4 py-3 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-omail-500 dark:text-omail-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-omail-800 dark:text-white">iPhone 13 Pro</p>
+                            <p class="text-xs text-omail-500 dark:text-omail-400">Last active: 5 minutes ago</p>
+                        </div>
+                    </div>
+                    <button class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                        Remove
+                    </button>
+                </div>
+                <div class="px-4 py-3 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-omail-500 dark:text-omail-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-omail-800 dark:text-white">MacBook Pro</p>
+                            <p class="text-xs text-omail-500 dark:text-omail-400">Last active: Now</p>
+                        </div>
+                    </div>
+                    <button class="text-sm text-omail-600 dark:text-omail-400 hover:text-omail-800 dark:hover:text-white">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task RequestDesktopPermission(ChangeEventArgs e)
+    {
+        if ((bool)e.Value)
+        {
+            try {
+                await JSRuntime.InvokeVoidAsync("Notification.requestPermission");
+            } 
+            catch (Exception ex) {
+                // Log error or handle appropriately
+                Console.WriteLine($"Error requesting notification permission: {ex.Message}");
+            }
+        }
+    }
+}

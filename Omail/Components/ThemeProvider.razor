@@ -1,21 +1,40 @@
 @inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="@ThemeService.GetThemeClass()">
+<CascadingValue Value="@isDarkMode" Name="IsDarkMode">
     @ChildContent
-</div>
+</CascadingValue>
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    private bool isDarkMode;
+
     protected override void OnInitialized()
     {
-        ThemeService.OnThemeChange += StateHasChanged;
+        ThemeService.OnThemeChange += HandleThemeChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ThemeService.InitializeThemeAsync();
+            isDarkMode = ThemeService.IsDarkMode;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleThemeChanged(object sender, ThemeChangedEventArgs e)
+    {
+        isDarkMode = e.IsDarkMode;
+        StateHasChanged();
     }
 
     public void Dispose()
     {
-        ThemeService.OnThemeChange -= StateHasChanged;
+        ThemeService.OnThemeChange -= HandleThemeChanged;
     }
 }

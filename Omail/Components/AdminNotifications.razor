@@ -111,25 +111,27 @@
     private bool showNotifications = false;
     private List<AdminNotification> notifications = new List<AdminNotification>();
     private int notificationCount => notifications.Count(n => !n.IsRead);
-    private System.Timers.Timer refreshTimer;
-    
+    private System.Timers.Timer? refreshTimer;
+
     protected override async Task OnInitializedAsync()
     {
         // Load notifications on initialization
         await LoadNotifications();
-        
-        // Setup a refresh timer (every 60 seconds)
-        refreshTimer = new System.Timers.Timer(60000);
-        refreshTimer.Elapsed += async (sender, e) => await InvokeAsync(LoadNotifications);
+    }
+
+    protected override void OnInitialized()
+    {
+        refreshTimer = new System.Timers.Timer(30000); // Initialize in OnInitialized
+        refreshTimer.Elapsed += (s, e) => InvokeAsync(LoadNotifications);
+        refreshTimer.AutoReset = true;
         refreshTimer.Start();
     }
-    
+
     public void Dispose()
     {
-        refreshTimer?.Stop();
         refreshTimer?.Dispose();
     }
-    
+
     private async Task LoadNotifications()
     {
         try

@@ -25,6 +25,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<IToastService, ToastService>();
 builder.Services.AddScoped<DatabaseSeeder>();
 
 // Ensure logger is properly registered

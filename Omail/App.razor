@@ -63,19 +63,24 @@
     <ThemeSwitch />
 </ThemeProvider>
 
+<ToastContainer />
+
 @code {
+    private bool firstRender = true;
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-
+            this.firstRender = false;
+            // Initialize the theme after rendering
+            await ThemeService.InitializeThemeAsync();
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Initialize theme without JavaScript
-        ThemeService.InitializeTheme();
+        // Do not call ThemeService.InitializeThemeAsync() here as it uses JS interop
         base.OnInitialized();
     }
 }

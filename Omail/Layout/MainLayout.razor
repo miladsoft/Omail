@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject Omail.Services.ThemeService ThemeService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 @using Omail.Components
 @implements IDisposable
 
@@ -24,14 +25,14 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                     <AuthorizeView>
-                        <Authorized>
+                        <Authorized Context="authContext">
                             <div class="relative px-3 py-2 group">
                                 <button class="flex items-center focus:outline-none" id="user-menu-button">
                                     <span class="sr-only">Open user menu</span>
-                                    <div class="avatar flex-shrink-0">@context.User.Identity?.Name?.Substring(0, 2)</div>
+                                    <div class="avatar flex-shrink-0">@authContext.User.Identity?.Name?.Substring(0, 2)</div>
                                     <div class="ml-3 hidden md:block text-left">
-                                        <div class="text-sm font-medium text-omail-800 dark:text-white">@context.User.Identity?.Name</div>
-                                        <div class="text-xs text-omail-500 dark:text-omail-400">@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+                                        <div class="text-sm font-medium text-omail-800 dark:text-white">@authContext.User.Identity?.Name</div>
+                                        <div class="text-xs text-omail-500 dark:text-omail-400">@authContext.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
                                     </div>
                                     <svg class="ml-2 h-5 w-5 text-omail-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -58,6 +59,14 @@
                                 </div>
                             </div>
                         </Authorized>
+                        <NotAuthorized>
+                            <a href="login" class="flex items-center px-4 py-2 rounded-lg bg-omail-600 text-white hover:bg-omail-700 transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                </svg>
+                                Login
+                            </a>
+                        </NotAuthorized>
                     </AuthorizeView>
                     
                     <div class="relative px-3 py-2">
@@ -91,112 +100,95 @@
         <div class="sm:hidden @(isMobileMenuOpen ? "block animate-fade-in" : "hidden") bg-white dark:bg-omail-800 shadow-lg dark:shadow-omail-600/20 transition-all duration-500">
             <div class="px-2 pt-2 pb-3 space-y-1 custom-scrollbar max-h-[70vh] overflow-y-auto">
                 <AuthorizeView>
-                    <Authorized>
+                    <Authorized Context="authMobileContext">
                         <div class="flex items-center px-4 py-2 mb-2 border-b border-omail-100 dark:border-omail-700">
                             <div class="avatar">
-                                @context.User.Identity?.Name?.Substring(0, 2)
+                                @authMobileContext.User.Identity?.Name?.Substring(0, 2)
                             </div>
                             <div class="ml-3">
-                                <div class="text-sm font-medium text-omail-800 dark:text-white">@context.User.Identity?.Name</div>
-                                <div class="text-xs text-omail-500 dark:text-omail-400">@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+                                <div class="text-sm font-medium text-omail-800 dark:text-white">@authMobileContext.User.Identity?.Name</div>
+                                <div class="text-xs text-omail-500 dark:text-omail-400">@authMobileContext.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
                             </div>
                         </div>
-                    </Authorized>
-                </AuthorizeView>
-                
-                <!-- Email mobile links -->
-                <NavLink href="inbox" Match="NavLinkMatch.All" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Inbox
-                    </span>
-                </NavLink>
-                <NavLink href="compose" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Compose
-                    </span>
-                </NavLink>
-                <NavLink href="sent" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Sent
-                    </span>
-                </NavLink>
-                <NavLink href="drafts" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/puvaffet.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Drafts
-                    </span>
-                </NavLink>
-                <NavLink href="trash" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Trash
-                    </span>
-                </NavLink>
-                
-                <!-- Site navigation -->
-                <div class="py-1 my-2 border-t border-omail-100 dark:border-omail-700"></div>
-                
-                <NavLink href="settings" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Settings
-                    </span>
-                </NavLink>
-                <NavLink href="portfolio" 
-                    class="nav-link"
-                    ActiveClass="nav-link-active">
-                    <span class="flex items-center">
-                        <lord-icon src="https://cdn.lordicon.com/fihkmkwt.json"
-                                  trigger="hover"
-                                  colors="primary:#121331,secondary:#818cf8"
-                                  class="w-5 h-5 mr-2">
-                        </lord-icon>
-                        Portfolio
-                    </span>
-                </NavLink>
-                
-                <!-- Auth links -->
-                <AuthorizeView>
-                    <Authorized>
+                        
+                        <!-- Email mobile links for authenticated users -->
+                        <NavLink href="inbox" Match="NavLinkMatch.All" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/tkaubbni.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Inbox
+                            </span>
+                        </NavLink>
+                        <NavLink href="compose" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/wloilxuq.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Compose
+                            </span>
+                        </NavLink>
+                        <NavLink href="sent" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/iltqorsz.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Sent
+                            </span>
+                        </NavLink>
+                        <NavLink href="drafts" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/puvaffet.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Drafts
+                            </span>
+                        </NavLink>
+                        <NavLink href="trash" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Trash
+                            </span>
+                        </NavLink>
+                        
+                        <!-- Site navigation -->
+                        <div class="py-1 my-2 border-t border-omail-100 dark:border-omail-700"></div>
+                        
+                        <NavLink href="settings" 
+                            class="nav-link"
+                            ActiveClass="nav-link-active">
+                            <span class="flex items-center">
+                                <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
+                                          trigger="hover"
+                                          colors="primary:#121331,secondary:#818cf8"
+                                          class="w-5 h-5 mr-2">
+                                </lord-icon>
+                                Settings
+                            </span>
+                        </NavLink>
+                        
                         <NavLink href="logout" class="nav-link text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                             <span class="flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -207,32 +199,56 @@
                         </NavLink>
                     </Authorized>
                     <NotAuthorized>
-                        <NavLink href="login" class="nav-link">
-                            <span class="flex items-center">
+                        <!-- Mobile login options for unauthenticated users -->
+                        <div class="py-6 flex flex-col items-center justify-center space-y-4">
+                            <div class="mx-auto w-20 h-20 bg-gradient-to-r from-omail-500 to-omail-600 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <p class="text-omail-700 dark:text-omail-300 text-center mb-2">Please sign in to access your emails</p>
+                            <NavLink href="login" class="w-full flex items-center justify-center px-4 py-2 bg-omail-600 text-white rounded-lg hover:bg-omail-700">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                                 </svg>
                                 Login
-                            </span>
-                        </NavLink>
+                            </NavLink>
+                        </div>
                     </NotAuthorized>
                 </AuthorizeView>
             </div>
         </div>
     </header>
 
+    <!-- Main Content Area with Conditional Sidebar -->
     <div class="flex-1 flex">
-        <!-- Sidebar Navigation - Primary App Navigation -->
-        <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 overflow-y-auto fixed md:sticky top-16 h-[calc(100vh-64px)] transition-all duration-300 sidebar-container">
-            <NavMenu />
-        </nav>
+        <!-- Sidebar Navigation - Only for Authenticated Users -->
+        <AuthorizeView>
+            <Authorized Context="sidebarContext">
+                <nav class="hidden md:block w-64 md:w-20 lg:w-64 bg-gradient-to-b from-omail-600 to-omail-700 text-white p-4 overflow-y-auto fixed md:sticky top-16 h-[calc(100vh-64px)] transition-all duration-300 sidebar-container">
+                    <NavMenu />
+                </nav>
+            </Authorized>
+        </AuthorizeView>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 p-4 overflow-auto main-content">
-            <div class="container mx-auto transition-all max-w-7xl">
-                @Body
-            </div>
-        </main>
+        <!-- Main Content Area (Different padding for authenticated vs unauthenticated) -->
+        <AuthorizeView>
+            <Authorized Context="mainContext">
+                <main class="flex-1 p-4 overflow-auto main-content">
+                    <div class="container mx-auto transition-all max-w-7xl">
+                        @Body
+                    </div>
+                </main>
+            </Authorized>
+            <NotAuthorized>
+                <!-- For unauthenticated users, we use the full width -->
+                <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+                    <div class="container mx-auto transition-all max-w-5xl">
+                        @Body
+                    </div>
+                </main>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 
     <!-- Footer -->
@@ -261,6 +277,13 @@
 
 @code {
     private bool isMobileMenuOpen = false;
+    private bool isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+    }
 
     private void ToggleMobileMenu()
     {
